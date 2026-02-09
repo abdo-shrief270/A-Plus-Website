@@ -1,0 +1,71 @@
+{
+    "meta": {
+        "title": "SMS Solutions - BeOn",
+        "description": "Reliable Bulk SMS for marketing and notifications."
+    },
+    "hero": {
+        "global_coverage": "Global SMS Coverage",
+        "title_part1": "Reach Everyone,",
+        "title_part2": "Everywhere.",
+        "description": "The most reliable bulk SMS platform for marketing and transactional messages. Direct carrier connections ensure 99.9% delivery rates worldwide.",
+        "start_campaign": "Start Campaign",
+        "view_pricing": "View Pricing",
+        "mockup": {
+            "store_name": "BeOn Store",
+            "official_account": "Official Business Account",
+            "flash_sale": "Flash Sale Alert!",
+            "flash_sale_text": "Get 50% OFF everything for the next 2 hours only!",
+            "order_update": "Order Update",
+            "order_update_text": "Your package has been shipped! Track it here:",
+            "delivery_rate": "Delivery Rate",
+            "contacts_reached": "Contacts Reached"
+        }
+    },
+    "features": {
+        "marketing": {
+            "title": "Drive Sales with Targeted SMS Marketing",
+            "list": {
+                "1": "Send personalized promotional offers to thousands of customers instantly.",
+                "2": "Schedule campaigns for optimal delivery times.",
+                "3": "Track click-through rates and conversions with detailed analytics."
+            },
+            "badge": "Bulk Marketing",
+            "mockup": {
+                "performance": "Campaign Performance",
+                "sent": "Sent",
+                "clicks": "Clicks"
+            }
+        },
+        "transactional": {
+            "title": "Keep Customers Informed with Real-time Alerts",
+            "list": {
+                "1": "Send instant order confirmations, shipping updates, and appointment reminders.",
+                "2": "Ensure critical notifications reach your users immediately.",
+                "3": "Reliable delivery for transactional messages via direct carrier routes."
+            },
+            "badge": "Transactional Alerts",
+            "mockup": {
+                "alerts": "System Alerts",
+                "live": "LIVE"
+            }
+        }
+    },
+    "integration": {
+        "title_part1": "Developer-friendly API,",
+        "title_part2": "built for scale.",
+        "steps": {
+            "1": {
+                "title": "Get API Credentials",
+                "description": "Create an account and generate your secure API key in seconds."
+            },
+            "2": {
+                "title": "Connect via REST",
+                "description": "Use our simple REST API to send messages from any application."
+            },
+            "3": {
+                "title": "Scale Instantly",
+                "description": "Send millions of messages with high throughput and reliability."
+            }
+        }
+    }
+}

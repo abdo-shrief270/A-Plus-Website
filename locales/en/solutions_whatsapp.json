@@ -1,0 +1,101 @@
+{
+    "meta": {
+        "title": "WhatsApp Business API - BeOn",
+        "description": "Automate customer communication with the official WhatsApp Business API."
+    },
+    "hero": {
+        "official_provider": "Official Business Solution Provider",
+        "title_part1": "Automate.",
+        "title_part2": "Engage.",
+        "title_part3": "Scale on WhatsApp.",
+        "description": "Transform your customer communication with the world's most popular messaging app. Build chatbots, send broadcasts, and drive sales—all on autopilot.",
+        "start_trial": "Start Free Trial",
+        "book_demo": "Book Demo",
+        "mockup": {
+            "official_account": "Official Business Account",
+            "bot_welcome": "Hello! 👋 Welcome to BeOn. How can we help you scale your business today?",
+            "user_reply": "I want to automate my customer support. 🤖",
+            "bot_response": "Great choice! Our AI chatbots can handle 80% of queries instantly. Would you like a demo?",
+            "btn_yes": "Yes, show me! 🚀",
+            "btn_pricing": "View Pricing",
+            "automated_support": "Automated Support",
+            "response_time": "Response Time",
+            "instant": "Instant",
+            "type_message": "Type a message...",
+            "support_24_7": "24/7"
+        }
+    },
+    "bento": {
+        "title_part1": "Everything you need to",
+        "title_part2": "scale",
+        "description": "Powerful features designed to help you reach, engage, and convert more customers on WhatsApp.",
+        "cards": {
+            "rich_media": {
+                "title": "Rich Media Support",
+                "description": "Send images, videos, PDFs, and documents directly in the chat. Increase engagement with visual content."
+            },
+            "green_tick": {
+                "title": "Green Tick Verification",
+                "description": "Build trust with the official WhatsApp Business verification badge. We help you get verified faster."
+            },
+            "broadcasts": {
+                "title": "Unlimited Broadcasts",
+                "description": "Reach thousands of opted-in users instantly without the risk of getting blocked."
+            },
+            "analytics": {
+                "title": "Real-time Analytics",
+                "description": "Track delivery rates, open rates, and response times in real-time."
+            }
+        }
+    },
+    "demo": {
+        "title": "Experience Automated Conversations",
+        "description": "Try our interactive demo below. See how BeOn's chatbots handle customer queries instantly, 24/7.",
+        "scenarios": {
+            "ecommerce": {
+                "title": "E-commerce Support",
+                "description": "Handle order tracking and returns automatically.",
+                "initial_message": "Hi! Welcome to BeOn Store. How can I help you today?",
+                "options": {
+                    "track": {
+                        "label": "Track Order 📦",
+                        "response": "I'd like to track my order #12345.",
+                        "reply": "Checking... 🔍\nYour order #12345 is out for delivery! It should arrive by 5 PM today."
+                    },
+                    "return": {
+                        "label": "Return Policy ↩️",
+                        "response": "What is your return policy?",
+                        "reply": "You can return any item within 30 days for a full refund. Would you like to start a return?"
+                    }
+                }
+            },
+            "booking": {
+                "title": "Appointment Booking",
+                "description": "Schedule meetings without human intervention.",
+                "initial_message": "Hello! I'm the BeOn Assistant. Would you like to book a demo?",
+                "options": {
+                    "book": {
+                        "label": "Book Demo 📅",
+                        "response": "Yes, I'd like to book a demo.",
+                        "reply": "Great! Please select a time slot:\n1. Tomorrow 10 AM\n2. Tomorrow 2 PM"
+                    },
+                    "human": {
+                        "label": "Talk to Human 👤",
+                        "response": "Can I speak to a representative?",
+                        "reply": "Sure. I'm connecting you with an agent now. Wait time is approx 2 mins."
+                    }
+                }
+            }
+        },
+        "mockup": {
+            "support_title": "BeOn Support",
+            "typing": "typing...",
+            "online": "Online",
+            "placeholder": "Type a message..."
+        }
+    },
+    "trust": {
+        "trusted_by": "Trusted by",
+        "brand_count": "100+ Brands"
+    }
+}

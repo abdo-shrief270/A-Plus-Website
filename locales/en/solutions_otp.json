@@ -1,0 +1,58 @@
+{
+    "meta": {
+        "title": "OTP Solutions - BeOn",
+        "description": "Secure and instant OTP delivery via SMS and WhatsApp."
+    },
+    "hero": {
+        "meta_partner": "Meta Official Partner",
+        "title_part1": "Secure OTP,",
+        "title_part2": "Instantly Delivered.",
+        "description": "Guarantee delivery with our multi-channel OTP infrastructure. SMS, WhatsApp, and Voice failover ensures your users are verified in seconds, every time.",
+        "start_trial": "Start Free Trial",
+        "learn_more": "Learn More",
+        "notification": {
+            "title": "BeOn Security",
+            "now": "Now",
+            "message": "Your verification code is:",
+            "swipe": "Swipe up to unlock",
+            "delivered": "Delivered",
+            "latency": "latency"
+        }
+    },
+    "features": {
+        "sms": {
+            "title": "Features of the SMS activation message",
+            "list": {
+                "1": "The most economical option to send OTP within Egypt without additional costs to the message price.",
+                "2": "Send OTP in your company name if you have a commercial register and tax card.",
+                "3": "Or use public sender as an alternative to obtaining official documents."
+            }
+        },
+        "whatsapp": {
+            "title": "Features of the WhatsApp activation message",
+            "list": {
+                "1": "The best option to send international and local OTP messages.",
+                "2": "Activate the service officially via Meta to ensure your number is never blocked.",
+                "3": "Send OTP under your business name without the need for official documents through BeOn engineers using cloud WhatsApp activation."
+            }
+        }
+    },
+    "integration": {
+        "title_part1": "Integration so simple,",
+        "title_part2": "it feels like magic.",
+        "steps": {
+            "1": {
+                "title": "Get your API Key",
+                "description": "Sign up and generate your secure access token instantly."
+            },
+            "2": {
+                "title": "Install SDK",
+                "description": "Use our lightweight SDKs for Node, Python, PHP, and more."
+            },
+            "3": {
+                "title": "Send OTP",
+                "description": "One line of code to send verifications globally."
+            }
+        }
+    }
+}
