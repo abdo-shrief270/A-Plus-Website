@@ -46,6 +46,12 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-07-11',
 
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: process.env.VITE_API_BASE_URL || 'https://api.example.com/api'
+    }
+  },
+
   nitro: {
     /**
      * ✅ تفعيل الضغط لتحسين الأداء
