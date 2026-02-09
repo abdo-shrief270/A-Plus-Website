@@ -1,57 +1,73 @@
 <template>
   <div class="min-h-screen bg-white">
     <!-- Header -->
-    <header class="border-b border-gray-200">
-      <div class="container mx-auto px-4 py-4">
+    <header
+      class="bg-white border-b border-gray-200 sticky top-0 w-full z-30 shadow-md"
+    >
+      <div class="container mx-auto px-6 py-3">
         <div class="flex items-center justify-between">
-          <!-- Logo -->
-          <NuxtLink to="/" class="flex items-center gap-2">
-            <img src="/logo.svg" alt="A+" class="h-10 w-10" />
-            <span class="text-2xl font-bold text-gray-900">A+</span>
-          </NuxtLink>
+          <!-- User Menu / Sign In -->
+          <div class="flex items-center">
+            <div v-if="!authStore.isLoggedIn">
+              <UButton
+                to="/login"
+                color="gray"
+                variant="ghost"
+                icon="i-heroicons-user"
+                class="font-medium"
+              >
+                تسجيل الدخول
+              </UButton>
+            </div>
 
-          <!-- Navigation -->
-          <nav class="hidden md:flex items-center gap-6">
-            <NuxtLink to="/" class="text-gray-700 hover:text-primary-600">
-              الرئيسية
-            </NuxtLink>
-            <NuxtLink to="/about" class="text-gray-700 hover:text-primary-600">
-              من نحن
-            </NuxtLink>
-            <NuxtLink
-              to="/courses"
-              class="text-gray-700 hover:text-primary-600"
-            >
-              الدورات
-            </NuxtLink>
-            <NuxtLink
-              to="/contact"
-              class="text-gray-700 hover:text-primary-600"
-            >
-              تواصل معنا
-            </NuxtLink>
-          </nav>
-
-          <!-- Auth Buttons -->
-          <div class="flex items-center gap-3">
-            <template v-if="authStore.isLoggedIn">
+            <div v-else>
               <UDropdown :items="userMenuItems">
                 <UButton
                   color="gray"
                   variant="ghost"
+                  icon="i-heroicons-user"
                   trailing-icon="i-heroicons-chevron-down-20-solid"
                 >
-                  {{ authStore.getUser?.name }}
+                  <span class="text-sm">حساب</span>
                 </UButton>
               </UDropdown>
-            </template>
-            <template v-else>
-              <UButton to="/login" variant="ghost" color="gray">
-                تسجيل الدخول
-              </UButton>
-              <UButton to="/register" color="primary"> إنشاء حساب </UButton>
-            </template>
+            </div>
           </div>
+
+          <!-- Mobile Menu Toggle -->
+          <UButton
+            @click="toggleMenu"
+            color="gray"
+            variant="ghost"
+            :icon="isMenuOpen ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
+            class="md:hidden"
+          />
+
+          <!-- Menu Items -->
+          <nav
+            :class="[
+              'md:flex md:flex-row md:items-center md:gap-8',
+              isMenuOpen
+                ? 'flex flex-col absolute top-full left-0 w-full bg-white shadow-lg md:shadow-none md:static p-4 md:p-0'
+                : 'hidden',
+            ]"
+          >
+            <NuxtLink
+              v-for="item in menuItems"
+              :key="item.id"
+              :to="item.route"
+              class="flex items-center gap-3 text-gray-600 hover:text-primary-500 font-medium p-2 rounded-lg transition-all"
+              :class="$route.path === item.route ? 'text-primary-500' : ''"
+            >
+              <UIcon :name="item.icon" class="text-lg" />
+              <span>{{ item.label }}</span>
+            </NuxtLink>
+          </nav>
+
+          <!-- Logo -->
+          <NuxtLink to="/" class="flex items-center gap-2">
+            <img src="/logo.svg" alt="A+" class="h-12 w-12" />
+          </NuxtLink>
         </div>
       </div>
     </header>
@@ -151,9 +167,42 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
+const isMenuOpen = ref(false);
+
+const menuItems = [
+  {
+    id: "plan",
+    route: "/plan",
+    label: "خطتي",
+    icon: "i-heroicons-calendar",
+  },
+  {
+    id: "exams",
+    route: "/exams",
+    label: "بنك الأسئلة",
+    icon: "i-heroicons-question-mark-circle",
+  },
+  {
+    id: "courses",
+    route: "/courses",
+    label: "الدورات",
+    icon: "i-heroicons-book-open",
+  },
+  {
+    id: "contestants",
+    route: "/contestants",
+    label: "المتصدرين",
+    icon: "i-heroicons-trophy",
+  },
+];
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
 
 const userMenuItems = [
   [
@@ -171,4 +220,10 @@ const userMenuItems = [
     },
   ],
 ];
+
+onMounted(() => {
+  if (authStore.isLoggedIn) {
+    authStore.fetchUser();
+  }
+});
 </script>

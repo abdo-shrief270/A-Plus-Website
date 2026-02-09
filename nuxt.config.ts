@@ -8,7 +8,6 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'nuxt-og-image',
     '@nuxtjs/robots',
-    '@nuxtjs/sitemap',
     '@nuxtjs/i18n',
     '@pinia/nuxt'
   ],
