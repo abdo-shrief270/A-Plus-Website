@@ -9,7 +9,8 @@ export default defineNuxtConfig({
     'nuxt-og-image',
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
-    '@nuxtjs/i18n'
+    '@nuxtjs/i18n',
+    '@pinia/nuxt'
   ],
 
   devtools: {

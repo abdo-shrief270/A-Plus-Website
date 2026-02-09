@@ -36,6 +36,22 @@ export const useAuthStore = defineStore('auth', {
         isLoggedIn: (state) => {
             const loggedIn = state.token?.length > 0 || (Cookie.get('APlus-token')?.length ?? 0) > 0
             return loggedIn
+        },
+
+        getUserRole: (state) => {
+            return state.user?.role?.toLowerCase() || null
+        },
+
+        isStudent: (state) => {
+            return state.user?.role?.toLowerCase() === 'student'
+        },
+
+        isTeacher: (state) => {
+            return state.user?.role?.toLowerCase() === 'teacher'
+        },
+
+        isParent: (state) => {
+            return state.user?.role?.toLowerCase() === 'parent'
         }
     },
 
