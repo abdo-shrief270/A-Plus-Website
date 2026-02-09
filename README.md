@@ -1,38 +1,38 @@
 # A-Plus Website
 
-موقع A-Plus - مشروع Nuxt عربي فقط
+A-Plus Website - Arabic-only Nuxt Project
 
-## نظرة عامة
+## Overview
 
-مشروع Nuxt 3 مُصمم خصيصاً للغة العربية مع:
+A Nuxt 3 project specifically designed for Arabic language with:
 
-- ✅ دعم RTL كامل
-- ✅ وضع نهاري فقط
-- ✅ شعار ملون بخلفية شفافة
-- ✅ تصميم بسيط ونظيف
+- ✅ Full RTL support
+- ✅ Light mode only
+- ✅ Colorful logo with transparent background
+- ✅ Clean and simple design
 
-## التثبيت
+## Installation
 
 ```bash
-# تثبيت المكتبات
+# Install dependencies
 npm install
 
-# تشغيل السيرفر المحلي
+# Start development server
 npm run dev
 
-# بناء للإنتاج
+# Build for production
 npm run build
 ```
 
-## المميزات
+## Features
 
-- 🌐 عربي فقط (Arabic-only)
-- 📱 تصميم متجاوب (Responsive)
+- 🌐 Arabic-only
+- 📱 Responsive design
 - 🎨 Nuxt UI Components
 - 🔍 SEO Optimized
 - ⚡ Fast & Lightweight
 
-## التكنولوجيا المستخدمة
+## Tech Stack
 
 - Nuxt 4.3.1
 - Vue 3.5.28
@@ -40,6 +40,6 @@ npm run build
 - TypeScript
 - Tailwind CSS
 
-## الترخيص
+## License
 
 MIT License
