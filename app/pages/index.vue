@@ -13,7 +13,7 @@
           <h2 class="text-3xl font-bold text-gray-900 mb-4">
             حمّل التطبيق الآن
           </h2>
-          <p class="text-lg text-gray-600 mb-8">متاح على جميع المنصات</p>
+          <p class="text-lg text-gray-600 mb-8">متاح الان على جميع المنصات</p>
           <div class="flex justify-center gap-4">
             <UButton size="lg" color="neutral"> App Store </UButton>
             <UButton size="lg" color="neutral"> Google Play </UButton>
