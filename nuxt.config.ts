@@ -56,12 +56,16 @@ export default defineNuxtConfig({
     /**
      * ✅ تفعيل الضغط لتحسين الأداء
      */
-    compressPublicAssets: true,
+    compressPublicAssets: true
 
-    prerender: {
-      routes: ['/'],
-      crawlLinks: true
-    }
+    /**
+     * ❌ تعطيل الـ prerendering مؤقتاً
+     * عشان الـ build يكمل على الـ server
+     */
+    // prerender: {
+    //   routes: ['/'],
+    //   crawlLinks: true
+    // }
   },
 
   eslint: {
