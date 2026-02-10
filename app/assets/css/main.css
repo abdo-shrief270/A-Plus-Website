@@ -173,3 +173,9 @@ html.lenis body {
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
 }
+
+/* Force white text on primary buttons */
+button[class*="bg-primary"],
+a[class*="bg-primary"] {
+  color: white !important;
+}

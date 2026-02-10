@@ -9,7 +9,7 @@
           <!-- User Menu / Sign In -->
           <div class="flex items-center">
             <div v-if="!authStore.isLoggedIn">
-              <UButton to="/login" color="primary" variant="ghost" icon="i-heroicons-user">
+              <UButton to="/login" icon="i-heroicons-user">
                 تسجيل الدخول
               </UButton>
             </div>
@@ -17,7 +17,6 @@
             <div v-else>
               <UPopover>
                 <UButton
-                  color="neutral"
                   variant="ghost"
                   icon="i-heroicons-user"
                   trailing-icon="i-heroicons-chevron-down-20-solid"
@@ -29,7 +28,6 @@
                   <div class="p-2 w-48">
                     <UButton
                       variant="ghost"
-                      color="neutral"
                       icon="i-heroicons-user"
                       class="w-full justify-start mb-1"
                       @click="navigateTo('/profile')"
@@ -54,7 +52,7 @@
           <!-- Mobile Menu Toggle -->
           <UButton
             @click="toggleMenu"
-            color="gray"
+            color="neutral"
             variant="ghost"
             :icon="isMenuOpen ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
             class="md:hidden"

@@ -15,8 +15,8 @@
           </h2>
           <p class="text-lg text-gray-600 mb-8">متاح على جميع المنصات</p>
           <div class="flex justify-center gap-4">
-            <UButton size="lg" color="gray"> App Store </UButton>
-            <UButton size="lg" color="gray"> Google Play </UButton>
+            <UButton size="lg" color="neutral"> App Store </UButton>
+            <UButton size="lg" color="neutral"> Google Play </UButton>
           </div>
         </div>
       </UContainer>
