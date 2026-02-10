@@ -78,10 +78,9 @@
           class="flex items-center justify-center lg:justify-end animate-fade-in relative"
         >
           <img
-            src="/images/hero.png"
+            src="/assets/images/home/hero.png"
             alt="طالب متفوق"
-            class="float-animation max-w-md w-full"
-            @error="handleImageError"
+            class="float-animation max-w-md w-full rounded-3xl"
           />
         </div>
       </div>
@@ -92,10 +91,6 @@
 <script setup>
 const startJourney = () => {
   navigateTo("/register");
-};
-
-const handleImageError = (e) => {
-  e.target.src = "https://fakeimg.pl/400x400/cccccc/ffffff?text=طالب&font=noto";
 };
 </script>
 

@@ -9,28 +9,45 @@
           <!-- User Menu / Sign In -->
           <div class="flex items-center">
             <div v-if="!authStore.isLoggedIn">
-              <UButton
-                to="/login"
-                color="gray"
-                variant="ghost"
-                icon="i-heroicons-user"
-                class="font-medium"
-              >
+              <UButton to="/login" color="primary" variant="ghost" icon="i-heroicons-user">
                 تسجيل الدخول
               </UButton>
             </div>
 
             <div v-else>
-              <UDropdown :items="userMenuItems">
+              <UPopover>
                 <UButton
-                  color="gray"
+                  color="neutral"
                   variant="ghost"
                   icon="i-heroicons-user"
                   trailing-icon="i-heroicons-chevron-down-20-solid"
                 >
                   <span class="text-sm">حساب</span>
                 </UButton>
-              </UDropdown>
+
+                <template #content>
+                  <div class="p-2 w-48">
+                    <UButton
+                      variant="ghost"
+                      color="neutral"
+                      icon="i-heroicons-user"
+                      class="w-full justify-start mb-1"
+                      @click="navigateTo('/profile')"
+                    >
+                      الملف الشخصي
+                    </UButton>
+                    <UButton
+                      variant="ghost"
+                      color="neutral"
+                      icon="i-heroicons-arrow-right-on-rectangle"
+                      class="w-full justify-start"
+                      @click="authStore.logoutUser()"
+                    >
+                      تسجيل الخروج
+                    </UButton>
+                  </div>
+                </template>
+              </UPopover>
             </div>
           </div>
 
@@ -167,7 +184,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 
 const authStore = useAuthStore();
@@ -203,27 +220,4 @@ const menuItems = [
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 };
-
-const userMenuItems = [
-  [
-    {
-      label: "الملف الشخصي",
-      icon: "i-heroicons-user",
-      click: () => navigateTo("/profile"),
-    },
-  ],
-  [
-    {
-      label: "تسجيل الخروج",
-      icon: "i-heroicons-arrow-right-on-rectangle",
-      click: () => authStore.logoutUser(),
-    },
-  ],
-];
-
-onMounted(() => {
-  if (authStore.isLoggedIn) {
-    authStore.fetchUser();
-  }
-});
 </script>

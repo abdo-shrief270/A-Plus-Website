@@ -21,7 +21,7 @@ export default defineNuxtConfig({
    * عشان ما يتحملش أثناء SSR
    */
 
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/global.css'],
 
   site: {
     url: 'https://beon.chat/',
