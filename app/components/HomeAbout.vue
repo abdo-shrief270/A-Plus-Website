@@ -182,6 +182,9 @@ const startAnimations = () => {
 };
 
 onMounted(() => {
+  // Only run on client side
+  if (typeof window === "undefined") return;
+
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -195,9 +198,13 @@ onMounted(() => {
     },
   );
 
-  const mainElement = document.querySelector('[role="section"]');
+  // Use a more reliable selector
+  const mainElement = document.querySelector(".relative.py-16");
   if (mainElement) {
     observer.observe(mainElement);
+  } else {
+    // Fallback: start animations immediately if element not found
+    startAnimations();
   }
 });
 </script>
