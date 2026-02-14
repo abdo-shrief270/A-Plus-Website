@@ -4,5 +4,12 @@
         "description": "Access your BeOn dashboard."
     },
     "title": "Login",
-    "coming_soon": "Coming soon..."
+    "coming_soon": "Coming soon...",
+    "email": "Email Address",
+    "password": "Password",
+    "email_placeholder": "example@email.com",
+    "password_placeholder": "••••••••",
+    "submit": "Login",
+    "no_account": "Don't have an account?",
+    "register": "Create new account"
 }

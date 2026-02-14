@@ -4,5 +4,12 @@
         "description": "الوصول إلى لوحة تحكم BeOn الخاصة بك."
     },
     "title": "تسجيل الدخول",
-    "coming_soon": "قريباً..."
+    "coming_soon": "قريباً...",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "email_placeholder": "example@email.com",
+    "password_placeholder": "••••••••",
+    "submit": "تسجيل الدخول",
+    "no_account": "ليس لديك حساب؟",
+    "register": "إنشاء حساب جديد"
 }
