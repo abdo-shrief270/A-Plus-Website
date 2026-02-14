@@ -3,6 +3,7 @@ import index from './ar/index.json'
 import contact from './ar/contact.json'
 import login from './ar/login.json'
 import signup from './ar/signup.json'
+import validation from './ar/validation.json'
 import privacy_policy from './ar/privacy_policy.json'
 import terms_conditions from './ar/terms_conditions.json'
 import blog from './ar/blog.json'
@@ -23,6 +24,7 @@ export default defineI18nLocale(async () => {
     contact,
     login,
     signup,
+    validation,
     privacy_policy,
     terms_conditions,
     blog,

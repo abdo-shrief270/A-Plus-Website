@@ -6,10 +6,16 @@
     "title": "Login",
     "coming_soon": "Coming soon...",
     "email": "Email Address",
+    "username": "Username",
     "password": "Password",
     "email_placeholder": "example@email.com",
+    "username_placeholder": "Enter your username",
     "password_placeholder": "••••••••",
     "submit": "Login",
-    "no_account": "Don't have an account?",
-    "register": "Create new account"
+    "no_account": "Not subscribed yet?",
+    "register": "Open Account",
+    "forgot_password": "Forgot Password?",
+    "banner_title": "Prepare for your exams with our free plan!",
+    "banner_subtitle": "Register now and excel",
+    "form_title": "Register now and start your study plan here!"
 }

@@ -17,6 +17,30 @@ export default defineAppConfig({
           solid: 'text-white dark:text-white'
         }
       }
+    },
+    input: {
+      defaultVariants: {
+        size: 'lg'
+      },
+      base: 'w-full'
+    },
+    select: {
+      defaultVariants: {
+        size: 'lg'
+      },
+      base: 'w-full'
+    },
+    selectMenu: {
+      defaultVariants: {
+        size: 'lg'
+      },
+      base: 'w-full'
+    },
+    textarea: {
+      defaultVariants: {
+        size: 'lg'
+      },
+      base: 'w-full'
     }
   }
 })

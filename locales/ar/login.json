@@ -6,10 +6,16 @@
     "title": "تسجيل الدخول",
     "coming_soon": "قريباً...",
     "email": "البريد الإلكتروني",
+    "username": "اسم المستخدم",
     "password": "كلمة المرور",
     "email_placeholder": "example@email.com",
+    "username_placeholder": "ادخل اسم المستخدم",
     "password_placeholder": "••••••••",
     "submit": "تسجيل الدخول",
-    "no_account": "ليس لديك حساب؟",
-    "register": "إنشاء حساب جديد"
+    "no_account": "لست مشتركاً بعد؟",
+    "register": "فتح حساب",
+    "forgot_password": "هل نسيت كلمة المرور؟",
+    "banner_title": "استعد لامتحاناتك مع خطتنا المجانية!",
+    "banner_subtitle": "سجل الآن وخليك متفوق",
+    "form_title": "سجل الآن وابدأ خطة دراستك من هنا!"
 }

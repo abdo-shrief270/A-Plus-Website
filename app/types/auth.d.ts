@@ -12,7 +12,8 @@ export interface User {
 }
 
 export interface LoginPayload {
-  email: string
+  email?: string
+  username?: string
   password: string
   remember_me?: boolean
 }

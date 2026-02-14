@@ -10,7 +10,7 @@
           <div class="flex items-center">
             <div v-if="!authStore.isLoggedIn">
               <UButton
-                to="/login"
+                to="/auth/login"
                 icon="i-heroicons-user"
               >
                 تسجيل الدخول
