@@ -4,7 +4,10 @@
       تسجيل الدخول
     </h2>
 
-    <form @submit.prevent="handleLogin" class="space-y-4">
+    <form
+      class="space-y-4"
+      @submit.prevent="handleLogin"
+    >
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">
           البريد الإلكتروني
@@ -55,36 +58,36 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthService } from "@/composables/useAuth";
-import { useAuthStore } from "@/stores/auth";
-import { useRedirect } from "@/composables/useRedirect";
+import { useAuthService } from '@/composables/useAuth'
+import { useAuthStore } from '@/stores/auth'
+import { useRedirect } from '@/composables/useRedirect'
 
 definePageMeta({
-  layout: "auth",
-  middleware: "guest",
-});
+  layout: 'auth',
+  middleware: 'guest'
+})
 
 useSeoMeta({
-  title: "تسجيل الدخول",
-  description: "سجل دخولك إلى حسابك",
-});
+  title: 'تسجيل الدخول',
+  description: 'سجل دخولك إلى حسابك'
+})
 
-const { login, loading } = useAuthService();
-const authStore = useAuthStore();
-const { redirectByRole } = useRedirect();
+const { login, loading } = useAuthService()
+const authStore = useAuthStore()
+const { redirectByRole } = useRedirect()
 
 const credentials = ref({
-  email: "",
-  password: "",
-});
+  email: '',
+  password: ''
+})
 
 const handleLogin = async () => {
   try {
-    const { data } = await login(credentials.value);
-    await authStore.storeUser(data);
-    redirectByRole(data.user);
+    const { data } = await login(credentials.value)
+    await authStore.storeUser(data)
+    redirectByRole(data.user)
   } catch (error) {
-    console.error("Login error:", error);
+    console.error('Login error:', error)
   }
-};
+}
 </script>

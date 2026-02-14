@@ -9,7 +9,10 @@
           <!-- User Menu / Sign In -->
           <div class="flex items-center">
             <div v-if="!authStore.isLoggedIn">
-              <UButton to="/login" icon="i-heroicons-user">
+              <UButton
+                to="/login"
+                icon="i-heroicons-user"
+              >
                 تسجيل الدخول
               </UButton>
             </div>
@@ -51,11 +54,11 @@
 
           <!-- Mobile Menu Toggle -->
           <UButton
-            @click="toggleMenu"
             color="neutral"
             variant="ghost"
             :icon="isMenuOpen ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
             class="md:hidden"
+            @click="toggleMenu"
           />
 
           <!-- Menu Items -->
@@ -64,7 +67,7 @@
               'md:flex md:flex-row md:items-center md:gap-8',
               isMenuOpen
                 ? 'flex flex-col absolute top-full left-0 w-full bg-white shadow-lg md:shadow-none md:static p-4 md:p-0'
-                : 'hidden',
+                : 'hidden'
             ]"
           >
             <NuxtLink
@@ -74,14 +77,24 @@
               class="flex items-center gap-3 text-gray-600 hover:text-primary-500 font-medium p-2 rounded-lg transition-all"
               :class="$route.path === item.route ? 'text-primary-500' : ''"
             >
-              <UIcon :name="item.icon" class="text-lg" />
+              <UIcon
+                :name="item.icon"
+                class="text-lg"
+              />
               <span>{{ item.label }}</span>
             </NuxtLink>
           </nav>
 
           <!-- Logo -->
-          <NuxtLink to="/" class="flex items-center gap-2">
-            <img src="/logo.svg" alt="A+" class="h-12 w-12" />
+          <NuxtLink
+            to="/"
+            class="flex items-center gap-2"
+          >
+            <img
+              src="/logo.svg"
+              alt="A+"
+              class="h-12 w-12"
+            >
           </NuxtLink>
         </div>
       </div>
@@ -98,7 +111,11 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div class="flex items-center gap-2 mb-4">
-              <img src="/logo.svg" alt="A+" class="h-8 w-8" />
+              <img
+                src="/logo.svg"
+                alt="A+"
+                class="h-8 w-8"
+              >
               <span class="text-xl font-bold text-gray-900">A+</span>
             </div>
             <p class="text-gray-600 text-sm">
@@ -107,10 +124,15 @@
           </div>
 
           <div>
-            <h3 class="font-semibold text-gray-900 mb-4">روابط سريعة</h3>
+            <h3 class="font-semibold text-gray-900 mb-4">
+              روابط سريعة
+            </h3>
             <ul class="space-y-2 text-sm">
               <li>
-                <NuxtLink to="/" class="text-gray-600 hover:text-primary-600">
+                <NuxtLink
+                  to="/"
+                  class="text-gray-600 hover:text-primary-600"
+                >
                   الرئيسية
                 </NuxtLink>
               </li>
@@ -134,7 +156,9 @@
           </div>
 
           <div>
-            <h3 class="font-semibold text-gray-900 mb-4">الدعم</h3>
+            <h3 class="font-semibold text-gray-900 mb-4">
+              الدعم
+            </h3>
             <ul class="space-y-2 text-sm">
               <li>
                 <NuxtLink
@@ -156,16 +180,36 @@
           </div>
 
           <div>
-            <h3 class="font-semibold text-gray-900 mb-4">تابعنا</h3>
+            <h3 class="font-semibold text-gray-900 mb-4">
+              تابعنا
+            </h3>
             <div class="flex gap-3">
-              <a href="#" class="text-gray-600 hover:text-primary-600">
-                <UIcon name="i-simple-icons-facebook" class="w-5 h-5" />
+              <a
+                href="#"
+                class="text-gray-600 hover:text-primary-600"
+              >
+                <UIcon
+                  name="i-simple-icons-facebook"
+                  class="w-5 h-5"
+                />
               </a>
-              <a href="#" class="text-gray-600 hover:text-primary-600">
-                <UIcon name="i-simple-icons-twitter" class="w-5 h-5" />
+              <a
+                href="#"
+                class="text-gray-600 hover:text-primary-600"
+              >
+                <UIcon
+                  name="i-simple-icons-twitter"
+                  class="w-5 h-5"
+                />
               </a>
-              <a href="#" class="text-gray-600 hover:text-primary-600">
-                <UIcon name="i-simple-icons-instagram" class="w-5 h-5" />
+              <a
+                href="#"
+                class="text-gray-600 hover:text-primary-600"
+              >
+                <UIcon
+                  name="i-simple-icons-instagram"
+                  class="w-5 h-5"
+                />
               </a>
             </div>
           </div>
@@ -182,40 +226,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useAuthStore } from "@/stores/auth";
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
-const authStore = useAuthStore();
-const isMenuOpen = ref(false);
+const authStore = useAuthStore()
+const isMenuOpen = ref(false)
 
 const menuItems = [
   {
-    id: "plan",
-    route: "/plan",
-    label: "خطتي",
-    icon: "i-heroicons-calendar",
+    id: 'plan',
+    route: '/plan',
+    label: 'خطتي',
+    icon: 'i-heroicons-calendar'
   },
   {
-    id: "exams",
-    route: "/exams",
-    label: "بنك الأسئلة",
-    icon: "i-heroicons-question-mark-circle",
+    id: 'exams',
+    route: '/exams',
+    label: 'بنك الأسئلة',
+    icon: 'i-heroicons-question-mark-circle'
   },
   {
-    id: "courses",
-    route: "/courses",
-    label: "الدورات",
-    icon: "i-heroicons-book-open",
+    id: 'courses',
+    route: '/courses',
+    label: 'الدورات',
+    icon: 'i-heroicons-book-open'
   },
   {
-    id: "contestants",
-    route: "/contestants",
-    label: "المتصدرين",
-    icon: "i-heroicons-trophy",
-  },
-];
+    id: 'contestants',
+    route: '/contestants',
+    label: 'المتصدرين',
+    icon: 'i-heroicons-trophy'
+  }
+]
 
 const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value;
-};
+  isMenuOpen.value = !isMenuOpen.value
+}
 </script>

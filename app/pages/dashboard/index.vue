@@ -4,7 +4,9 @@
       <h1 class="text-3xl font-bold text-gray-900">
         مرحباً، {{ authStore.getUser?.name }}!
       </h1>
-      <p class="text-gray-600 mt-2">نوع الحساب: {{ getRoleLabel }}</p>
+      <p class="text-gray-600 mt-2">
+        نوع الحساب: {{ getRoleLabel }}
+      </p>
     </div>
 
     <!-- Stats Grid -->
@@ -12,8 +14,12 @@
       <div class="bg-white rounded-lg shadow p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-600">الطلاب</p>
-            <p class="text-3xl font-bold text-gray-900 mt-1">24</p>
+            <p class="text-sm text-gray-600">
+              الطلاب
+            </p>
+            <p class="text-3xl font-bold text-gray-900 mt-1">
+              24
+            </p>
           </div>
           <div
             class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center"
@@ -29,8 +35,12 @@
       <div class="bg-white rounded-lg shadow p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-600">الدورات</p>
-            <p class="text-3xl font-bold text-gray-900 mt-1">12</p>
+            <p class="text-sm text-gray-600">
+              الدورات
+            </p>
+            <p class="text-3xl font-bold text-gray-900 mt-1">
+              12
+            </p>
           </div>
           <div
             class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"
@@ -46,8 +56,12 @@
       <div class="bg-white rounded-lg shadow p-6">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-600">التقارير</p>
-            <p class="text-3xl font-bold text-gray-900 mt-1">8</p>
+            <p class="text-sm text-gray-600">
+              التقارير
+            </p>
+            <p class="text-3xl font-bold text-gray-900 mt-1">
+              8
+            </p>
           </div>
           <div
             class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center"
@@ -64,41 +78,45 @@
     <!-- Recent Activity -->
     <div class="bg-white rounded-lg shadow">
       <div class="p-6 border-b border-gray-200">
-        <h2 class="text-xl font-semibold text-gray-900">النشاط الأخير</h2>
+        <h2 class="text-xl font-semibold text-gray-900">
+          النشاط الأخير
+        </h2>
       </div>
       <div class="p-6">
-        <p class="text-gray-600 text-center py-8">لا يوجد نشاط حديث</p>
+        <p class="text-gray-600 text-center py-8">
+          لا يوجد نشاط حديث
+        </p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from '@/stores/auth'
 
 definePageMeta({
-  layout: "dashboard",
-  middleware: ["auth", "role"],
-});
+  layout: 'dashboard',
+  middleware: ['auth', 'role']
+})
 
 useSeoMeta({
-  title: "لوحة التحكم",
-  description: "لوحة التحكم الخاصة بك",
-});
+  title: 'لوحة التحكم',
+  description: 'لوحة التحكم الخاصة بك'
+})
 
-const authStore = useAuthStore();
+const authStore = useAuthStore()
 
 const getRoleLabel = computed(() => {
-  const role = authStore.getUserRole;
+  const role = authStore.getUserRole
   switch (role) {
-    case "teacher":
-      return "معلم";
-    case "parent":
-      return "ولي أمر";
-    case "student":
-      return "طالب";
+    case 'teacher':
+      return 'معلم'
+    case 'parent':
+      return 'ولي أمر'
+    case 'student':
+      return 'طالب'
     default:
-      return "غير محدد";
+      return 'غير محدد'
   }
-});
+})
 </script>

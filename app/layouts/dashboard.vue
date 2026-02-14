@@ -6,7 +6,11 @@
         <!-- Logo -->
         <div class="p-6 border-b border-gray-200">
           <div class="flex items-center gap-2">
-            <img src="/logo.svg" alt="A+" class="h-10 w-10" />
+            <img
+              src="/logo.svg"
+              alt="A+"
+              class="h-10 w-10"
+            >
             <span class="text-2xl font-bold text-gray-900">A+</span>
           </div>
         </div>
@@ -18,7 +22,10 @@
             class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
             active-class="bg-primary-50 text-primary-600 hover:bg-primary-50"
           >
-            <UIcon name="i-heroicons-home" class="w-5 h-5" />
+            <UIcon
+              name="i-heroicons-home"
+              class="w-5 h-5"
+            />
             <span>الرئيسية</span>
           </NuxtLink>
 
@@ -27,7 +34,10 @@
             class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
             active-class="bg-primary-50 text-primary-600 hover:bg-primary-50"
           >
-            <UIcon name="i-heroicons-user-group" class="w-5 h-5" />
+            <UIcon
+              name="i-heroicons-user-group"
+              class="w-5 h-5"
+            />
             <span>الطلاب</span>
           </NuxtLink>
 
@@ -36,7 +46,10 @@
             class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
             active-class="bg-primary-50 text-primary-600 hover:bg-primary-50"
           >
-            <UIcon name="i-heroicons-book-open" class="w-5 h-5" />
+            <UIcon
+              name="i-heroicons-book-open"
+              class="w-5 h-5"
+            />
             <span>الدورات</span>
           </NuxtLink>
 
@@ -45,7 +58,10 @@
             class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
             active-class="bg-primary-50 text-primary-600 hover:bg-primary-50"
           >
-            <UIcon name="i-heroicons-chart-bar" class="w-5 h-5" />
+            <UIcon
+              name="i-heroicons-chart-bar"
+              class="w-5 h-5"
+            />
             <span>التقارير</span>
           </NuxtLink>
 
@@ -54,14 +70,20 @@
             class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
             active-class="bg-primary-50 text-primary-600 hover:bg-primary-50"
           >
-            <UIcon name="i-heroicons-cog-6-tooth" class="w-5 h-5" />
+            <UIcon
+              name="i-heroicons-cog-6-tooth"
+              class="w-5 h-5"
+            />
             <span>الإعدادات</span>
           </NuxtLink>
         </nav>
 
         <!-- User Menu -->
         <div class="p-4 border-t border-gray-200">
-          <UDropdown :items="userMenuItems" :popper="{ placement: 'top' }">
+          <UDropdown
+            :items="userMenuItems"
+            :popper="{ placement: 'top' }"
+          >
             <div
               class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100 cursor-pointer"
             >
@@ -94,15 +116,24 @@
         <!-- Header -->
         <header class="bg-white border-b border-gray-200 px-6 py-4">
           <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-gray-900">لوحة التحكم</h1>
+            <h1 class="text-2xl font-bold text-gray-900">
+              لوحة التحكم
+            </h1>
 
             <div class="flex items-center gap-4">
               <!-- Notifications -->
-              <UButton color="gray" variant="ghost" icon="i-heroicons-bell">
-              </UButton>
+              <UButton
+                color="gray"
+                variant="ghost"
+                icon="i-heroicons-bell"
+              />
 
               <!-- Back to Website -->
-              <UButton to="/" color="gray" variant="ghost">
+              <UButton
+                to="/"
+                color="gray"
+                variant="ghost"
+              >
                 العودة للموقع
               </UButton>
             </div>
@@ -119,24 +150,24 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from '@/stores/auth'
 
-const authStore = useAuthStore();
+const authStore = useAuthStore()
 
 const userMenuItems = [
   [
     {
-      label: "الملف الشخصي",
-      icon: "i-heroicons-user",
-      click: () => navigateTo("/dashboard/profile"),
-    },
+      label: 'الملف الشخصي',
+      icon: 'i-heroicons-user',
+      click: () => navigateTo('/dashboard/profile')
+    }
   ],
   [
     {
-      label: "تسجيل الخروج",
-      icon: "i-heroicons-arrow-right-on-rectangle",
-      click: () => authStore.logoutUser(),
-    },
-  ],
-];
+      label: 'تسجيل الخروج',
+      icon: 'i-heroicons-arrow-right-on-rectangle',
+      click: () => authStore.logoutUser()
+    }
+  ]
+]
 </script>

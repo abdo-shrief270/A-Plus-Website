@@ -39,9 +39,7 @@
             >
               {{ animatedNumbers.questions }}
             </span>
-            <span class="text-2xl lg:text-3xl font-bold text-green-600 mr-2"
-              >+</span
-            >
+            <span class="text-2xl lg:text-3xl font-bold text-green-600 mr-2">+</span>
           </div>
 
           <!-- Description -->
@@ -55,13 +53,19 @@
         </div>
 
         <!-- Statistic Item 2: Videos -->
-        <div class="text-center animate-fade-in" style="animation-delay: 200ms">
+        <div
+          class="text-center animate-fade-in"
+          style="animation-delay: 200ms"
+        >
           <div class="flex justify-center mb-6">
             <div class="relative">
               <div
                 class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-pulse-subtle"
               >
-                <UIcon name="i-heroicons-play" class="text-white text-2xl" />
+                <UIcon
+                  name="i-heroicons-play"
+                  class="text-white text-2xl"
+                />
               </div>
               <div
                 class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full animate-bounce-subtle"
@@ -75,9 +79,7 @@
             >
               {{ animatedNumbers.videos }}
             </span>
-            <span class="text-2xl lg:text-3xl font-bold text-green-600 mr-2"
-              >+</span
-            >
+            <span class="text-2xl lg:text-3xl font-bold text-green-600 mr-2">+</span>
           </div>
 
           <p
@@ -90,7 +92,10 @@
         </div>
 
         <!-- Statistic Item 3: Students -->
-        <div class="text-center animate-fade-in" style="animation-delay: 400ms">
+        <div
+          class="text-center animate-fade-in"
+          style="animation-delay: 400ms"
+        >
           <div class="flex justify-center mb-6">
             <div class="relative">
               <div
@@ -113,9 +118,7 @@
             >
               {{ animatedNumbers.students }}
             </span>
-            <span class="text-2xl lg:text-3xl font-bold text-green-600 mr-2"
-              >+</span
-            >
+            <span class="text-2xl lg:text-3xl font-bold text-green-600 mr-2">+</span>
           </div>
 
           <p
@@ -135,78 +138,78 @@
 const animatedNumbers = ref({
   questions: 0,
   videos: 0,
-  students: 0,
-});
+  students: 0
+})
 
-const isVisible = ref(false);
+const isVisible = ref(false)
 
 const animateCounter = (start, end, duration, callback) => {
-  const startTime = performance.now();
-  const difference = end - start;
+  const startTime = performance.now()
+  const difference = end - start
 
   const step = (currentTime) => {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const easeOutCubic = 1 - Math.pow(1 - progress, 3);
-    const current = Math.floor(start + difference * easeOutCubic);
+    const elapsed = currentTime - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    const easeOutCubic = 1 - Math.pow(1 - progress, 3)
+    const current = Math.floor(start + difference * easeOutCubic)
 
-    callback(current);
+    callback(current)
 
     if (progress < 1) {
-      requestAnimationFrame(step);
+      requestAnimationFrame(step)
     }
-  };
+  }
 
-  requestAnimationFrame(step);
-};
+  requestAnimationFrame(step)
+}
 
 const startAnimations = () => {
-  if (isVisible.value) return;
-  isVisible.value = true;
+  if (isVisible.value) return
+  isVisible.value = true
 
   animateCounter(0, 4000, 2000, (value) => {
-    animatedNumbers.value.questions = value;
-  });
+    animatedNumbers.value.questions = value
+  })
 
   setTimeout(() => {
     animateCounter(0, 300, 1500, (value) => {
-      animatedNumbers.value.videos = value;
-    });
-  }, 200);
+      animatedNumbers.value.videos = value
+    })
+  }, 200)
 
   setTimeout(() => {
     animateCounter(0, 2000, 1800, (value) => {
-      animatedNumbers.value.students = value;
-    });
-  }, 400);
-};
+      animatedNumbers.value.students = value
+    })
+  }, 400)
+}
 
 onMounted(() => {
   // Only run on client side
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return
 
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting && !isVisible.value) {
-          startAnimations();
+          startAnimations()
         }
-      });
+      })
     },
     {
-      threshold: 0.3,
-    },
-  );
+      threshold: 0.3
+    }
+  )
 
   // Use a more reliable selector
-  const mainElement = document.querySelector(".relative.py-16");
+  const mainElement = document.querySelector('.relative.py-16')
   if (mainElement) {
-    observer.observe(mainElement);
+    observer.observe(mainElement)
   } else {
     // Fallback: start animations immediately if element not found
-    startAnimations();
+    startAnimations()
   }
-});
+})
 </script>
 
 <style scoped>

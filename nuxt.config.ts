@@ -28,6 +28,11 @@ export default defineNuxtConfig({
     name: 'Beon'
   },
 
+  colorMode: {
+    preference: 'light',
+    fallback: 'light'
+  },
+
   ui: {
     theme: {
       colors: ['primary', 'error', 'warning', 'success', 'info'],
@@ -39,18 +44,13 @@ export default defineNuxtConfig({
     }
   },
 
-  colorMode: {
-    preference: 'light',
-    fallback: 'light'
-  },
-
-  compatibilityDate: '2024-07-11',
-
   runtimeConfig: {
     public: {
       apiBaseUrl: process.env.VITE_API_BASE_URL || 'https://api.example.com/api'
     }
   },
+
+  compatibilityDate: '2024-07-11',
 
   nitro: {
     /**
@@ -85,7 +85,7 @@ export default defineNuxtConfig({
     lazy: true,
     langDir: '../locales',
     strategy: 'no_prefix'
-  },
+  }
 
   /**
    * ✅ Icons will be loaded on-demand for better performance

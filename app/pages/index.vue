@@ -13,10 +13,22 @@
           <h2 class="text-3xl font-bold text-gray-900 mb-4">
             حمّل التطبيق الآن
           </h2>
-          <p class="text-lg text-gray-600 mb-8">متاح الان على جميع المنصات</p>
+          <p class="text-lg text-gray-600 mb-8">
+            متاح الان على جميع المنصات
+          </p>
           <div class="flex justify-center gap-4">
-            <UButton size="lg" color="neutral"> App Store </UButton>
-            <UButton size="lg" color="neutral"> Google Play </UButton>
+            <UButton
+              size="lg"
+              color="neutral"
+            >
+              App Store
+            </UButton>
+            <UButton
+              size="lg"
+              color="neutral"
+            >
+              Google Play
+            </UButton>
           </div>
         </div>
       </UContainer>
@@ -26,8 +38,12 @@
     <div class="py-16">
       <UContainer>
         <div class="text-center">
-          <h2 class="text-3xl font-bold text-gray-900 mb-4">آراء الطلاب</h2>
-          <p class="text-lg text-gray-600 mb-8">ماذا يقول طلابنا عن المنصة</p>
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">
+            آراء الطلاب
+          </h2>
+          <p class="text-lg text-gray-600 mb-8">
+            ماذا يقول طلابنا عن المنصة
+          </p>
         </div>
       </UContainer>
     </div>
@@ -36,11 +52,11 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: "website",
-});
+  layout: 'website'
+})
 
 useSeoMeta({
-  title: "الرئيسية - A+",
-  description: "منصة تعليمية متكاملة للطلاب والمعلمين",
-});
+  title: 'الرئيسية - A+',
+  description: 'منصة تعليمية متكاملة للطلاب والمعلمين'
+})
 </script>

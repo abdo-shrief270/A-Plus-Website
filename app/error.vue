@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import type { NuxtError } from "#app";
+import type { NuxtError } from '#app'
 
 defineProps({
   error: {
     type: Object as PropType<NuxtError>,
-    required: true,
-  },
-});
+    required: true
+  }
+})
 
 useHead({
   htmlAttrs: {
-    lang: "ar",
-    dir: "rtl",
-  },
-});
+    lang: 'ar',
+    dir: 'rtl'
+  }
+})
 
 useSeoMeta({
-  title: "الصفحة غير موجودة",
-  description: "عذراً، لم نتمكن من العثور على هذه الصفحة.",
-});
+  title: 'الصفحة غير موجودة',
+  description: 'عذراً، لم نتمكن من العثور على هذه الصفحة.'
+})
 
-const handleError = () => clearError({ redirect: "/" });
+const handleError = () => clearError({ redirect: '/' })
 </script>
 
 <template>
@@ -32,7 +32,12 @@ const handleError = () => clearError({ redirect: "/" });
       <p class="text-xl text-gray-600 mb-8">
         {{ error.message || "الصفحة غير موجودة" }}
       </p>
-      <UButton size="lg" @click="handleError"> العودة للرئيسية </UButton>
+      <UButton
+        size="lg"
+        @click="handleError"
+      >
+        العودة للرئيسية
+      </UButton>
     </div>
   </div>
 </template>

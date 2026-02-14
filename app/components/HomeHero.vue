@@ -5,7 +5,10 @@
     <!-- Background Decorative Elements -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div class="absolute top-10 left-10 w-20 h-20 opacity-30">
-        <svg viewBox="0 0 100 100" class="w-full h-full text-primary-300">
+        <svg
+          viewBox="0 0 100 100"
+          class="w-full h-full text-primary-300"
+        >
           <defs>
             <pattern
               id="dots1"
@@ -15,15 +18,27 @@
               height="20"
               patternUnits="userSpaceOnUse"
             >
-              <circle cx="10" cy="10" r="2" fill="currentColor" />
+              <circle
+                cx="10"
+                cy="10"
+                r="2"
+                fill="currentColor"
+              />
             </pattern>
           </defs>
-          <rect width="100" height="100" fill="url(#dots1)" />
+          <rect
+            width="100"
+            height="100"
+            fill="url(#dots1)"
+          />
         </svg>
       </div>
 
       <div class="absolute bottom-20 right-10 w-16 h-16 opacity-20">
-        <svg viewBox="0 0 100 100" class="w-full h-full text-primary-400">
+        <svg
+          viewBox="0 0 100 100"
+          class="w-full h-full text-primary-400"
+        >
           <defs>
             <pattern
               id="dots2"
@@ -33,10 +48,19 @@
               height="15"
               patternUnits="userSpaceOnUse"
             >
-              <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" />
+              <circle
+                cx="7.5"
+                cy="7.5"
+                r="1.5"
+                fill="currentColor"
+              />
             </pattern>
           </defs>
-          <rect width="100" height="100" fill="url(#dots2)" />
+          <rect
+            width="100"
+            height="100"
+            fill="url(#dots2)"
+          />
         </svg>
       </div>
     </div>
@@ -67,7 +91,11 @@
           </p>
 
           <div class="flex justify-center lg:justify-start">
-            <UButton size="xl" color="primary" @click="startJourney">
+            <UButton
+              size="xl"
+              color="primary"
+              @click="startJourney"
+            >
               ابدأ رحلتك الآن
             </UButton>
           </div>
@@ -81,7 +109,7 @@
             src="/assets/images/home/hero.png"
             alt="طالب متفوق"
             class="float-animation max-w-md w-full rounded-3xl"
-          />
+          >
         </div>
       </div>
     </UContainer>
@@ -90,8 +118,8 @@
 
 <script setup>
 const startJourney = () => {
-  navigateTo("/register");
-};
+  navigateTo('/register')
+}
 </script>
 
 <style scoped>
