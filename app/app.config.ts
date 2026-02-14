@@ -22,25 +22,34 @@ export default defineAppConfig({
       defaultVariants: {
         size: 'lg'
       },
-      base: 'w-full'
+      base: 'w-full',
+      wrapper: 'w-full',
+      slots: {
+        root: 'w-full',
+        base: 'w-full',
+        wrapper: 'w-full'
+      }
     },
     select: {
       defaultVariants: {
         size: 'lg'
       },
-      base: 'w-full'
+      base: 'w-full',
+      wrapper: 'w-full'
     },
     selectMenu: {
       defaultVariants: {
         size: 'lg'
       },
-      base: 'w-full'
+      base: 'w-full',
+      wrapper: 'w-full'
     },
     textarea: {
       defaultVariants: {
         size: 'lg'
       },
-      base: 'w-full'
+      base: 'w-full',
+      wrapper: 'w-full'
     }
   }
 })
