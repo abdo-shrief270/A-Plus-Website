@@ -2,9 +2,7 @@ import { defineStore } from 'pinia'
 import CryptoJS from 'crypto-js'
 import type { User, AuthResponse } from '@/types/auth'
 
-const SECRET_KEY = import.meta.env.VITE_ENCRYPTION_KEY || (() => {
-  throw new Error('VITE_ENCRYPTION_KEY is not defined in .env')
-})()
+const SECRET_KEY = import.meta.env.VITE_ENCRYPTION_KEY || 'aplus-secret-2026'
 
 interface AuthState {
   user: User | null
@@ -27,36 +25,46 @@ export const useAuthStore = defineStore('auth', {
       const token = useCookie('APlus-token')
       return !!state.token || !!token.value
     },
-    getUserRole: state => state.user?.role?.toLowerCase() || null,
-    isStudent: state => state.user?.role?.toLowerCase() === 'student',
-    isTeacher: state => state.user?.role?.toLowerCase() === 'teacher',
-    isParent: state => state.user?.role?.toLowerCase() === 'parent'
+    // type is the raw field from v2 API: student | parent | school
+    getUserType: state => state.user?.type || null,
+    isStudent: state => state.user?.type === 'student',
+    isParent: state => state.user?.type === 'parent',
+    isSchool: state => state.user?.type === 'school',
+    // Alias kept for backward compatibility with role-based middleware
+    getUserRole: state => state.user?.type || null
   },
 
   actions: {
     async storeUser(data: AuthResponse) {
       return new Promise((resolve, reject) => {
         try {
-          if (!data?.user || !data?.token) {
+          const user = data.data?.user
+          const token = data.data?.token
+
+          if (!user || !token) {
             throw new Error('Invalid user or token data')
           }
 
+          // Store encrypted user data in localStorage
           const encryptedUserData = CryptoJS.AES.encrypt(
-            JSON.stringify(data.user),
+            JSON.stringify(user),
             SECRET_KEY
           ).toString()
 
-          // Use Nuxt useCookie composable
-          const tokenCookie = useCookie('APlus-token', { maxAge: 60 * 60 * 24 * 7 }) // 7 days
-          tokenCookie.value = data.token
+          // Token in cookie (7 days)
+          const tokenCookie = useCookie('APlus-token', { maxAge: 60 * 60 * 24 * 7 })
+          tokenCookie.value = token
+
+          // Type stored unencrypted in cookie for middleware use (no sensitive data)
+          const typeCookie = useCookie('APlus-type', { maxAge: 60 * 60 * 24 * 7 })
+          typeCookie.value = user.type
 
           if (import.meta.client) {
             localStorage.setItem('APlus-user', encryptedUserData)
-            localStorage.setItem('b-language', data.user.lang)
           }
 
-          this.user = Object.freeze(data.user) as User
-          this.token = data.token
+          this.user = Object.freeze(user) as User
+          this.token = token
           resolve(true)
         } catch (error) {
           console.error('Error in storeUser:', error)
@@ -66,10 +74,7 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async fetchUser() {
-      if (this.user?.name) {
-        return this.user
-      }
-
+      if (this.user?.name) return this.user
       if (import.meta.server) return null
 
       const encryptedUserData = localStorage.getItem('APlus-user')
@@ -102,16 +107,17 @@ export const useAuthStore = defineStore('auth', {
       return new Promise((resolve) => {
         if (import.meta.client) {
           localStorage.removeItem('APlus-user')
-          localStorage.removeItem('b-language')
         }
 
         const tokenCookie = useCookie('APlus-token')
+        const typeCookie = useCookie('APlus-type')
         tokenCookie.value = null
+        typeCookie.value = null
 
         this.user = null
         this.token = null
 
-        navigateTo('/login')
+        navigateTo('/auth/login')
         resolve(true)
       })
     }

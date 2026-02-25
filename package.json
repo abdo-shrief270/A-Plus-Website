@@ -24,7 +24,7 @@
     "@types/canvas-confetti": "^1.9.0",
     "@vueuse/nuxt": "^13.9.0",
     "axios": "^1.13.5",
-    "better-sqlite3": "^9.6.0",
+    "better-sqlite3": "^12.6.2",
     "canvas-confetti": "^1.9.4",
     "crypto-js": "^4.2.0",
     "js-cookie": "^3.0.5",

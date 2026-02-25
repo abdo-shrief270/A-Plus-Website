@@ -1,8 +1,7 @@
-export default defineNuxtRouteMiddleware((to, from) => {
-  // Use useCookie instead of store in middleware
+export default defineNuxtRouteMiddleware((to) => {
   const token = useCookie('APlus-token')
 
   if (!token.value) {
-    return navigateTo('/login')
+    return navigateTo('/auth/login')
   }
 })

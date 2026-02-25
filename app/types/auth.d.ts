@@ -1,14 +1,22 @@
 export interface User {
   id: number
   name: string
-  email: string
+  user_name: string
+  email?: string
   phone?: string
-  role: 'student' | 'teacher' | 'parent' | 'admin'
+  type: 'student' | 'parent' | 'school'
+  gender?: 'male' | 'female'
   avatar?: string
   lang: 'ar' | 'en'
   created_at?: string
   updated_at?: string
   [key: string]: string | number | boolean | undefined | null
+}
+
+export interface StudentData {
+  id_number?: string
+  exam_id?: number
+  exam_date?: string
 }
 
 export interface LoginPayload {
@@ -17,7 +25,7 @@ export interface LoginPayload {
   device_id: string
 }
 
-export interface RegisterPayload {
+export interface RegisterParentPayload {
   name: string
   email: string
   country_code: string
@@ -45,7 +53,10 @@ export interface CheckUsernamePayload {
 }
 
 export interface AuthResponse {
-  user: User
-  token: string
+  data: {
+    token: string
+    user: User
+  }
   message?: string
+  status?: number
 }
