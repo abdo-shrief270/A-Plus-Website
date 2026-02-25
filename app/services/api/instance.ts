@@ -1,10 +1,14 @@
 import axios, { type AxiosInstance } from 'axios'
 import { handleResponseErrors } from './errorHandler'
 import { showToast } from '@/utils/helpers/toast.helper'
+import { useDeviceInfo } from '@/composables/useDeviceInfo'
 
 export default function createAxiosInstance(): AxiosInstance {
   const config = useRuntimeConfig()
   const token = useCookie('APlus-token')
+
+  // Get device headers (only available on client side)
+  const deviceHeaders = import.meta.client ? useDeviceInfo().getHeaders() : {}
 
   const axiosInstance = axios.create({
     baseURL: config.public.apiBaseUrl || import.meta.env.VITE_API_BASE_URL,
@@ -12,7 +16,8 @@ export default function createAxiosInstance(): AxiosInstance {
       'Accept': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
       'Content-Language': 'ar',
-      ...(token.value && { Authorization: `Bearer ${token.value}` })
+      ...(token.value && { Authorization: `Bearer ${token.value}` }),
+      ...deviceHeaders
     }
   })
 

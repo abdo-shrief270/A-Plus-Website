@@ -24,8 +24,8 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css', '~/assets/css/global.css'],
 
   site: {
-    url: 'https://beon.chat/',
-    name: 'Beon'
+    url: 'https://aplus.test/',
+    name: 'A Plus'
   },
 
   colorMode: {
@@ -46,7 +46,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.VITE_API_BASE_URL || 'https://api.example.com/api'
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'https://aplus.test/api'
     }
   },
 

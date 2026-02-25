@@ -12,7 +12,7 @@ export function handleResponseErrors(error: AxiosError) {
     case 401:
       // Logout user
       useCookie('APlus-token').value = null
-      navigateTo('/login')
+      navigateTo('/auth/login')
       break
     case 403:
       navigateTo('/unauthorized')

@@ -1,34 +1,24 @@
-export default defineNuxtRouteMiddleware((to, from) => {
-  // Use useCookie instead of store in middleware
+// Role middleware: ensures only school and parent can access /dashboard routes
+export default defineNuxtRouteMiddleware(() => {
   const token = useCookie('APlus-token')
-  const userDataEncrypted = useCookie('APlus-user')
+  const userType = useCookie('APlus-type')
 
   if (!token.value) {
-    return navigateTo('/login')
+    return navigateTo('/auth/login')
   }
 
-  if (!userDataEncrypted.value) {
-    return navigateTo('/login')
-  }
+  const type = userType.value?.toLowerCase()
 
-  try {
-    const userData = JSON.parse(userDataEncrypted.value)
-    const userRole = userData.role?.toLowerCase()
-
-    // Only teachers and parents can access dashboard
-    if (userRole === 'student') {
-      return navigateTo('/')
-    }
-
-    // Allow teachers and parents
-    if (userRole === 'teacher' || userRole === 'parent') {
-      return
-    }
-
-    // Unknown role, redirect to home
+  // Students are redirected to their home page
+  if (type === 'student') {
     return navigateTo('/')
-  } catch (error) {
-    console.error('Error parsing user data:', error)
-    return navigateTo('/login')
   }
+
+  // school and parent are allowed onto the dashboard
+  if (type === 'school' || type === 'parent') {
+    return
+  }
+
+  // Unknown role — back to login
+  return navigateTo('/auth/login')
 })

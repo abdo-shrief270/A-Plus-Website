@@ -1,34 +1,57 @@
 export interface User {
   id: number
   name: string
-  email: string
+  user_name: string
+  email?: string
   phone?: string
-  role: 'student' | 'teacher' | 'parent' | 'admin'
+  type: 'student' | 'parent' | 'school'
+  gender?: 'male' | 'female'
   avatar?: string
-  lang: 'ar' | 'en'
-  created_at?: string
-  updated_at?: string
+  two_factor_enabled?: boolean
+  lang?: string
+  student?: StudentData
   [key: string]: any
 }
 
-export interface LoginPayload {
-  email?: string
-  username?: string
-  password: string
-  remember_me?: boolean
+export interface StudentData {
+  id_number?: string
+  exam_id?: number
+  exam_date?: string
 }
 
-export interface RegisterPayload {
-  name: string
-  email: string
+export interface LoginPayload {
+  user_name: string
   password: string
-  password_confirmation: string
-  phone?: string
-  role?: string
+}
+
+export interface RegisterStudentPayload {
+  name: string
+  user_name: string
+  country_code: string
+  phone: string
+  email?: string
+  password: string
+  gender: 'male' | 'female'
+  exam_id: number
+  exam_date: string
+  id_number: string
+}
+
+export interface RegisterParentPayload {
+  name: string
+  user_name: string
+  country_code: string
+  phone: string
+  email?: string
+  password: string
+  gender: 'male' | 'female'
 }
 
 export interface AuthResponse {
-  user: User
-  token: string
+  data: {
+    token: string
+    user: User
+  }
   message?: string
+  status?: number
 }
