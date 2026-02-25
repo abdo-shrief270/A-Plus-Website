@@ -8,7 +8,7 @@
         src="~/assets/images/auth/authBg.png"
         class="absolute w-full h-full object-cover"
         alt="Background"
-      />
+      >
 
       <div
         class="z-[100] mt-32 w-full flex flex-col items-center justify-start text-center px-8"
@@ -44,7 +44,10 @@
             class="space-y-4"
             @submit="onSubmit"
           >
-            <UFormField :label="$t('login.username')" name="username">
+            <UFormField
+              :label="$t('login.username')"
+              name="username"
+            >
               <UInput
                 v-model="state.username"
                 type="text"
@@ -54,7 +57,10 @@
               />
             </UFormField>
 
-            <UFormField :label="$t('login.password')" name="password">
+            <UFormField
+              :label="$t('login.password')"
+              name="password"
+            >
               <UInput
                 v-model="state.password"
                 type="password"
@@ -73,7 +79,12 @@
               </NuxtLink>
             </div>
 
-            <UButton type="submit" block size="lg" :loading="loading">
+            <UButton
+              type="submit"
+              block
+              size="lg"
+              :loading="loading"
+            >
               {{ $t("login.submit") }}
             </UButton>
 
@@ -96,57 +107,55 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
-import type { FormSubmitEvent } from "#ui/types";
-import { useAuthService } from "@/composables/useAuth";
-import { useAuthStore } from "@/stores/auth";
-import { useRedirect } from "@/composables/useRedirect";
+import { z } from 'zod'
+import type { FormSubmitEvent } from '#ui/types'
+import { useAuthService } from '@/composables/useAuth'
+import { useAuthStore } from '@/stores/auth'
+import { useRedirect } from '@/composables/useRedirect'
+import { useDeviceId } from '@/utils/device'
 
 definePageMeta({
-  layout: "fullscreen",
-  middleware: "guest",
-});
+  layout: 'fullscreen',
+  middleware: 'guest'
+})
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 useSeoMeta({
-  title: t("login.meta.title"),
-  description: t("login.meta.description"),
-});
+  title: t('login.meta.title'),
+  description: t('login.meta.description')
+})
 
-const { login, loading } = useAuthService();
-const authStore = useAuthStore();
-const { redirectByRole } = useRedirect();
+const { login, loading } = useAuthService()
+const authStore = useAuthStore()
+const { redirectByRole } = useRedirect()
 
 const schema = z.object({
   username: z
     .string()
-    .min(1, t("validation.required", { field: t("login.username") })),
+    .min(1, t('validation.required', { field: t('login.username') })),
   password: z
     .string()
-    .min(1, t("validation.required", { field: t("login.password") })),
-});
+    .min(1, t('validation.required', { field: t('login.password') }))
+})
 
-type Schema = z.output<typeof schema>;
+type Schema = z.output<typeof schema>
 
 const state = reactive({
-  username: "",
-  password: "",
-});
+  username: '',
+  password: '',
+  device_id: useDeviceId()
+})
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   try {
-    // Adapter to match backend expected payload if it differs,
-    // assuming backend can handle 'username' as 'email' or generic identifier
-    // If backend STRICTLY requires 'email', we might need to change this.
-    // Given previous code used 'email', let's preserve 'email' key if possible,
-    // or send 'username' if updated types support it.
-    // We updated types to support 'username', so we send state directly.
-    const response = await login(event.data);
-    await authStore.storeUser(response);
-    redirectByRole(response.user);
+    const response = await login(event.data)
+    // Handle potential data wrapper: { status, message, data: { user, token } }
+    const authData = response?.data || response
+    await authStore.storeUser(authData)
+    redirectByRole(authData.user)
   } catch (error) {
-    console.error("Login error:", error);
+    console.error('Login error:', error)
   }
 }
 </script>

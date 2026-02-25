@@ -1,3 +1,5 @@
 {
-    "required": "{field} مطلوب"
+    "required": "{field} مطلوب",
+    "invalid_email": "البريد الإلكتروني غير صالح",
+    "password_mismatch": "كلمات المرور غير متطابقة"
 }

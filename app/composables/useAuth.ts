@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { showToast } from '@/utils/helpers/toast.helper'
-import type { LoginPayload, RegisterPayload, AuthResponse } from '@/types/auth'
+import type { LoginPayload, RegisterPayload, AuthResponse, StudentRegisterPayload, ParentRegisterPayload, CheckUsernamePayload } from '@/types/auth'
 
 export const useAuthService = () => {
-  const api = new useApi('auth')
+  const api = new useApi('auth', '') // API version is already in VITE_API_BASE_URL
   const loading = ref(false)
   const error = ref<any>(null)
 
@@ -40,7 +40,9 @@ export const useAuthService = () => {
   }
 
   const login = (payload: LoginPayload) => post<AuthResponse>('login', payload)
-  const register = (payload: RegisterPayload) => post<AuthResponse>('register', payload)
+  const registerStudent = (payload: StudentRegisterPayload) => post<AuthResponse>('register/student', payload)
+  const registerParent = (payload: ParentRegisterPayload) => post<AuthResponse>('register/parent', payload)
+  const checkUsername = (payload: CheckUsernamePayload) => post<{ available: boolean }>('username/check', payload)
   const verifyAccounts = (payload: any) => post('verify-account', payload)
   const logout = (payload: any = {}) => post('logout', payload)
   const passwordSendOtp = (payload: { email: string }) => post('password/send-otp', payload)
@@ -54,7 +56,9 @@ export const useAuthService = () => {
     loading,
     error,
     login,
-    register,
+    registerStudent,
+    registerParent,
+    checkUsername,
     verifyAccounts,
     logout,
     passwordSendOtp,

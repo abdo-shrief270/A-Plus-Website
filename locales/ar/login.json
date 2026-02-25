@@ -8,7 +8,7 @@
     "email": "البريد الإلكتروني",
     "username": "اسم المستخدم",
     "password": "كلمة المرور",
-    "email_placeholder": "example@email.com",
+    "email_placeholder": "example[at]email.com",
     "username_placeholder": "ادخل اسم المستخدم",
     "password_placeholder": "••••••••",
     "submit": "تسجيل الدخول",

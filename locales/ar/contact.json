@@ -20,7 +20,7 @@
     "phone": "رقم الهاتف",
     "phone_placeholder": "أضف رقم الهاتف",
     "email": "البريد الإلكتروني",
-    "email_placeholder": "example{'@'}email.com",
+    "email_placeholder": "example.email.com",
     "submit": "إرسال"
   },
   "validation": {

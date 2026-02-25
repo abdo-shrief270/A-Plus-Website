@@ -1,3 +1,5 @@
 {
-    "required": "{field} is required"
+    "required": "{field} is required",
+    "invalid_email": "Invalid email address",
+    "password_mismatch": "Passwords do not match"
 }

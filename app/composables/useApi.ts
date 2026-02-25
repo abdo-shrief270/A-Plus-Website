@@ -28,7 +28,8 @@ export class useApi<T = any> {
 
   constructor(resource: string, api_version: string = 'v3') {
     const config = useRuntimeConfig()
-    this.baseUrl = `${config.public.apiBaseUrl || import.meta.env.VITE_API_BASE_URL}/${api_version}/${resource}`
+    const base = config.public.apiBaseUrl || import.meta.env.VITE_API_BASE_URL
+    this.baseUrl = api_version ? `${base}/${api_version}/${resource}` : `${base}/${resource}`
     this.loading = ref(false)
     this.creating = ref(false)
     this.editing = ref(false)
