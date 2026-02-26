@@ -20,9 +20,34 @@ export interface StudentData {
 }
 
 export interface LoginPayload {
-  username: string
-  password: string
+  user_name: string
+  password?: string
   device_id: string
+}
+
+export interface LoginCheckResponse {
+  data: {
+    exists: boolean
+    has_2fa: boolean
+    phone?: string
+    email?: string
+  }
+  message?: string
+  status?: number
+}
+
+export interface SendOtpPayload {
+  user_name?: string
+  email?: string
+  phone?: string
+  country_code?: string
+  method: 'email' | 'sms' | 'whatsapp'
+}
+
+export interface VerifyOtpPayload {
+  token: string
+  otp: string
+  type: 'login' | 'reset'
 }
 
 export interface RegisterParentPayload {
@@ -54,8 +79,9 @@ export interface CheckUsernamePayload {
 
 export interface AuthResponse {
   data: {
-    token: string
-    user: User
+    token?: string
+    user?: User
+    requires_2fa?: boolean
   }
   message?: string
   status?: number

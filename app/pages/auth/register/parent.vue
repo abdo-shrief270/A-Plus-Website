@@ -241,8 +241,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   loading.value = true;
   try {
     const res = await authService.registerParent(event.data);
-    await authStore.storeUser(res.data);
-    redirectByRole(res.data.data.user);
+    const authData = res?.data || res;
+    await authStore.storeUser(authData);
+    redirectByRole(authData.user);
   } catch {
     // handled by interceptor
   } finally {

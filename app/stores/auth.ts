@@ -38,8 +38,9 @@ export const useAuthStore = defineStore('auth', {
     async storeUser(data: AuthResponse) {
       return new Promise((resolve, reject) => {
         try {
-          const user = data.data?.user
-          const token = data.data?.token
+          // Unwrapped or wrapped response payloads
+          const user = (data as any).user || data.data?.user
+          const token = (data as any).token || data.data?.token
 
           if (!user || !token) {
             throw new Error('Invalid user or token data')

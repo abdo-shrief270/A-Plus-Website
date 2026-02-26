@@ -39,22 +39,52 @@
           </h2>
 
           <UForm
-            :schema="schema"
+            :schema="usernameSchema"
             :state="state"
             class="space-y-4"
-            @submit="onSubmit"
+            @submit="onUsernameSubmit"
           >
-            <UFormField :label="$t('login.username')" name="username">
+            <UFormField :label="$t('login.username')" name="user_name">
               <UInput
-                v-model="state.username"
+                v-model="state.user_name"
                 type="text"
                 placeholder="أدخل اسم المستخدم"
                 size="lg"
                 icon="i-heroicons-user"
                 class="w-full"
+                autofocus
               />
             </UFormField>
 
+            <UButton type="submit" block size="lg" :loading="loading">
+              التالي
+            </UButton>
+          </UForm>
+        </div>
+
+        <!-- Step 2: Password Authentication -->
+        <div
+          v-if="step === 2"
+          class="border border-gray-200 dark:border-gray-700 rounded-2xl p-8 shadow-sm"
+        >
+          <div class="flex items-center gap-3 mb-6">
+            <UButton
+              icon="i-heroicons-arrow-right"
+              color="gray"
+              variant="ghost"
+              @click="step = 1"
+            />
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+              أهلاً، {{ state.user_name }}
+            </h2>
+          </div>
+
+          <UForm
+            :schema="passwordSchema"
+            :state="state"
+            class="space-y-4"
+            @submit="onPasswordSubmit"
+          >
             <UFormField :label="$t('login.password')" name="password">
               <UInput
                 v-model="state.password"
@@ -67,8 +97,10 @@
                 "
                 class="w-full"
                 @click:trailing="showPassword = !showPassword"
+                autofocus
               />
             </UFormField>
+
             <div class="flex justify-end">
               <NuxtLink
                 to="/auth/forgot-password"
@@ -84,11 +116,19 @@
           </UForm>
         </div>
 
-        <!-- Step 3: 2FA hint -->
+        <!-- Step 3: Choose OTP Method -->
         <div
           v-if="step === 3"
           class="border border-gray-200 dark:border-gray-700 rounded-2xl p-8 shadow-sm text-center"
         >
+          <div class="flex items-center justify-between mb-6">
+            <UButton
+              icon="i-heroicons-arrow-right"
+              color="gray"
+              variant="ghost"
+              @click="authCheckData.has_password ? (step = 2) : (step = 1)"
+            />
+          </div>
           <UIcon
             name="i-heroicons-shield-check"
             class="w-16 h-16 text-primary-600 mx-auto mb-4"
@@ -97,47 +137,90 @@
             التحقق الثنائي مطلوب
           </h2>
           <p class="text-gray-600 dark:text-gray-400 mb-6">
-            سيتم إرسال رمز التحقق إلى
-            <span v-if="twoFaContact.phone" class="font-semibold">{{
-              twoFaContact.phone
-            }}</span>
-            <span v-if="twoFaContact.email" class="font-semibold">
-              أو {{ twoFaContact.email }}</span
-            >
+            الرجاء اختيار طريقة استلام رمز التحقق
           </p>
           <div class="flex flex-col gap-3">
             <UButton
-              v-if="twoFaContact.phone"
               block
               size="lg"
+              color="primary"
+              variant="outline"
+              icon="i-heroicons-envelope"
               :loading="loading"
-              @click="sendOtpAndRedirect('sms')"
+              @click="onSendOtp('email')"
+            >
+              إرسال رمز عبر البريد الإلكتروني
+            </UButton>
+            <UButton
+              block
+              size="lg"
+              color="primary"
+              variant="outline"
+              icon="i-heroicons-device-phone-mobile"
+              :loading="loading"
+              @click="onSendOtp('sms')"
             >
               إرسال رمز عبر SMS
             </UButton>
             <UButton
-              v-if="twoFaContact.phone"
               block
               size="lg"
               color="success"
               variant="outline"
+              icon="i-simple-icons-whatsapp"
               :loading="loading"
-              @click="sendOtpAndRedirect('whatsapp')"
+              @click="onSendOtp('whatsapp')"
             >
               إرسال رمز عبر WhatsApp
             </UButton>
-            <UButton
-              v-if="twoFaContact.email"
-              block
-              size="lg"
-              color="neutral"
-              variant="outline"
-              :loading="loading"
-              @click="sendOtpAndRedirect('email')"
-            >
-              إرسال رمز عبر البريد الإلكتروني
-            </UButton>
           </div>
+        </div>
+
+        <!-- Step 4: Verify OTP code -->
+        <div
+          v-if="step === 4"
+          class="border border-gray-200 dark:border-gray-700 rounded-2xl p-8 shadow-sm"
+        >
+          <div class="flex items-center gap-3 mb-6">
+            <UButton
+              icon="i-heroicons-arrow-right"
+              color="gray"
+              variant="ghost"
+              @click="step = 3"
+            />
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+              أدخل رمز التحقق
+            </h2>
+          </div>
+
+          <p
+            class="text-sm text-gray-600 dark:text-gray-400 mb-6 font-medium leading-relaxed"
+          >
+            تم إرسال رمز التحقق إليك. يرجى إدخاله في الحقل أدناه لإكمال الدخول.
+          </p>
+
+          <UForm
+            :schema="otpSchema"
+            :state="state"
+            class="space-y-4"
+            @submit="onVerifyOtpSubmit"
+          >
+            <UFormField label="رمز التحقق (OTP)" name="otp">
+              <UInput
+                v-model="state.otp"
+                type="text"
+                placeholder="أدخل الرمز المكون من 6 أرقام"
+                size="lg"
+                class="w-full text-center tracking-[0.5em] text-lg font-bold"
+                :maxlength="6"
+                autofocus
+              />
+            </UFormField>
+
+            <UButton type="submit" block size="lg" :loading="loading">
+              تأكيد الرمز والدخول
+            </UButton>
+          </UForm>
         </div>
       </div>
     </div>
@@ -164,43 +247,137 @@ useSeoMeta({
   description: t("login.meta.description"),
 });
 
-const { login, loading } = useAuthService();
+const { loginCheck, login, sendOtp, verifyOtp, loading } = useAuthService();
 const authStore = useAuthStore();
 const { redirectByRole } = useRedirect();
+const toast = useToast();
 
 const step = ref(1);
 const showPassword = ref(false);
-const twoFaContact = reactive({ phone: "", email: "" });
-const sendOtpAndRedirect = (type: string) => {
-  console.log("OTP type:", type);
-};
 
-const schema = z.object({
-  username: z
+const authCheckData = reactive({
+  has_2fa: false,
+  exists: false,
+});
+
+const usernameSchema = z.object({
+  user_name: z
     .string()
     .min(1, t("validation.required", { field: t("login.username") })),
+});
+
+const passwordSchema = z.object({
   password: z
     .string()
     .min(1, t("validation.required", { field: t("login.password") })),
 });
 
-type Schema = z.output<typeof schema>;
+const otpSchema = z.object({
+  otp: z.string().min(6, "رمز التحقق يجب أن يكون 6 أرقام على الأقل"),
+});
 
 const state = reactive({
-  username: "",
+  user_name: "",
   password: "",
+  otp: "",
   device_id: useDeviceId(),
 });
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
+// Step 1: Handle Username Form Submit
+async function onUsernameSubmit(
+  event: FormSubmitEvent<z.output<typeof usernameSchema>>,
+) {
   try {
-    const response = await login(event.data);
-    // Handle potential data wrapper: { status, message, data: { user, token } }
+    const response = await loginCheck({ user_name: event.data.user_name });
+    const authData = response?.data || response;
+
+    // Store returned flags
+    authCheckData.exists = authData.exists;
+    authCheckData.has_2fa = authData.has_2fa;
+
+    if (!authCheckData.exists) {
+      toast.add({
+        title: "خطأ",
+        description: "اسم المستخدم غير موجود",
+        color: "error",
+      });
+      return;
+    }
+
+    if (authCheckData.has_2fa) {
+      step.value = 3; // Proceed directly to OTP choice
+    } else {
+      step.value = 2; // Proceed to Password input
+    }
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      toast.add({
+        title: "خطأ",
+        description: "اسم المستخدم غير موجود",
+        color: "error",
+      });
+    }
+    console.error("Login Check error:", error);
+  }
+}
+
+// Step 2: Handle Password Form Submit
+async function onPasswordSubmit(
+  event: FormSubmitEvent<z.output<typeof passwordSchema>>,
+) {
+  try {
+    // Attempt standard login
+    const response = await login({
+      user_name: state.user_name,
+      password: event.data.password,
+      device_id: state.device_id,
+    });
+
+    const authData = response?.data || response;
+
+    // If successful but 2FA is required, go to OTP options
+    if (authData.requires_2fa) {
+      step.value = 3;
+      return;
+    }
+
+    // Otherwise, we got the token and user!
+    await authStore.storeUser(authData);
+    redirectByRole(authData.user);
+  } catch (error) {
+    console.error("Login password error:", error);
+  }
+}
+
+// Step 3: Handle OTP Request
+async function onSendOtp(method: "sms" | "whatsapp" | "email") {
+  try {
+    await sendOtp({
+      user_name: state.user_name,
+      method,
+    });
+    step.value = 4; // Proceed to Verify OTP input
+  } catch (error) {
+    console.error("Send OTP error:", error);
+  }
+}
+
+// Step 4: Verify OTP
+async function onVerifyOtpSubmit(
+  event: FormSubmitEvent<z.output<typeof otpSchema>>,
+) {
+  try {
+    const response = await verifyOtp({
+      token: state.user_name, // Typically the username is the token for login 2FA
+      otp: event.data.otp,
+      type: "login",
+    });
+
     const authData = response?.data || response;
     await authStore.storeUser(authData);
     redirectByRole(authData.user);
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Verify OTP error:", error);
   }
 }
 </script>

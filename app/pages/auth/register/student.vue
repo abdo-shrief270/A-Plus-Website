@@ -307,8 +307,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       exam_date: event.data.exam_date.toString(),
     };
     const res = await authService.registerStudent(dataToSend);
-    await authStore.storeUser(res.data);
-    redirectByRole(res.data.data.user);
+    const authData = res?.data || res;
+    await authStore.storeUser(authData);
+    redirectByRole(authData.user);
   } catch (err) {
     console.error("Register Error:", err);
   } finally {
