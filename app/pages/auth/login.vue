@@ -317,11 +317,6 @@ async function onUsernameSubmit(
     authCheckData.has_2fa = authData.has_2fa;
 
     if (!authCheckData.exists) {
-      toast.add({
-        title: "خطأ",
-        description: "اسم المستخدم غير موجود",
-        color: "error",
-      });
       return;
     }
 
@@ -331,13 +326,6 @@ async function onUsernameSubmit(
       step.value = 2; // Proceed to Password input
     }
   } catch (error: any) {
-    if (error.response?.status === 404) {
-      toast.add({
-        title: "خطأ",
-        description: "اسم المستخدم غير موجود",
-        color: "error",
-      });
-    }
     console.error("Login Check error:", error);
   }
 }

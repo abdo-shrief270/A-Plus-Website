@@ -84,7 +84,9 @@
                         : undefined
                   "
                   :loading="usernameCheck.loading.value"
-                  @input="() => usernameCheck.checkUsername(state.user_name)"
+                  @update:model-value="
+                    (val) => usernameCheck.checkUsername(String(val))
+                  "
                 />
                 <p
                   v-if="usernameCheck.status.value === 'available'"
