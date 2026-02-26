@@ -15,12 +15,6 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true
   },
-
-  /**
-   * ❌ شيلنا تحميل السكربت من هنا
-   * عشان ما يتحملش أثناء SSR
-   */
-
   css: ['~/assets/css/main.css', '~/assets/css/global.css'],
 
   site: {
@@ -46,26 +40,14 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'https://aplus.test/api'
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || 'https://control.apls-edu.com/api'
     }
   },
 
   compatibilityDate: '2024-07-11',
 
   nitro: {
-    /**
-     * ✅ تفعيل الضغط لتحسين الأداء
-     */
     compressPublicAssets: true
-
-    /**
-     * ❌ تعطيل الـ prerendering مؤقتاً
-     * عشان الـ build يكمل على الـ server
-     */
-    // prerender: {
-    //   routes: ['/'],
-    //   crawlLinks: true
-    // }
   },
 
   eslint: {
@@ -86,14 +68,4 @@ export default defineNuxtConfig({
     langDir: '../locales',
     strategy: 'no_prefix'
   }
-
-  /**
-   * ✅ Icons will be loaded on-demand for better performance
-   * Instead of bundling all icon collections in the server bundle
-   */
-
-  /**
-   * ✅ Removed aggressive prefetch/preload disabling
-   * Nuxt's smart prefetching will handle resource hints automatically
-   */
 })
