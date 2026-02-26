@@ -59,6 +59,27 @@
             <UButton type="submit" block size="lg" :loading="loading">
               التالي
             </UButton>
+
+            <div
+              class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400"
+            >
+              ليس لديك حساب؟
+              <div class="mt-2 flex justify-center gap-4">
+                <NuxtLink
+                  to="/auth/register/student"
+                  class="font-medium text-primary-600 hover:text-primary-500"
+                >
+                  تسجيل طالب
+                </NuxtLink>
+                <span class="text-gray-300 dark:text-gray-700">|</span>
+                <NuxtLink
+                  to="/auth/register/parent"
+                  class="font-medium text-primary-600 hover:text-primary-500"
+                >
+                  تسجيل ولي أمر
+                </NuxtLink>
+              </div>
+            </div>
           </UForm>
         </div>
 
