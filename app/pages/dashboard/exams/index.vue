@@ -11,7 +11,10 @@
       </div>
     </div>
 
-    <div v-if="academicStore.loadingExams" class="flex justify-center py-20">
+    <div
+      v-if="academicStore.loadingExams"
+      class="flex justify-center py-20"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-10 h-10 text-primary-500 animate-spin"
@@ -49,7 +52,10 @@
         <div
           class="w-16 h-16 rounded-2xl bg-primary-50 dark:bg-primary-900/20 text-primary-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
         >
-          <UIcon name="i-heroicons-book-open" class="w-8 h-8" />
+          <UIcon
+            name="i-heroicons-book-open"
+            class="w-8 h-8"
+          />
         </div>
         <h3
           class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
@@ -68,14 +74,14 @@
 </template>
 
 <script setup lang="ts">
-import { useAcademicStore } from "@/stores/academic";
+import { useAcademicStore } from '@/stores/academic'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
-useSeoMeta({ title: "المراحل الدراسية | A Plus" });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
+useSeoMeta({ title: 'المراحل الدراسية | A Plus' })
 
-const academicStore = useAcademicStore();
+const academicStore = useAcademicStore()
 
 onMounted(() => {
-  academicStore.fetchExams();
-});
+  academicStore.fetchExams()
+})
 </script>

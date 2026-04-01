@@ -18,7 +18,12 @@
         >
           تصدير / استيراد اكسيل
         </UButton>
-        <UButton color="primary" icon="i-heroicons-plus"> إضافة طالب </UButton>
+        <UButton
+          color="primary"
+          icon="i-heroicons-plus"
+        >
+          إضافة طالب
+        </UButton>
       </div>
     </div>
 
@@ -37,7 +42,7 @@
           v-model="statusFilter"
           :options="[
             { label: 'نشط', value: 'active' },
-            { label: 'معلق', value: 'suspended' },
+            { label: 'معلق', value: 'suspended' }
           ]"
           placeholder="حالة الحساب"
           class="w-full sm:w-48"
@@ -149,60 +154,60 @@
 </template>
 
 <script setup lang="ts">
-import { studentsService } from "@/services/api/students.service";
+import { studentsService } from '@/services/api/students.service'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
-useSeoMeta({ title: "الطلاب | A Plus" });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
+useSeoMeta({ title: 'الطلاب | A Plus' })
 
-const loading = ref(true);
-const students = ref<any[]>([]);
-const meta = ref<any>(null);
+const loading = ref(true)
+const students = ref<any[]>([])
+const meta = ref<any>(null)
 
-const searchQuery = ref("");
-const statusFilter = ref(null);
-const page = ref(1);
+const searchQuery = ref('')
+const statusFilter = ref(null)
+const page = ref(1)
 
 const columns = [
-  { key: "name", label: "الطالب" },
-  { key: "parent_phone", label: "ولي الأمر" },
-  { key: "grade", label: "المرحلة" },
-  { key: "status", label: "الحالة" },
-  { key: "created_at", label: "تاريخ التسجيل" },
-  { key: "actions", label: "" },
-];
+  { key: 'name', label: 'الطالب' },
+  { key: 'parent_phone', label: 'ولي الأمر' },
+  { key: 'grade', label: 'المرحلة' },
+  { key: 'status', label: 'الحالة' },
+  { key: 'created_at', label: 'تاريخ التسجيل' },
+  { key: 'actions', label: '' }
+]
 
 onMounted(async () => {
-  await fetchStudents();
-});
+  await fetchStudents()
+})
 
 // Watch inputs and page change with a slight debouncing for search
-let searchTimeout: any;
+let searchTimeout: any
 watch([searchQuery, statusFilter, page], () => {
-  clearTimeout(searchTimeout);
+  clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
-    fetchStudents();
-  }, 300);
-});
+    fetchStudents()
+  }, 300)
+})
 
 async function fetchStudents() {
-  loading.value = true;
+  loading.value = true
   try {
     const res = await studentsService.getStudents({
       page: page.value,
       search: searchQuery.value || undefined,
-      status: statusFilter.value?.value || undefined,
-    });
+      status: statusFilter.value?.value || undefined
+    })
 
-    const payload = res.data?.data || res.data;
+    const payload = res.data?.data || res.data
     students.value = Array.isArray(payload)
       ? payload
-      : payload?.students || payload?.data || [];
-    meta.value = res.data?.meta ||
-      payload?.meta || { total: students.value.length, per_page: 15 };
+      : payload?.students || payload?.data || []
+    meta.value = res.data?.meta
+      || payload?.meta || { total: students.value.length, per_page: 15 }
   } catch (error) {
-    console.error("Failed to load students", error);
+    console.error('Failed to load students', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
@@ -210,44 +215,44 @@ function getActionItems(row: any) {
   return [
     [
       {
-        label: "عرض الدرجات",
-        icon: "i-heroicons-chart-bar",
-        click: () => navigateTo(`/dashboard/student-stats?student=${row.id}`),
+        label: 'عرض الدرجات',
+        icon: 'i-heroicons-chart-bar',
+        click: () => navigateTo(`/dashboard/student-stats?student=${row.id}`)
       },
-      { label: "مراسلة الطالب", icon: "i-heroicons-chat-bubble-left-ellipsis" },
+      { label: 'مراسلة الطالب', icon: 'i-heroicons-chat-bubble-left-ellipsis' }
     ],
     [
       {
-        label: "تعليق الحساب",
-        icon: "i-heroicons-no-symbol",
-        color: "red" as const,
-        click: () => console.log("Suspend student"),
+        label: 'تعليق الحساب',
+        icon: 'i-heroicons-no-symbol',
+        color: 'red' as const,
+        click: () => console.log('Suspend student')
       },
       {
-        label: "طلب حذف الحساب",
-        icon: "i-heroicons-trash",
-        color: "red" as const,
-        click: () => requestDeletion(row.id),
-      },
-    ],
-  ];
+        label: 'طلب حذف الحساب',
+        icon: 'i-heroicons-trash',
+        color: 'red' as const,
+        click: () => requestDeletion(row.id)
+      }
+    ]
+  ]
 }
 
 async function requestDeletion(id: number) {
   if (
     confirm(
-      "هل أنت متأكد من تقديم طلب لحذف حساب هذا الطالب بالكامل؟ لا يمكن التراجع عن هذا الإجراء.",
+      'هل أنت متأكد من تقديم طلب لحذف حساب هذا الطالب بالكامل؟ لا يمكن التراجع عن هذا الإجراء.'
     )
   ) {
     try {
       await studentsService.requestStudentDeletion(
         id,
-        "حذف يدوي من لوحة التحكم",
-      );
+        'حذف يدوي من لوحة التحكم'
+      )
       // Could show a toast success here
-      alert("تم إرسال طلب الحذف بنجاح إلى الإدارة.");
+      alert('تم إرسال طلب الحذف بنجاح إلى الإدارة.')
     } catch (e) {
-      alert("حدث خطأ أثناء إرسال طلب الحذف.");
+      alert('حدث خطأ أثناء إرسال طلب الحذف.')
     }
   }
 }

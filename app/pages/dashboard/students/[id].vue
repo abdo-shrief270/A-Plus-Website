@@ -6,8 +6,8 @@
         icon="i-heroicons-arrow-right"
         color="neutral"
         variant="ghost"
-        @click="$router.back()"
         class="rtl:-scale-x-100"
+        @click="$router.back()"
       />
       <div>
         <h1
@@ -29,7 +29,10 @@
     </div>
 
     <!-- loading state -->
-    <div v-if="loading" class="flex justify-center py-20">
+    <div
+      v-if="loading"
+      class="flex justify-center py-20"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-10 h-10 text-primary-500 animate-spin"
@@ -52,7 +55,10 @@
       </p>
     </div>
 
-    <div v-else class="space-y-6">
+    <div
+      v-else
+      class="space-y-6"
+    >
       <!-- Profile Header Summary -->
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 flex flex-col md:flex-row items-center md:items-start gap-6 shadow-sm"
@@ -81,14 +87,20 @@
             <span
               class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-800"
             >
-              <UIcon name="i-heroicons-phone" class="w-4 h-4 text-gray-400" />
+              <UIcon
+                name="i-heroicons-phone"
+                class="w-4 h-4 text-gray-400"
+              />
               {{ student.phone || "غير مدرج" }}
             </span>
             <span
               v-if="student.parent_phone"
               class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-800"
             >
-              <UIcon name="i-heroicons-users" class="w-4 h-4 text-gray-400" />
+              <UIcon
+                name="i-heroicons-users"
+                class="w-4 h-4 text-gray-400"
+              />
               ولي الأمر: {{ student.parent_phone }}
             </span>
             <span
@@ -152,11 +164,15 @@
         <UForm
           :state="editState"
           :schema="updateSchema"
-          @submit="onUpdateStudent"
           class="space-y-6"
+          @submit="onUpdateStudent"
         >
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <UFormField label="الاسم الكامل" name="name" required>
+            <UFormField
+              label="الاسم الكامل"
+              name="name"
+              required
+            >
               <UInput
                 v-model="editState.name"
                 icon="i-heroicons-user"
@@ -164,7 +180,10 @@
               />
             </UFormField>
 
-            <UFormField label="البريد الإلكتروني" name="email">
+            <UFormField
+              label="البريد الإلكتروني"
+              name="email"
+            >
               <UInput
                 v-model="editState.email"
                 type="email"
@@ -173,7 +192,10 @@
               />
             </UFormField>
 
-            <UFormField label="رقم الجوال الخاص بالطالب" name="phone">
+            <UFormField
+              label="رقم الجوال الخاص بالطالب"
+              name="phone"
+            >
               <UInput
                 v-model="editState.phone"
                 type="tel"
@@ -183,7 +205,11 @@
               />
             </UFormField>
 
-            <UFormField label="رقم هاتف ولي الأمر" name="parent_phone" required>
+            <UFormField
+              label="رقم هاتف ولي الأمر"
+              name="parent_phone"
+              required
+            >
               <UInput
                 v-model="editState.parent_phone"
                 type="tel"
@@ -195,7 +221,11 @@
           </div>
 
           <!-- Academic selection -->
-          <UFormField label="المرحلة الدراسية" name="exam_id" required>
+          <UFormField
+            label="المرحلة الدراسية"
+            name="exam_id"
+            required
+          >
             <USelectMenu
               v-model="editState.exam_id"
               :options="academicStore.exams"
@@ -206,7 +236,10 @@
             />
           </UFormField>
 
-          <UFormField label="ملاحظات إضافية (خاصة بالإدارة)" name="admin_notes">
+          <UFormField
+            label="ملاحظات إضافية (خاصة بالإدارة)"
+            name="admin_notes"
+          >
             <UTextarea
               v-model="editState.admin_notes"
               :rows="3"
@@ -226,7 +259,7 @@
               طلب الحذف
             </UButton>
 
-            <div class="flex-1"></div>
+            <div class="flex-1" />
 
             <UButton
               type="submit"
@@ -246,138 +279,138 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
-import { studentsService } from "@/services/api/students.service";
-import { useAcademicStore } from "@/stores/academic";
-import { showToast } from "@/utils/helpers/toast.helper";
-import type { FormSubmitEvent } from "@nuxt/ui";
+import { z } from 'zod'
+import { studentsService } from '@/services/api/students.service'
+import { useAcademicStore } from '@/stores/academic'
+import { showToast } from '@/utils/helpers/toast.helper'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
 
-const route = useRoute();
-const studentId = route.params.id as string;
+const route = useRoute()
+const studentId = route.params.id as string
 
-const loading = ref(true);
-const isSaving = ref(false);
-const isStatusUpdating = ref(false);
+const loading = ref(true)
+const isSaving = ref(false)
+const isStatusUpdating = ref(false)
 
-const student = ref<any>(null);
-const academicStore = useAcademicStore();
+const student = ref<any>(null)
+const academicStore = useAcademicStore()
 
 const updateSchema = z.object({
-  name: z.string().min(2, "الاسم يجب أن يكون حرفين على الأقل"),
+  name: z.string().min(2, 'الاسم يجب أن يكون حرفين على الأقل'),
   email: z
     .string()
-    .email("البريد الإلكتروني غير صالح")
+    .email('البريد الإلكتروني غير صالح')
     .optional()
-    .or(z.literal("")),
-  phone: z.string().optional().or(z.literal("")),
-  parent_phone: z.string().min(8, "رقم ولي الأمر متطلب ضروري"),
+    .or(z.literal('')),
+  phone: z.string().optional().or(z.literal('')),
+  parent_phone: z.string().min(8, 'رقم ولي الأمر متطلب ضروري'),
   exam_id: z.number().nullable(),
-  admin_notes: z.string().optional(),
-});
-type UpdateSchema = z.output<typeof updateSchema>;
+  admin_notes: z.string().optional()
+})
+type UpdateSchema = z.output<typeof updateSchema>
 
 const editState = reactive({
-  name: "",
-  email: "",
-  phone: "",
-  parent_phone: "",
+  name: '',
+  email: '',
+  phone: '',
+  parent_phone: '',
   exam_id: null as number | null,
-  admin_notes: "",
-});
+  admin_notes: ''
+})
 
 onMounted(async () => {
-  await Promise.all([fetchStudent(), academicStore.fetchExams()]);
-});
+  await Promise.all([fetchStudent(), academicStore.fetchExams()])
+})
 
 async function fetchStudent() {
-  loading.value = true;
+  loading.value = true
   try {
-    const res = await studentsService.getStudentProfile(studentId);
-    const data = res.data?.data || res.data;
-    student.value = data?.student || data;
+    const res = await studentsService.getStudentProfile(studentId)
+    const data = res.data?.data || res.data
+    student.value = data?.student || data
 
     useSeoMeta({
-      title: `${student.value?.name_ar || student.value?.name || "تفاصيل الطالب"} | A Plus`,
-    });
+      title: `${student.value?.name_ar || student.value?.name || 'تفاصيل الطالب'} | A Plus`
+    })
 
     // Populate form
-    editState.name = student.value.name_ar || student.value.name || "";
-    editState.email = student.value.email || "";
-    editState.phone = student.value.phone || "";
-    editState.parent_phone = student.value.parent_phone || "";
-    editState.exam_id = student.value.exam_id || student.value.exam?.id || null;
-    editState.admin_notes = student.value.admin_notes || "";
+    editState.name = student.value.name_ar || student.value.name || ''
+    editState.email = student.value.email || ''
+    editState.phone = student.value.phone || ''
+    editState.parent_phone = student.value.parent_phone || ''
+    editState.exam_id = student.value.exam_id || student.value.exam?.id || null
+    editState.admin_notes = student.value.admin_notes || ''
   } catch (error) {
-    console.error("Failed to load student details", error);
+    console.error('Failed to load student details', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 async function onUpdateStudent(event: FormSubmitEvent<UpdateSchema>) {
-  isSaving.value = true;
+  isSaving.value = true
   try {
     // Delete empty optional strings so validation doesn't fail on backend
-    const payload = { ...event.data };
-    if (!payload.email) delete payload.email;
-    if (!payload.phone) delete payload.phone;
+    const payload = { ...event.data }
+    if (!payload.email) delete payload.email
+    if (!payload.phone) delete payload.phone
 
-    await studentsService.updateStudentProfile(studentId, payload);
+    await studentsService.updateStudentProfile(studentId, payload)
 
-    showToast("نجاح", "تم تحديث بيانات الطالب بنجاح", "success");
-    await fetchStudent(); // Refresh data
+    showToast('نجاح', 'تم تحديث بيانات الطالب بنجاح', 'success')
+    await fetchStudent() // Refresh data
   } catch (error: any) {
-    const msg =
-      error.response?.data?.message || "حدث خطأ أثناء تعديل بيانات الطالب";
-    showToast("خطأ", msg, "error");
+    const msg
+      = error.response?.data?.message || 'حدث خطأ أثناء تعديل بيانات الطالب'
+    showToast('خطأ', msg, 'error')
   } finally {
-    isSaving.value = false;
+    isSaving.value = false
   }
 }
 
 async function suspendStudent() {
-  isStatusUpdating.value = true;
+  isStatusUpdating.value = true
   try {
     // A minimal payload to toggle status if the API supports it,
     // otherwise we fallback to update properties.
     // Depending on Swagger mapping for PUT /v2/students/{id}, status updates might be via PUT.
     await studentsService.updateStudentProfile(studentId, {
-      status: "suspended",
-    });
-    student.value.status = "suspended";
-    showToast("تنبيه", "تم تعليق حساب الطالب", "warning");
+      status: 'suspended'
+    })
+    student.value.status = 'suspended'
+    showToast('تنبيه', 'تم تعليق حساب الطالب', 'warning')
   } catch {
-    showToast("خطأ", "لم يتم تعليق الحساب", "error");
+    showToast('خطأ', 'لم يتم تعليق الحساب', 'error')
   } finally {
-    isStatusUpdating.value = false;
+    isStatusUpdating.value = false
   }
 }
 
 async function activateStudent() {
-  isStatusUpdating.value = true;
+  isStatusUpdating.value = true
   try {
-    await studentsService.updateStudentProfile(studentId, { status: "active" });
-    student.value.status = "active";
-    showToast("نجاح", "تم تنشيط حساب الطالب", "success");
+    await studentsService.updateStudentProfile(studentId, { status: 'active' })
+    student.value.status = 'active'
+    showToast('نجاح', 'تم تنشيط حساب الطالب', 'success')
   } catch {
-    showToast("خطأ", "فشل تنشيط الحساب", "error");
+    showToast('خطأ', 'فشل تنشيط الحساب', 'error')
   } finally {
-    isStatusUpdating.value = false;
+    isStatusUpdating.value = false
   }
 }
 
 async function requestDeletion() {
-  if (confirm("هل أنت متأكد من تقديم طلب لحذف حساب هذا الطالب؟")) {
+  if (confirm('هل أنت متأكد من تقديم طلب لحذف حساب هذا الطالب؟')) {
     try {
       await studentsService.requestStudentDeletion(
         studentId,
-        "حذف يدوي من الملف الشخصي",
-      );
-      showToast("تم", "تم إرسال طلب الحذف بنجاح إلى الإدارة.", "success");
+        'حذف يدوي من الملف الشخصي'
+      )
+      showToast('تم', 'تم إرسال طلب الحذف بنجاح إلى الإدارة.', 'success')
     } catch (e) {
-      showToast("خطأ", "حدث خطأ أثناء إرسال طلب الحذف.", "error");
+      showToast('خطأ', 'حدث خطأ أثناء إرسال طلب الحذف.', 'error')
     }
   }
 }

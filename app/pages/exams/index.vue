@@ -34,8 +34,14 @@
 
     <!-- Content -->
     <div class="container mx-auto px-4 py-12 -mt-8 relative z-10">
-      <div v-if="examsStore.isLoading && examsStore.exams.length === 0" class="flex flex-col items-center justify-center py-20">
-        <UIcon name="i-heroicons-arrow-path" class="w-12 h-12 text-primary-500 animate-spin mb-4" />
+      <div
+        v-if="examsStore.isLoading && examsStore.exams.length === 0"
+        class="flex flex-col items-center justify-center py-20"
+      >
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="w-12 h-12 text-primary-500 animate-spin mb-4"
+        />
         <span class="text-gray-500 animate-pulse">جاري تحميل الاختبارات...</span>
       </div>
 
@@ -55,7 +61,10 @@
         </p>
       </div>
 
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div
+        v-else
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+      >
         <NuxtLink
           v-for="exam in filteredExams"
           :key="exam.id"
@@ -75,7 +84,10 @@
                   class="w-8 h-8"
                 />
               </div>
-              <div v-if="exam.type" class="absolute -top-2 -right-2">
+              <div
+                v-if="exam.type"
+                class="absolute -top-2 -right-2"
+              >
                 <UBadge
                   color="primary"
                   variant="solid"

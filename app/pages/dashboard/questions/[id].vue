@@ -6,8 +6,8 @@
         icon="i-heroicons-arrow-right"
         color="neutral"
         variant="ghost"
-        @click="$router.back()"
         class="rtl:-scale-x-100"
+        @click="$router.back()"
       />
       <div>
         <h1
@@ -29,8 +29,7 @@
           <span
             v-if="question?.category"
             class="text-gray-300 dark:text-gray-600"
-            >•</span
-          >
+          >•</span>
           <span v-if="question?.category">{{
             question.category.name_ar || question.category.name
           }}</span>
@@ -39,7 +38,10 @@
     </div>
 
     <!-- loading state -->
-    <div v-if="loading" class="flex justify-center py-20">
+    <div
+      v-if="loading"
+      class="flex justify-center py-20"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-10 h-10 text-primary-500 animate-spin"
@@ -61,12 +63,20 @@
         لا يمكن العثور على هذا السؤال، ربما تم حذفه أو ليس لديك صلاحية للوصول
         إليه.
       </p>
-      <UButton to="/dashboard/exams" class="mt-6" color="neutral" variant="soft"
-        >العودة للمراحل</UButton
+      <UButton
+        to="/dashboard/exams"
+        class="mt-6"
+        color="neutral"
+        variant="soft"
       >
+        العودة للمراحل
+      </UButton>
     </div>
 
-    <div v-else class="space-y-6">
+    <div
+      v-else
+      class="space-y-6"
+    >
       <!-- Question Content Container -->
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm"
@@ -76,7 +86,7 @@
           <div
             class="prose dark:prose-invert max-w-none text-lg leading-relaxed text-gray-900 dark:text-gray-100 font-medium"
             v-html="question.question_text || question.content"
-          ></div>
+          />
 
           <!-- Render media if attached (images/audio) -->
           <div
@@ -87,7 +97,7 @@
               :src="question.media_url || question.image"
               alt="مرفق السؤال"
               class="max-w-full h-auto mx-auto rounded-lg"
-            />
+            >
           </div>
         </div>
 
@@ -96,7 +106,10 @@
           <h4
             class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2"
           >
-            <UIcon name="i-heroicons-queue-list" class="w-5 h-5" />
+            <UIcon
+              name="i-heroicons-queue-list"
+              class="w-5 h-5"
+            />
             اختر الإجابة الصحيحة
           </h4>
 
@@ -115,22 +128,22 @@
                 isSubmitted && answer.is_correct
                   ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
                   : '',
-                isSubmitted &&
-                selectedAnswerId === answer.id &&
-                !answer.is_correct
+                isSubmitted
+                  && selectedAnswerId === answer.id
+                  && !answer.is_correct
                   ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                  : '',
+                  : ''
               ]"
             >
               <div class="flex items-center h-6">
                 <input
+                  v-model="selectedAnswerId"
                   type="radio"
                   :name="'question_' + question.id"
                   :value="answer.id"
-                  v-model="selectedAnswerId"
                   :disabled="isSubmitted || isSubmitting"
                   class="w-5 h-5 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                />
+                >
               </div>
               <div class="flex-1">
                 <div
@@ -144,11 +157,14 @@
                   v-if="answer.media_url || answer.image"
                   :src="answer.media_url || answer.image"
                   class="mt-2 rounded-lg max-h-32 object-contain"
-                />
+                >
               </div>
 
               <!-- Indicators after submission -->
-              <div v-if="isSubmitted" class="shrink-0 h-6 flex items-center">
+              <div
+                v-if="isSubmitted"
+                class="shrink-0 h-6 flex items-center"
+              >
                 <UIcon
                   v-if="answer.is_correct"
                   name="i-heroicons-check-circle"
@@ -182,14 +198,17 @@
           size="xl"
           :loading="isSubmitting"
           :disabled="isSubmitted || (!selectedAnswerId && !textAnswer)"
-          @click="submitAnswer"
           class="min-w-[150px] justify-center"
+          @click="submitAnswer"
         >
           {{ isSubmitted ? "تم الإرسال" : "تأكيد الإجابة" }}
         </UButton>
 
         <!-- Dynamic feedback alert -->
-        <div v-if="isSubmitted" class="flex items-center gap-2 animate-fade-in">
+        <div
+          v-if="isSubmitted"
+          class="flex items-center gap-2 animate-fade-in"
+        >
           <UBadge
             v-if="isCorrectResult"
             color="success"
@@ -197,7 +216,10 @@
             variant="subtle"
             class="px-4 py-2 text-base"
           >
-            <UIcon name="i-heroicons-star" class="w-5 h-5 mr-1" />
+            <UIcon
+              name="i-heroicons-star"
+              class="w-5 h-5 mr-1"
+            />
             إجابة صحيحة! أحسنت!
           </UBadge>
           <UBadge
@@ -207,7 +229,10 @@
             variant="subtle"
             class="px-4 py-2 text-base"
           >
-            <UIcon name="i-heroicons-exclamation-circle" class="w-5 h-5 mr-1" />
+            <UIcon
+              name="i-heroicons-exclamation-circle"
+              class="w-5 h-5 mr-1"
+            />
             إجابة خاطئة. حاول مرة أخرى.
           </UBadge>
         </div>
@@ -217,88 +242,88 @@
 </template>
 
 <script setup lang="ts">
-import { questionsService } from "@/services/api/questions.service";
-import { showToast } from "@/utils/helpers/toast.helper";
+import { questionsService } from '@/services/api/questions.service'
+import { showToast } from '@/utils/helpers/toast.helper'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
 
-const route = useRoute();
-const questionId = route.params.id as string;
+const route = useRoute()
+const questionId = route.params.id as string
 
-const loading = ref(true);
-const question = ref<any>(null);
+const loading = ref(true)
+const question = ref<any>(null)
 
-const selectedAnswerId = ref<number | null>(null);
-const textAnswer = ref("");
-const isSubmitting = ref(false);
-const isSubmitted = ref(false);
-const isCorrectResult = ref(false);
+const selectedAnswerId = ref<number | null>(null)
+const textAnswer = ref('')
+const isSubmitting = ref(false)
+const isSubmitted = ref(false)
+const isCorrectResult = ref(false)
 
 onMounted(async () => {
   try {
-    const res = await questionsService.getQuestionDetails(questionId);
-    const data = res.data?.data || res.data;
-    question.value = data?.question || data;
+    const res = await questionsService.getQuestionDetails(questionId)
+    const data = res.data?.data || res.data
+    question.value = data?.question || data
 
-    useSeoMeta({ title: `السؤال #${questionId} | A Plus` });
+    useSeoMeta({ title: `السؤال #${questionId} | A Plus` })
   } catch (error) {
-    console.error("Failed to load question details", error);
+    console.error('Failed to load question details', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-});
+})
 
 async function submitAnswer() {
-  if (!selectedAnswerId.value && !textAnswer.value) return;
+  if (!selectedAnswerId.value && !textAnswer.value) return
 
-  isSubmitting.value = true;
+  isSubmitting.value = true
   try {
-    const payload: any = { question_id: parseInt(questionId) };
-    if (selectedAnswerId.value) payload.answer_id = selectedAnswerId.value;
-    if (textAnswer.value) payload.answer_text = textAnswer.value;
+    const payload: any = { question_id: parseInt(questionId) }
+    if (selectedAnswerId.value) payload.answer_id = selectedAnswerId.value
+    if (textAnswer.value) payload.answer_text = textAnswer.value
 
-    const res = await questionsService.submitAnswer(payload);
+    const res = await questionsService.submitAnswer(payload)
 
     // Evaluate if backend returns correctness, or check against question answers array locally if exposed
-    const responseData = res.data?.data || res.data;
-    isCorrectResult.value = responseData?.is_correct === true;
+    const responseData = res.data?.data || res.data
+    isCorrectResult.value = responseData?.is_correct === true
 
     // If backend doesn't return exact correctness in response but we have valid local data exposing it
     if (responseData?.is_correct === undefined && selectedAnswerId.value) {
       const chosen = question.value.answers?.find(
-        (a: any) => a.id === selectedAnswerId.value,
-      );
-      isCorrectResult.value = chosen?.is_correct === true;
+        (a: any) => a.id === selectedAnswerId.value
+      )
+      isCorrectResult.value = chosen?.is_correct === true
     }
 
-    isSubmitted.value = true;
+    isSubmitted.value = true
 
     if (isCorrectResult.value) {
-      showToast("ممتاز", "إجابتك صحيحة!", "success");
+      showToast('ممتاز', 'إجابتك صحيحة!', 'success')
     } else {
-      showToast("تنبيه", "الإجابة خاطئة", "warning");
+      showToast('تنبيه', 'الإجابة خاطئة', 'warning')
     }
   } catch (error: any) {
-    console.error("Failed to submit answer", error);
+    console.error('Failed to submit answer', error)
     showToast(
-      "خطأ",
-      error.response?.data?.message || "حدث خطأ أثناء إرسال الإجابة",
-      "error",
-    );
+      'خطأ',
+      error.response?.data?.message || 'حدث خطأ أثناء إرسال الإجابة',
+      'error'
+    )
   } finally {
-    isSubmitting.value = false;
+    isSubmitting.value = false
   }
 }
 
 function getDifficultyColor(difficulty: string) {
   switch (difficulty?.toLowerCase()) {
-    case "easy":
-      return "emerald";
-    case "hard":
-      return "red";
-    case "medium":
+    case 'easy':
+      return 'emerald'
+    case 'hard':
+      return 'red'
+    case 'medium':
     default:
-      return "orange";
+      return 'orange'
   }
 }
 </script>

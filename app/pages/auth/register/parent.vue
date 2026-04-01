@@ -53,7 +53,11 @@
             @submit="onSubmit"
           >
             <div class="grid grid-cols-2 gap-4">
-              <UFormField label="الاسم الكامل" name="name" class="col-span-2">
+              <UFormField
+                label="الاسم الكامل"
+                name="name"
+                class="col-span-2"
+              >
                 <UInput
                   v-model="state.name"
                   placeholder="أدخل اسمك الكامل"
@@ -125,7 +129,10 @@
                 />
               </UFormField>
 
-              <UFormField label="كلمة المرور" name="password">
+              <UFormField
+                label="كلمة المرور"
+                name="password"
+              >
                 <UInput
                   v-model="state.password"
                   type="password"
@@ -148,7 +155,11 @@
                 />
               </UFormField>
 
-              <UFormField label="الجنس" name="gender" class="col-span-2">
+              <UFormField
+                label="الجنس"
+                name="gender"
+                class="col-span-2"
+              >
                 <USelect
                   v-model="state.gender"
                   :items="genderOptions"
@@ -181,75 +192,75 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
-import type { FormSubmitEvent } from "#ui/types";
-import { authService } from "@/services/api/auth.service";
-import { useAuthStore } from "@/stores/auth";
-import { useRedirect } from "@/composables/useRedirect";
-import { useUsernameCheck } from "@/composables/useUsernameCheck";
+import { z } from 'zod'
+import type { FormSubmitEvent } from '#ui/types'
+import { authService } from '@/services/api/auth.service'
+import { useAuthStore } from '@/stores/auth'
+import { useRedirect } from '@/composables/useRedirect'
+import { useUsernameCheck } from '@/composables/useUsernameCheck'
 
-definePageMeta({ layout: "fullscreen", middleware: "guest" });
-useSeoMeta({ title: "تسجيل ولي أمر | A Plus" });
+definePageMeta({ layout: 'fullscreen', middleware: 'guest' })
+useSeoMeta({ title: 'تسجيل ولي أمر | A Plus' })
 
-const authStore = useAuthStore();
-const { redirectByRole } = useRedirect();
-const usernameCheck = useUsernameCheck();
+const authStore = useAuthStore()
+const { redirectByRole } = useRedirect()
+const usernameCheck = useUsernameCheck()
 
-const loading = ref(false);
+const loading = ref(false)
 
 const genderOptions = [
-  { label: "ذكر", value: "male" },
-  { label: "أنثى", value: "female" },
-];
+  { label: 'ذكر', value: 'male' },
+  { label: 'أنثى', value: 'female' }
+]
 
 const schema = z
   .object({
-    name: z.string().min(2, "الاسم مطلوب"),
-    user_name: z.string().min(3, "اسم المستخدم مطلوب"),
-    country_code: z.string().min(1, "كود الدولة مطلوب"),
-    phone: z.string().min(7, "رقم الهاتف مطلوب"),
+    name: z.string().min(2, 'الاسم مطلوب'),
+    user_name: z.string().min(3, 'اسم المستخدم مطلوب'),
+    country_code: z.string().min(1, 'كود الدولة مطلوب'),
+    phone: z.string().min(7, 'رقم الهاتف مطلوب'),
     email: z
       .string()
-      .email("بريد إلكتروني غير صالح")
+      .email('بريد إلكتروني غير صالح')
       .optional()
-      .or(z.literal("")),
-    password: z.string().min(8, "كلمة المرور ٨ أحرف على الأقل"),
-    password_confirmation: z.string().min(8, "تأكيد كلمة المرور مطلوب"),
-    gender: z.enum(["male", "female"], { message: "الجنس مطلوب" }),
+      .or(z.literal('')),
+    password: z.string().min(8, 'كلمة المرور ٨ أحرف على الأقل'),
+    password_confirmation: z.string().min(8, 'تأكيد كلمة المرور مطلوب'),
+    gender: z.enum(['male', 'female'], { message: 'الجنس مطلوب' })
   })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: "كلمات المرور غير متطابقة",
-    path: ["password_confirmation"],
-  });
+  .refine(data => data.password === data.password_confirmation, {
+    message: 'كلمات المرور غير متطابقة',
+    path: ['password_confirmation']
+  })
 
-type Schema = z.output<typeof schema>;
+type Schema = z.output<typeof schema>
 
 const state = reactive<Partial<Schema>>({
-  name: "",
-  user_name: "",
-  country_code: "+20",
-  phone: "",
-  email: "",
-  password: "",
-  password_confirmation: "",
-  gender: undefined,
-});
+  name: '',
+  user_name: '',
+  country_code: '+20',
+  phone: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
+  gender: undefined
+})
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  if (usernameCheck.status.value !== "available") {
-    return;
+  if (usernameCheck.status.value !== 'available') {
+    return
   }
 
-  loading.value = true;
+  loading.value = true
   try {
-    const res = await authService.registerParent(event.data);
-    const authData = res?.data || res;
-    await authStore.storeUser(authData);
-    redirectByRole(authData.user);
+    const res = await authService.registerParent(event.data)
+    const authData = res?.data || res
+    await authStore.storeUser(authData)
+    redirectByRole(authData.user)
   } catch {
     // handled by interceptor
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

@@ -52,19 +52,22 @@
           class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-10 text-center hover:border-emerald-500 dark:hover:border-emerald-500 transition-colors cursor-pointer group"
           :class="{
             'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10':
-              fileData,
+              fileData
           }"
           @click="triggerFileInput"
         >
           <input
-            type="file"
             ref="fileInput"
+            type="file"
             class="hidden"
             accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
             @change="handleFileUpload"
-          />
+          >
 
-          <div v-if="!fileData" class="space-y-3">
+          <div
+            v-if="!fileData"
+            class="space-y-3"
+          >
             <div
               class="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/30 transition-colors"
             >
@@ -81,7 +84,10 @@
             </p>
           </div>
 
-          <div v-else class="space-y-4">
+          <div
+            v-else
+            class="space-y-4"
+          >
             <UIcon
               name="i-heroicons-document-text"
               class="w-16 h-16 text-emerald-500 mx-auto"
@@ -109,8 +115,8 @@
             icon="i-heroicons-check"
             :loading="isUploading"
             :disabled="!fileData"
-            @click="uploadExcelFile"
             class="px-8"
+            @click="uploadExcelFile"
           >
             بدء الاستيراد
           </UButton>
@@ -138,7 +144,7 @@
 
         <UTextarea
           v-model="jsonContent"
-          placeholder='[ {"name": "طالب تجريبي", "phone": "0500000000", "parent_phone": "0511111111", "email": "test@domain.com"} ]'
+          placeholder="[ {&quot;name&quot;: &quot;طالب تجريبي&quot;, &quot;phone&quot;: &quot;0500000000&quot;, &quot;parent_phone&quot;: &quot;0511111111&quot;, &quot;email&quot;: &quot;test@domain.com&quot;} ]"
           :rows="8"
           class="font-mono text-left w-full"
           dir="ltr"
@@ -169,8 +175,8 @@
             :disabled="
               !jsonContent || !!jsonParseError || parsedJsonCount === 0
             "
-            @click="submitJson"
             class="px-8"
+            @click="submitJson"
           >
             تنفيذ JSON
           </UButton>
@@ -181,106 +187,106 @@
 </template>
 
 <script setup lang="ts">
-import { studentsService } from "@/services/api/students.service";
-import { showToast } from "@/utils/helpers/toast.helper";
+import { studentsService } from '@/services/api/students.service'
+import { showToast } from '@/utils/helpers/toast.helper'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
-useSeoMeta({ title: "استيراد الطلاب | A Plus" });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
+useSeoMeta({ title: 'استيراد الطلاب | A Plus' })
 
 // File Upload State
-const fileInput = ref<HTMLInputElement | null>(null);
-const fileData = ref<File | null>(null);
-const isUploading = ref(false);
+const fileInput = ref<HTMLInputElement | null>(null)
+const fileData = ref<File | null>(null)
+const isUploading = ref(false)
 
 // JSON Upload State
-const jsonContent = ref("");
-const isJsonSubmitting = ref(false);
+const jsonContent = ref('')
+const isJsonSubmitting = ref(false)
 
 const jsonParseError = computed(() => {
-  if (!jsonContent.value) return "";
+  if (!jsonContent.value) return ''
   try {
-    const parsed = JSON.parse(jsonContent.value);
+    const parsed = JSON.parse(jsonContent.value)
     if (!Array.isArray(parsed))
-      return "البيانات المدخلة يجب أن تكون مصفوفة JSON Array []";
+      return 'البيانات المدخلة يجب أن تكون مصفوفة JSON Array []'
     // Deep check
     for (const item of parsed) {
       if (!item.name || !item.parent_phone) {
-        return "أحد السجلات ينقصه بيانات أساسية (name أو parent_phone)";
+        return 'أحد السجلات ينقصه بيانات أساسية (name أو parent_phone)'
       }
     }
-    return "";
+    return ''
   } catch (e) {
-    return "صيغة JSON غير صحيحة";
+    return 'صيغة JSON غير صحيحة'
   }
-});
+})
 
 const parsedJsonCount = computed(() => {
-  if (jsonParseError.value || !jsonContent.value) return 0;
-  return JSON.parse(jsonContent.value).length;
-});
+  if (jsonParseError.value || !jsonContent.value) return 0
+  return JSON.parse(jsonContent.value).length
+})
 
 function triggerFileInput() {
-  fileInput.value?.click();
+  fileInput.value?.click()
 }
 
 function handleFileUpload(event: Event) {
-  const target = event.target as HTMLInputElement;
+  const target = event.target as HTMLInputElement
   if (target.files && target.files.length > 0) {
-    fileData.value = target.files[0];
+    fileData.value = target.files[0]
   }
 }
 
 async function uploadExcelFile() {
-  if (!fileData.value) return;
+  if (!fileData.value) return
 
-  isUploading.value = true;
+  isUploading.value = true
   try {
-    const formData = new FormData();
-    formData.append("file", fileData.value);
+    const formData = new FormData()
+    formData.append('file', fileData.value)
 
     // Add endpoint dynamically if we want
-    await studentsService.importStudents(formData);
+    await studentsService.importStudents(formData)
 
     showToast(
-      "نجاح",
+      'نجاح',
       `تم استيراد قائمة الطلاب بنجاح من الملف ${fileData.value.name}`,
-      "success",
-    );
-    fileData.value = null; // reset
+      'success'
+    )
+    fileData.value = null // reset
   } catch (error: any) {
     showToast(
-      "خطأ",
-      error.response?.data?.message || "فشل في قراءة ومعالجة الملف",
-      "error",
-    );
+      'خطأ',
+      error.response?.data?.message || 'فشل في قراءة ومعالجة الملف',
+      'error'
+    )
   } finally {
-    isUploading.value = false;
+    isUploading.value = false
   }
 }
 
 async function submitJson() {
-  if (jsonParseError.value || !jsonContent.value) return;
+  if (jsonParseError.value || !jsonContent.value) return
 
-  isJsonSubmitting.value = true;
+  isJsonSubmitting.value = true
   try {
-    const parsedData = JSON.parse(jsonContent.value);
+    const parsedData = JSON.parse(jsonContent.value)
 
-    await studentsService.bulkCreateStudents({ students: parsedData });
+    await studentsService.bulkCreateStudents({ students: parsedData })
 
     showToast(
-      "نجاح",
+      'نجاح',
       `تم إضافة ${parsedJsonCount.value} سجلات بنجاح`,
-      "success",
-    );
-    jsonContent.value = ""; // reset
+      'success'
+    )
+    jsonContent.value = '' // reset
   } catch (error: any) {
     showToast(
-      "خطأ",
-      error.response?.data?.message || "حدث خطأ أثناء إدراج البيانات",
-      "error",
-    );
+      'خطأ',
+      error.response?.data?.message || 'حدث خطأ أثناء إدراج البيانات',
+      'error'
+    )
   } finally {
-    isJsonSubmitting.value = false;
+    isJsonSubmitting.value = false
   }
 }
 </script>

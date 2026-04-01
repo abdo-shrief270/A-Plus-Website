@@ -4,14 +4,20 @@
       الأجهزة المرتبطة
     </h1>
 
-    <div v-if="loading" class="flex justify-center py-10">
+    <div
+      v-if="loading"
+      class="flex justify-center py-10"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-8 h-8 text-primary-500 animate-spin"
       />
     </div>
 
-    <div v-else class="space-y-4 max-w-2xl">
+    <div
+      v-else
+      class="space-y-4 max-w-2xl"
+    >
       <template v-if="devices.length > 0">
         <div
           v-for="device in devices"
@@ -85,42 +91,42 @@
 </template>
 
 <script setup lang="ts">
-import { authService } from "@/services/api/auth.service";
-import { showToast } from "@/utils/helpers/toast.helper";
+import { authService } from '@/services/api/auth.service'
+import { showToast } from '@/utils/helpers/toast.helper'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
-useSeoMeta({ title: "الأجهزة | A Plus" });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
+useSeoMeta({ title: 'الأجهزة | A Plus' })
 
-const loading = ref(true);
-const revokingId = ref<number | null>(null);
-const devices = ref<any[]>([]);
+const loading = ref(true)
+const revokingId = ref<number | null>(null)
+const devices = ref<any[]>([])
 
 onMounted(async () => {
   try {
-    const res = await authService.devices();
-    const payload = res.data?.data || res.data;
+    const res = await authService.devices()
+    const payload = res.data?.data || res.data
     // The API might return it wrapped in an array or under a 'devices' key
-    devices.value = Array.isArray(payload) ? payload : payload?.devices || [];
+    devices.value = Array.isArray(payload) ? payload : payload?.devices || []
   } catch (error: any) {
-    console.error("Failed to load devices", error);
-    showToast("خطأ", "فشل في تحميل الأجهزة المتصلة", "error");
+    console.error('Failed to load devices', error)
+    showToast('خطأ', 'فشل في تحميل الأجهزة المتصلة', 'error')
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-});
+})
 
 async function onRevoke(id: number) {
-  revokingId.value = id;
+  revokingId.value = id
   try {
-    await authService.revokeDevice(id);
-    devices.value = devices.value.filter((d) => d.id !== id);
-    showToast("نجاح", "تم تسجيل الخروج من الجهاز بنجاح", "success");
+    await authService.revokeDevice(id)
+    devices.value = devices.value.filter(d => d.id !== id)
+    showToast('نجاح', 'تم تسجيل الخروج من الجهاز بنجاح', 'success')
   } catch (error: any) {
-    const msg =
-      error.response?.data?.message || "فشل في تسجيل الخروج من الجهاز";
-    showToast("خطأ", msg, "error");
+    const msg
+      = error.response?.data?.message || 'فشل في تسجيل الخروج من الجهاز'
+    showToast('خطأ', msg, 'error')
   } finally {
-    revokingId.value = null;
+    revokingId.value = null
   }
 }
 </script>

@@ -23,7 +23,10 @@
       />
     </div>
 
-    <div v-if="loading" class="flex justify-center py-20">
+    <div
+      v-if="loading"
+      class="flex justify-center py-20"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-10 h-10 text-primary-500 animate-spin"
@@ -37,7 +40,10 @@
       <div
         class="w-20 h-20 rounded-2xl bg-primary-50 dark:bg-primary-900/20 text-primary-500 flex items-center justify-center mx-auto mb-6"
       >
-        <UIcon name="i-heroicons-video-camera" class="w-10 h-10" />
+        <UIcon
+          name="i-heroicons-video-camera"
+          class="w-10 h-10"
+        />
       </div>
       <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
         لست مشتركاً في أي دورة بعد
@@ -45,13 +51,20 @@
       <p class="text-gray-500 max-w-md mx-auto mb-6">
         تصفح الدورات الأكثر إقبالاً وابدأ رحلتك التعليمية معنا الآن.
       </p>
-      <UButton to="/dashboard/trending-courses" size="lg" color="primary">
+      <UButton
+        to="/dashboard/trending-courses"
+        size="lg"
+        color="primary"
+      >
         تصفح الدورات المتاحة
       </UButton>
     </div>
 
     <!-- Enrollments Grid -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      v-else
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    >
       <NuxtLink
         v-for="enrollment in enrollments"
         :key="enrollment.id"
@@ -66,7 +79,7 @@
             v-if="enrollment.course?.image"
             :src="enrollment.course.image"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+          >
           <div
             v-else
             class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500/10 to-primary-600/20 group-hover:scale-105 transition-transform duration-500"
@@ -110,9 +123,9 @@
           >
             تم الانضمام:
             {{
-              enrollment.enrolled_at ||
-              enrollment.created_at?.split("T")[0] ||
-              "مؤخراً"
+              enrollment.enrolled_at
+                || enrollment.created_at?.split("T")[0]
+                || "مؤخراً"
             }}
           </p>
 
@@ -120,16 +133,16 @@
             class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors mb-2 line-clamp-2"
           >
             {{
-              enrollment.course?.title ||
-              enrollment.course?.name ||
-              "اسم الدورة غير متوفر"
+              enrollment.course?.title
+                || enrollment.course?.name
+                || "اسم الدورة غير متوفر"
             }}
           </h3>
 
           <p class="text-sm text-gray-500 line-clamp-2 mb-6 flex-1">
             {{
-              enrollment.course?.description ||
-              "شاهد محتوى هذه الدورة لتحسين مستواك الدراسي."
+              enrollment.course?.description
+                || "شاهد محتوى هذه الدورة لتحسين مستواك الدراسي."
             }}
           </p>
 
@@ -152,7 +165,10 @@
     </div>
 
     <!-- Pagination Mockup -->
-    <div v-if="enrollments.length > 0" class="flex justify-center mt-8">
+    <div
+      v-if="enrollments.length > 0"
+      class="flex justify-center mt-8"
+    >
       <UPagination
         v-model="page"
         :page-count="15"
@@ -163,41 +179,41 @@
 </template>
 
 <script setup lang="ts">
-import { studentsService } from "@/services/api/students.service";
+import { studentsService } from '@/services/api/students.service'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
-useSeoMeta({ title: "دوراتي | A Plus" });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
+useSeoMeta({ title: 'دوراتي | A Plus' })
 
-const loading = ref(true);
-const enrollments = ref<any[]>([]);
-const meta = ref<any>(null);
+const loading = ref(true)
+const enrollments = ref<any[]>([])
+const meta = ref<any>(null)
 
-const searchQuery = ref("");
-const page = ref(1);
+const searchQuery = ref('')
+const page = ref(1)
 
 onMounted(async () => {
-  await fetchEnrollments();
-});
+  await fetchEnrollments()
+})
 
 watch(page, () => {
-  fetchEnrollments();
-});
+  fetchEnrollments()
+})
 
 async function fetchEnrollments() {
-  loading.value = true;
+  loading.value = true
   try {
     const res = await studentsService.getEnrollments({
       page: page.value,
-      search: searchQuery.value || undefined,
-    });
+      search: searchQuery.value || undefined
+    })
 
-    const data = res.data?.data || res.data;
-    enrollments.value = Array.isArray(data) ? data : data?.enrollments || [];
-    meta.value = res.data?.meta || data?.meta || null;
+    const data = res.data?.data || res.data
+    enrollments.value = Array.isArray(data) ? data : data?.enrollments || []
+    meta.value = res.data?.meta || data?.meta || null
   } catch (error) {
-    console.error("Failed to load enrollments", error);
+    console.error('Failed to load enrollments', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

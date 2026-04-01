@@ -14,7 +14,11 @@
           >
             {{ s }}
           </div>
-          <div v-if="s < 4" class="w-8 h-0.5" :class="step > s ? 'bg-primary-600' : 'bg-gray-200'" />
+          <div
+            v-if="s < 4"
+            class="w-8 h-0.5"
+            :class="step > s ? 'bg-primary-600' : 'bg-gray-200'"
+          />
         </div>
       </div>
 
@@ -35,7 +39,12 @@
               icon="i-heroicons-user"
               class="w-full"
             />
-            <UButton block size="lg" :loading="loading" @click="onFindUser">
+            <UButton
+              block
+              size="lg"
+              :loading="loading"
+              @click="onFindUser"
+            >
               متابعة
             </UButton>
           </div>
@@ -58,7 +67,10 @@
               class="justify-start"
               @click="onSendOtp('sms')"
             >
-              <UIcon name="i-heroicons-device-phone-mobile" class="w-5 h-5 ml-2" />
+              <UIcon
+                name="i-heroicons-device-phone-mobile"
+                class="w-5 h-5 ml-2"
+              />
               SMS · {{ maskedPhone }}
             </UButton>
             <UButton
@@ -71,7 +83,10 @@
               class="justify-start"
               @click="onSendOtp('whatsapp')"
             >
-              <UIcon name="i-simple-icons-whatsapp" class="w-5 h-5 ml-2" />
+              <UIcon
+                name="i-simple-icons-whatsapp"
+                class="w-5 h-5 ml-2"
+              />
               WhatsApp · {{ maskedPhone }}
             </UButton>
             <UButton
@@ -84,7 +99,10 @@
               class="justify-start"
               @click="onSendOtp('email')"
             >
-              <UIcon name="i-heroicons-envelope" class="w-5 h-5 ml-2" />
+              <UIcon
+                name="i-heroicons-envelope"
+                class="w-5 h-5 ml-2"
+              />
               بريد إلكتروني · {{ maskedEmail }}
             </UButton>
           </div>
@@ -116,7 +134,10 @@
               icon="i-heroicons-lock-closed"
               class="w-full"
             />
-            <p v-if="confirmPassword && newPassword !== confirmPassword" class="text-xs text-error-600">
+            <p
+              v-if="confirmPassword && newPassword !== confirmPassword"
+              class="text-xs text-error-600"
+            >
               كلمتا المرور غير متطابقتين
             </p>
             <UButton

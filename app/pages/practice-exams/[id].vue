@@ -3,18 +3,31 @@
     <div class="max-w-3xl mx-auto">
       <div class="mb-6 flex items-center gap-3">
         <NuxtLink to="/practice-exams">
-          <UButton color="neutral" variant="ghost" icon="i-heroicons-arrow-right" />
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-heroicons-arrow-right"
+          />
         </NuxtLink>
         <h1 class="text-xl font-bold text-gray-900 dark:text-white">
           {{ practiceExam?.name || 'نموذج اختبار' }}
         </h1>
       </div>
 
-      <div v-if="loading" class="flex justify-center py-20">
-        <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 text-primary-500 animate-spin" />
+      <div
+        v-if="loading"
+        class="flex justify-center py-20"
+      >
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="w-10 h-10 text-primary-500 animate-spin"
+        />
       </div>
 
-      <div v-else class="space-y-4">
+      <div
+        v-else
+        class="space-y-4"
+      >
         <NuxtLink
           v-for="(q, idx) in practiceExam?.questions || []"
           :key="q.id"

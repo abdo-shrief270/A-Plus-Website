@@ -29,8 +29,7 @@
                 icon="i-heroicons-magnifying-glass"
                 class="flex-1"
                 :ui="{
-                  base: 'rounded-2xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-gray-900 text-lg py-4',
-                  icon: { trailing: { pointer: '' } }
+                  base: 'rounded-2xl border-none ring-1 ring-gray-200 dark:ring-gray-800 bg-white dark:bg-gray-900 text-lg py-4'
                 }"
                 @keyup.enter="handleSearch"
               />
@@ -144,9 +143,7 @@
             :page-count="questionsStore.searchPagination.per_page"
             class="rtl"
             :ui="{
-              list: 'flex items-center gap-1',
-              base: 'rounded-lg font-bold',
-              rounded: 'rounded-lg'
+              list: 'flex items-center gap-1'
             }"
           />
         </div>
@@ -166,10 +163,20 @@ useSeoMeta({
 })
 
 const questionsStore = useQuestionsStore()
-const searchQuery = ref('')
-const lastQuery = ref('')
-const searched = ref(false)
-const currentPage = ref(1)
+const route = useRoute()
+const router = useRouter()
+
+const searchQuery = ref(route.query.q?.toString() || '')
+const lastQuery = ref(route.query.q?.toString() || '')
+const searched = ref(!!route.query.q)
+
+const { currentPage } = usePagination({
+  onPageChange: (page) => {
+    if (lastQuery.value) {
+      questionsStore.searchQuestions({ q: lastQuery.value, page, per_page: 15 })
+    }
+  }
+})
 
 const suggestions = ['الرياضيات', 'الكيمياء', 'الأحياء', 'الفيزياء', 'البلاغة']
 
@@ -187,13 +194,16 @@ async function handleSearch() {
   searched.value = true
   lastQuery.value = query
   currentPage.value = 1
+
+  // Sync search query and page 1 to URL
+  router.push({ query: { ...route.query, q: query, page: '1' } })
+
   await questionsStore.searchQuestions({ q: query, page: 1, per_page: 15 })
 }
 
-watch(currentPage, async (val) => {
+onMounted(() => {
   if (lastQuery.value) {
-    await questionsStore.searchQuestions({ q: lastQuery.value, page: val, per_page: 15 })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    questionsStore.searchQuestions({ q: lastQuery.value, page: currentPage.value, per_page: 15 })
   }
 })
 </script>

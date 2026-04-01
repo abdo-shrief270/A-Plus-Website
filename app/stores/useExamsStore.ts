@@ -140,7 +140,7 @@ export const useExamsStore = defineStore('exams', () => {
     pagination,
     isLoading,
     error,
-    
+
     // Actions
     fetchExams,
     fetchExamById,

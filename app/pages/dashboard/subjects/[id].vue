@@ -7,8 +7,8 @@
           icon="i-heroicons-arrow-right"
           color="neutral"
           variant="ghost"
-          @click="$router.back()"
           class="rtl:-scale-x-100"
+          @click="$router.back()"
         />
         <div>
           <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -21,14 +21,20 @@
       </div>
     </div>
 
-    <div v-if="loading" class="flex justify-center py-20">
+    <div
+      v-if="loading"
+      class="flex justify-center py-20"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-10 h-10 text-primary-500 animate-spin"
       />
     </div>
 
-    <div v-else class="space-y-6">
+    <div
+      v-else
+      class="space-y-6"
+    >
       <!-- Search & Filters (Mockup for now) -->
       <div class="flex flex-col sm:flex-row gap-4 mb-6">
         <UInput
@@ -64,7 +70,10 @@
         </p>
       </div>
 
-      <div v-else class="space-y-4">
+      <div
+        v-else
+        class="space-y-4"
+      >
         <NuxtLink
           v-for="question in questions"
           :key="question.id"
@@ -95,19 +104,28 @@
                 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-2"
               >
                 {{
-                  question.question_text ||
-                  question.content ||
-                  "نص السؤال غير متوفر"
+                  question.question_text
+                    || question.content
+                    || "نص السؤال غير متوفر"
                 }}
               </h3>
 
               <div class="flex items-center gap-4 mt-4 text-xs text-gray-500">
                 <span class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-check-circle" class="w-4 h-4" />
+                  <UIcon
+                    name="i-heroicons-check-circle"
+                    class="w-4 h-4"
+                  />
                   {{ question.answers_count || 0 }} إجابات
                 </span>
-                <span v-if="question.category" class="flex items-center gap-1">
-                  <UIcon name="i-heroicons-folder" class="w-4 h-4" />
+                <span
+                  v-if="question.category"
+                  class="flex items-center gap-1"
+                >
+                  <UIcon
+                    name="i-heroicons-folder"
+                    class="w-4 h-4"
+                  />
                   {{ question.category.name_ar || question.category.name }}
                 </span>
               </div>
@@ -126,7 +144,10 @@
       </div>
 
       <!-- Pagination Mockup -->
-      <div v-if="questions.length > 0" class="flex justify-center mt-8">
+      <div
+        v-if="questions.length > 0"
+        class="flex justify-center mt-8"
+      >
         <UPagination
           v-model="page"
           :page-count="15"
@@ -138,65 +159,65 @@
 </template>
 
 <script setup lang="ts">
-import { questionsService } from "@/services/api/questions.service";
+import { questionsService } from '@/services/api/questions.service'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
 
-const route = useRoute();
-const subjectId = route.params.id as string;
+const route = useRoute()
+const subjectId = route.params.id as string
 
-const loading = ref(true);
-const subject = ref<any>(null);
-const questions = ref<any[]>([]);
-const meta = ref<any>(null);
+const loading = ref(true)
+const subject = ref<any>(null)
+const questions = ref<any[]>([])
+const meta = ref<any>(null)
 
-const searchQuery = ref("");
-const selectedCategory = ref(null);
-const page = ref(1);
+const searchQuery = ref('')
+const selectedCategory = ref(null)
+const page = ref(1)
 
 onMounted(async () => {
-  await fetchQuestions();
-});
+  await fetchQuestions()
+})
 
 watch(page, () => {
-  fetchQuestions();
-});
+  fetchQuestions()
+})
 
 async function fetchQuestions() {
-  loading.value = true;
+  loading.value = true
   try {
     const res = await questionsService.getSubjectQuestions(subjectId, {
-      page: page.value,
+      page: page.value
       // Add more filters as needed by the API
-    });
+    })
 
     // API logic to parse standard paginated response or flat array
-    const data = res.data?.data || res.data;
+    const data = res.data?.data || res.data
     questions.value = Array.isArray(data)
       ? data
-      : data?.questions || data?.data || [];
-    meta.value = res.data?.meta || data?.meta || null;
-    subject.value = data?.subject || { name_ar: "المادة " + subjectId }; // Fallback if API doesn't return subject details alongside questions
+      : data?.questions || data?.data || []
+    meta.value = res.data?.meta || data?.meta || null
+    subject.value = data?.subject || { name_ar: 'المادة ' + subjectId } // Fallback if API doesn't return subject details alongside questions
 
     useSeoMeta({
-      title: `${subject.value?.name_ar || "تفاصيل المادة"} | A Plus`,
-    });
+      title: `${subject.value?.name_ar || 'تفاصيل المادة'} | A Plus`
+    })
   } catch (error) {
-    console.error("Failed to load questions", error);
+    console.error('Failed to load questions', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 function getDifficultyColor(difficulty: string) {
   switch (difficulty?.toLowerCase()) {
-    case "easy":
-      return "emerald";
-    case "hard":
-      return "red";
-    case "medium":
+    case 'easy':
+      return 'emerald'
+    case 'hard':
+      return 'red'
+    case 'medium':
     default:
-      return "orange";
+      return 'orange'
   }
 }
 </script>

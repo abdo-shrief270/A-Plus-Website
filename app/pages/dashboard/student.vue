@@ -33,7 +33,10 @@
       >
         <div class="flex items-center justify-between mb-3">
           <div :class="`w-10 h-10 rounded-lg ${stat.iconBg} flex items-center justify-center`">
-            <UIcon :name="stat.icon" :class="`w-5 h-5 ${stat.iconColor}`" />
+            <UIcon
+              :name="stat.icon"
+              :class="`w-5 h-5 ${stat.iconColor}`"
+            />
           </div>
         </div>
         <p class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -52,16 +55,29 @@
           الاختبارات المتاحة
         </h2>
         <NuxtLink to="/exams">
-          <UButton variant="link" size="sm" trailing-icon="i-heroicons-arrow-left">
+          <UButton
+            variant="link"
+            size="sm"
+            trailing-icon="i-heroicons-arrow-left"
+          >
             عرض الكل
           </UButton>
         </NuxtLink>
       </div>
       <div class="p-5">
-        <div v-if="examsLoading" class="flex justify-center py-8">
-          <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-400 animate-spin" />
+        <div
+          v-if="examsLoading"
+          class="flex justify-center py-8"
+        >
+          <UIcon
+            name="i-heroicons-arrow-path"
+            class="w-8 h-8 text-gray-400 animate-spin"
+          />
         </div>
-        <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div
+          v-else
+          class="grid grid-cols-1 md:grid-cols-3 gap-4"
+        >
           <NuxtLink
             v-for="exam in exams.slice(0, 3)"
             :key="exam.id"
@@ -70,9 +86,16 @@
             <div class="border border-gray-200 dark:border-gray-600 rounded-xl p-4 hover:border-primary-400 hover:shadow-md transition-all cursor-pointer">
               <div class="flex items-start justify-between mb-3">
                 <div class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
-                  <UIcon name="i-heroicons-clipboard-document-check" class="w-5 h-5 text-primary-600" />
+                  <UIcon
+                    name="i-heroicons-clipboard-document-check"
+                    class="w-5 h-5 text-primary-600"
+                  />
                 </div>
-                <UBadge color="primary" variant="soft" size="xs">
+                <UBadge
+                  color="primary"
+                  variant="soft"
+                  size="xs"
+                >
                   نشط
                 </UBadge>
               </div>
@@ -95,16 +118,29 @@
           أسئلة رائجة
         </h2>
         <NuxtLink to="/questions/trending">
-          <UButton variant="link" size="sm" trailing-icon="i-heroicons-arrow-left">
+          <UButton
+            variant="link"
+            size="sm"
+            trailing-icon="i-heroicons-arrow-left"
+          >
             عرض الكل
           </UButton>
         </NuxtLink>
       </div>
       <div class="p-5">
-        <div v-if="questionsLoading" class="flex justify-center py-8">
-          <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-gray-400 animate-spin" />
+        <div
+          v-if="questionsLoading"
+          class="flex justify-center py-8"
+        >
+          <UIcon
+            name="i-heroicons-arrow-path"
+            class="w-8 h-8 text-gray-400 animate-spin"
+          />
         </div>
-        <div v-else class="space-y-3">
+        <div
+          v-else
+          class="space-y-3"
+        >
           <NuxtLink
             v-for="q in trendingQuestions.slice(0, 5)"
             :key="q.id"
@@ -112,7 +148,10 @@
           >
             <div class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors">
               <div class="w-8 h-8 rounded-lg bg-warning-100 flex items-center justify-center flex-shrink-0">
-                <UIcon name="i-heroicons-question-mark-circle" class="w-4 h-4 text-warning-600" />
+                <UIcon
+                  name="i-heroicons-question-mark-circle"
+                  class="w-4 h-4 text-warning-600"
+                />
               </div>
               <p class="text-sm text-gray-800 dark:text-gray-200 line-clamp-2">
                 {{ q.text || q.content }}

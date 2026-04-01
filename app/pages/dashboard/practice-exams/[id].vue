@@ -1,6 +1,9 @@
 <template>
   <div class="max-w-5xl mx-auto">
-    <div v-if="loading" class="flex justify-center py-20">
+    <div
+      v-if="loading"
+      class="flex justify-center py-20"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-10 h-10 text-primary-500 animate-spin"
@@ -26,8 +29,9 @@
         class="mt-6"
         color="neutral"
         variant="soft"
-        >العودة للاختبارات</UButton
       >
+        العودة للاختبارات
+      </UButton>
     </div>
 
     <!-- Exam Intro State -->
@@ -41,7 +45,10 @@
         <div
           class="w-20 h-20 rounded-2xl bg-primary-50 dark:bg-primary-900/20 text-primary-500 flex items-center justify-center mx-auto mb-6"
         >
-          <UIcon name="i-heroicons-academic-cap" class="w-10 h-10" />
+          <UIcon
+            name="i-heroicons-academic-cap"
+            class="w-10 h-10"
+          />
         </div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
           {{ exam.title || exam.name }}
@@ -63,7 +70,9 @@
             name="i-heroicons-clipboard-document-list"
             class="w-8 h-8 text-gray-400 mb-3 mx-auto"
           />
-          <h4 class="font-bold text-gray-900 dark:text-white">عدد الأسئلة</h4>
+          <h4 class="font-bold text-gray-900 dark:text-white">
+            عدد الأسئلة
+          </h4>
           <p class="text-gray-500 mt-1">
             {{ exam.questions?.length || exam.questions_count || 0 }} سؤال
           </p>
@@ -75,7 +84,9 @@
             name="i-heroicons-clock"
             class="w-8 h-8 text-gray-400 mb-3 mx-auto"
           />
-          <h4 class="font-bold text-gray-900 dark:text-white">المدة الزمنية</h4>
+          <h4 class="font-bold text-gray-900 dark:text-white">
+            المدة الزمنية
+          </h4>
           <p class="text-gray-500 mt-1">
             {{ exam.duration || "غير محدد" }} دقيقة
           </p>
@@ -87,8 +98,12 @@
             name="i-heroicons-check-badge"
             class="w-8 h-8 text-gray-400 mb-3 mx-auto"
           />
-          <h4 class="font-bold text-gray-900 dark:text-white">درجة النجاح</h4>
-          <p class="text-gray-500 mt-1">{{ exam.passing_score || 50 }}%</p>
+          <h4 class="font-bold text-gray-900 dark:text-white">
+            درجة النجاح
+          </h4>
+          <p class="text-gray-500 mt-1">
+            {{ exam.passing_score || 50 }}%
+          </p>
         </div>
       </div>
 
@@ -107,7 +122,10 @@
     </div>
 
     <!-- Active Exam State -->
-    <div v-else-if="!isFinished" class="space-y-6">
+    <div
+      v-else-if="!isFinished"
+      class="space-y-6"
+    >
       <!-- Exam Header / Timer -->
       <div
         class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-6 flex flex-col md:flex-row items-center justify-between gap-4 sticky top-4 z-10 shadow-sm"
@@ -142,17 +160,21 @@
             v-if="exam.duration"
             class="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 text-red-600 px-4 py-2 rounded-lg font-mono font-bold border border-red-100 dark:border-red-900/50"
           >
-            <UIcon name="i-heroicons-clock" class="w-5 h-5" />
+            <UIcon
+              name="i-heroicons-clock"
+              class="w-5 h-5"
+            />
             <span class="text-lg">{{ formattedTimeRemaining }}</span>
           </div>
 
           <UButton
             color="red"
             variant="soft"
-            @click="finishExam"
             class="shrink-0"
-            >إنهاء الاختبار</UButton
+            @click="finishExam"
           >
+            إنهاء الاختبار
+          </UButton>
         </div>
       </div>
 
@@ -185,7 +207,7 @@
           <div
             class="prose dark:prose-invert max-w-none text-xl leading-relaxed text-gray-900 dark:text-gray-100 font-medium"
             v-html="currentQuestion.question_text || currentQuestion.content"
-          ></div>
+          />
 
           <div
             v-if="currentQuestion.media_url || currentQuestion.image"
@@ -194,12 +216,15 @@
             <img
               :src="currentQuestion.media_url || currentQuestion.image"
               class="max-w-full h-auto mx-auto rounded-lg"
-            />
+            >
           </div>
         </div>
 
         <div class="p-6 md:p-8 bg-gray-50/50 dark:bg-gray-800/50">
-          <div v-if="currentQuestion.answers" class="space-y-3">
+          <div
+            v-if="currentQuestion.answers"
+            class="space-y-3"
+          >
             <label
               v-for="answer in currentQuestion.answers"
               :key="answer.id"
@@ -212,18 +237,18 @@
             >
               <div class="flex items-center h-6">
                 <input
+                  v-model="answersMap[currentQuestion.id]"
                   type="radio"
                   :name="'q_' + currentQuestion.id"
                   :value="answer.id"
-                  v-model="answersMap[currentQuestion.id]"
                   class="w-5 h-5 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                />
+                >
               </div>
               <div class="flex-1">
                 <div
                   class="text-gray-900 dark:text-white"
                   :class="{
-                    'font-medium': answersMap[currentQuestion.id] === answer.id,
+                    'font-medium': answersMap[currentQuestion.id] === answer.id
                   }"
                 >
                   {{ answer.answer_text || answer.content }}
@@ -232,7 +257,7 @@
                   v-if="answer.media_url || answer.image"
                   :src="answer.media_url || answer.image"
                   class="mt-2 rounded-lg max-h-32 object-contain"
-                />
+                >
               </div>
             </label>
           </div>
@@ -267,15 +292,15 @@
           <button
             v-for="(q, idx) in questions"
             :key="idx"
-            @click="currentQuestionIndex = idx"
             class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors"
             :class="[
               currentQuestionIndex === idx
                 ? 'bg-primary-500 text-white ring-2 ring-primary-500 ring-offset-2 dark:ring-offset-gray-800'
                 : answersMap[q.id] || textAnswersMap[q.id]
                   ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400'
-                  : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600',
+                  : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
             ]"
+            @click="currentQuestionIndex = idx"
           >
             {{ idx + 1 }}
           </button>
@@ -311,7 +336,9 @@
           name="i-heroicons-check-badge"
           class="w-24 h-24 mx-auto text-emerald-500 mb-6"
         />
-        <h2 class="text-3xl font-bold mb-2">تم إنهاء الاختبار بنجاح</h2>
+        <h2 class="text-3xl font-bold mb-2">
+          تم إنهاء الاختبار بنجاح
+        </h2>
         <p class="text-gray-500 mb-8 max-w-md mx-auto">
           سيتم الآن تصحيح إجاباتك وعرض النتيجة التفصيلية الخاصة بك لتقييم مستواك
           في هذه المادة.
@@ -321,17 +348,21 @@
           class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-10"
         >
           <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl">
-            <div class="text-sm text-gray-500 mb-1">الأسئلة المجابة</div>
+            <div class="text-sm text-gray-500 mb-1">
+              الأسئلة المجابة
+            </div>
             <div class="text-2xl font-bold text-gray-900 dark:text-white">
               {{
-                Object.keys(answersMap).length +
-                Object.keys(textAnswersMap).length
+                Object.keys(answersMap).length
+                  + Object.keys(textAnswersMap).length
               }}
               / {{ questions.length }}
             </div>
           </div>
           <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl">
-            <div class="text-sm text-gray-500 mb-1">الوقت المستغرق</div>
+            <div class="text-sm text-gray-500 mb-1">
+              الوقت المستغرق
+            </div>
             <div class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ formattedTimeSpent }}
             </div>
@@ -364,99 +395,99 @@
 </template>
 
 <script setup lang="ts">
-import { questionsService } from "@/services/api/questions.service";
+import { questionsService } from '@/services/api/questions.service'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
 
-const route = useRoute();
-const examId = route.params.id as string;
+const route = useRoute()
+const examId = route.params.id as string
 
-const loading = ref(true);
-const exam = ref<any>(null);
-const questions = ref<any[]>([]);
+const loading = ref(true)
+const exam = ref<any>(null)
+const questions = ref<any[]>([])
 
 // Test taking states
-const isStarted = ref(false);
-const isFinished = ref(false);
-const currentQuestionIndex = ref(0);
+const isStarted = ref(false)
+const isFinished = ref(false)
+const currentQuestionIndex = ref(0)
 
 // Answers tracking: store selected Answer ID (for multiple choice) or text (for open)
-const answersMap = ref<Record<string, number>>({});
-const textAnswersMap = ref<Record<string, string>>({});
+const answersMap = ref<Record<string, number>>({})
+const textAnswersMap = ref<Record<string, string>>({})
 
 // Timer implementation
-const timerSeconds = ref(0);
-const spentSeconds = ref(0);
-let timerInterval: any = null;
+const timerSeconds = ref(0)
+const spentSeconds = ref(0)
+let timerInterval: any = null
 
 const currentQuestion = computed(
-  () => questions.value[currentQuestionIndex.value] || null,
-);
+  () => questions.value[currentQuestionIndex.value] || null
+)
 
 const progressPercentage = computed(() => {
-  if (questions.value.length === 0) return 0;
-  const answered =
-    Object.keys(answersMap.value).length +
-    Object.keys(textAnswersMap.value).length;
-  return Math.round((answered / questions.value.length) * 100);
-});
+  if (questions.value.length === 0) return 0
+  const answered
+    = Object.keys(answersMap.value).length
+      + Object.keys(textAnswersMap.value).length
+  return Math.round((answered / questions.value.length) * 100)
+})
 
 const formattedTimeRemaining = computed(() => {
-  const m = Math.floor(timerSeconds.value / 60);
-  const s = timerSeconds.value % 60;
-  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-});
+  const m = Math.floor(timerSeconds.value / 60)
+  const s = timerSeconds.value % 60
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+})
 
 const formattedTimeSpent = computed(() => {
-  const m = Math.floor(spentSeconds.value / 60);
-  const s = spentSeconds.value % 60;
-  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-});
+  const m = Math.floor(spentSeconds.value / 60)
+  const s = spentSeconds.value % 60
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+})
 
 onMounted(async () => {
   try {
-    const res = await questionsService.getPracticeExamDetails(examId);
-    const data = res.data?.data || res.data;
-    exam.value = data?.practice_exam || data?.exam || data;
+    const res = await questionsService.getPracticeExamDetails(examId)
+    const data = res.data?.data || res.data
+    exam.value = data?.practice_exam || data?.exam || data
 
-    useSeoMeta({ title: `${exam.value?.title || "نماذج الاختبار"} | A Plus` });
+    useSeoMeta({ title: `${exam.value?.title || 'نماذج الاختبار'} | A Plus` })
 
     // Ensure questions array is available and flattened
-    questions.value = exam.value.questions || [];
+    questions.value = exam.value.questions || []
   } catch (error) {
-    console.error("Failed to load practice exam", error);
+    console.error('Failed to load practice exam', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-});
+})
 
 onUnmounted(() => {
-  if (timerInterval) clearInterval(timerInterval);
-});
+  if (timerInterval) clearInterval(timerInterval)
+})
 
 function startExam() {
-  isStarted.value = true;
+  isStarted.value = true
   // Initialize duration from API (assumes duration is in minutes)
-  const durationInMinutes = exam.value.duration || 60;
-  timerSeconds.value = durationInMinutes * 60;
-  spentSeconds.value = 0;
+  const durationInMinutes = exam.value.duration || 60
+  timerSeconds.value = durationInMinutes * 60
+  spentSeconds.value = 0
 
   timerInterval = setInterval(() => {
-    spentSeconds.value++;
+    spentSeconds.value++
     if (timerSeconds.value > 0) {
-      timerSeconds.value--;
+      timerSeconds.value--
     } else {
       // Time is up!
-      finishExam();
+      finishExam()
     }
-  }, 1000);
+  }, 1000)
 }
 
 async function finishExam() {
-  if (!confirm("هل أنت متأكد من إنهاء الاختبار وإرسال الإجابات؟")) return;
+  if (!confirm('هل أنت متأكد من إنهاء الاختبار وإرسال الإجابات؟')) return
 
-  if (timerInterval) clearInterval(timerInterval);
-  isFinished.value = true;
+  if (timerInterval) clearInterval(timerInterval)
+  isFinished.value = true
 
   // Here we would dispatch all answers in `answersMap` & `textAnswersMap` to backend
   // For example:
@@ -467,13 +498,13 @@ async function finishExam() {
 
 function getDifficultyColor(difficulty: string) {
   switch (difficulty?.toLowerCase()) {
-    case "easy":
-      return "emerald";
-    case "hard":
-      return "red";
-    case "medium":
+    case 'easy':
+      return 'emerald'
+    case 'hard':
+      return 'red'
+    case 'medium':
     default:
-      return "orange";
+      return 'orange'
   }
 }
 </script>

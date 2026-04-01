@@ -27,7 +27,10 @@
       </UButton>
     </div>
 
-    <div v-if="loading" class="flex justify-center py-20">
+    <div
+      v-if="loading"
+      class="flex justify-center py-20"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-10 h-10 text-primary-500 animate-spin"
@@ -50,7 +53,10 @@
       </p>
     </div>
 
-    <div v-else class="space-y-6">
+    <div
+      v-else
+      class="space-y-6"
+    >
       <!-- Top Overview Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
@@ -59,7 +65,10 @@
           <div
             class="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 flex items-center justify-center"
           >
-            <UIcon name="i-heroicons-check-circle" class="w-8 h-8" />
+            <UIcon
+              name="i-heroicons-check-circle"
+              class="w-8 h-8"
+            />
           </div>
           <div>
             <div class="text-sm text-gray-500 mb-1">
@@ -77,10 +86,15 @@
           <div
             class="w-14 h-14 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-500 flex items-center justify-center"
           >
-            <UIcon name="i-heroicons-document-text" class="w-8 h-8" />
+            <UIcon
+              name="i-heroicons-document-text"
+              class="w-8 h-8"
+            />
           </div>
           <div>
-            <div class="text-sm text-gray-500 mb-1">الاختبارات المجتازة</div>
+            <div class="text-sm text-gray-500 mb-1">
+              الاختبارات المجتازة
+            </div>
             <div class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ stats.completed_exams || 0 }}
             </div>
@@ -93,10 +107,15 @@
           <div
             class="w-14 h-14 rounded-full bg-orange-50 dark:bg-orange-900/20 text-orange-500 flex items-center justify-center"
           >
-            <UIcon name="i-heroicons-fire" class="w-8 h-8" />
+            <UIcon
+              name="i-heroicons-fire"
+              class="w-8 h-8"
+            />
           </div>
           <div>
-            <div class="text-sm text-gray-500 mb-1">أيام التدريب المتتالية</div>
+            <div class="text-sm text-gray-500 mb-1">
+              أيام التدريب المتتالية
+            </div>
             <div class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ stats.streak_days || 0 }} سلسلة
             </div>
@@ -109,10 +128,15 @@
           <div
             class="w-14 h-14 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-500 flex items-center justify-center"
           >
-            <UIcon name="i-heroicons-academic-cap" class="w-8 h-8" />
+            <UIcon
+              name="i-heroicons-academic-cap"
+              class="w-8 h-8"
+            />
           </div>
           <div>
-            <div class="text-sm text-gray-500 mb-1">متوسط الدرجات</div>
+            <div class="text-sm text-gray-500 mb-1">
+              متوسط الدرجات
+            </div>
             <div class="text-2xl font-bold text-gray-900 dark:text-white">
               {{ stats.average_score || 0 }}%
             </div>
@@ -153,7 +177,7 @@
               <div
                 class="w-full bg-primary-100 dark:bg-primary-900/30 rounded-t-sm group-hover:bg-primary-400 transition-colors"
                 :style="`height: ${Math.floor(Math.random() * 80) + 20}%`"
-              ></div>
+              />
             </div>
           </div>
           <div class="flex justify-between text-xs text-gray-400 mt-2 px-2">
@@ -168,7 +192,10 @@
           <h3
             class="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2"
           >
-            <UIcon name="i-heroicons-chart-pie" class="w-5 h-5 text-gray-400" />
+            <UIcon
+              name="i-heroicons-chart-pie"
+              class="w-5 h-5 text-gray-400"
+            />
             توزيع المهارات والمواد
           </h3>
 
@@ -189,13 +216,11 @@
                     50% 0
                   );
                 "
-              ></div>
+              />
               <div
                 class="text-center bg-white dark:bg-gray-800 w-32 h-32 rounded-full flex flex-col items-center justify-center z-10 shadow-sm border border-gray-100 dark:border-gray-700"
               >
-                <span class="text-3xl font-bold text-gray-900 dark:text-white"
-                  >4</span
-                >
+                <span class="text-3xl font-bold text-gray-900 dark:text-white">4</span>
                 <span class="text-xs text-gray-500">مواد قوية</span>
               </div>
             </div>
@@ -207,31 +232,31 @@
 </template>
 
 <script setup lang="ts">
-import { studentsService } from "@/services/api/students.service";
+import { studentsService } from '@/services/api/students.service'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
-useSeoMeta({ title: "إحصائيات التقدم | A Plus" });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
+useSeoMeta({ title: 'إحصائيات التقدم | A Plus' })
 
-const route = useRoute();
+const route = useRoute()
 // Optional: If an admin is viewing a specific student, they might pass ?student=ID
-const targetStudentId = route.query.student as string | undefined;
+const targetStudentId = route.query.student as string | undefined
 
-const loading = ref(true);
-const stats = ref<any>(null);
+const loading = ref(true)
+const stats = ref<any>(null)
 
 onMounted(async () => {
-  await fetchStats();
-});
+  await fetchStats()
+})
 
 async function fetchStats() {
-  loading.value = true;
+  loading.value = true
   try {
     const res = await studentsService.getStudentStats({
-      student_id: targetStudentId || undefined,
-    });
+      student_id: targetStudentId || undefined
+    })
 
-    const payload = res.data?.data || res.data;
-    stats.value = payload?.stats || payload;
+    const payload = res.data?.data || res.data
+    stats.value = payload?.stats || payload
 
     // Just a basic fallback to show the mockup UI if backend is empty
     if (Object.keys(stats.value || {}).length === 0) {
@@ -239,20 +264,20 @@ async function fetchStats() {
         total_answered_questions: 154,
         completed_exams: 12,
         streak_days: 5,
-        average_score: 87,
-      };
+        average_score: 87
+      }
     }
   } catch (error) {
-    console.error("Failed to load student stats", error);
+    console.error('Failed to load student stats', error)
     // Add mock data for demonstration
     stats.value = {
       total_answered_questions: 154,
       completed_exams: 12,
       streak_days: 5,
-      average_score: 87,
-    };
+      average_score: 87
+    }
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

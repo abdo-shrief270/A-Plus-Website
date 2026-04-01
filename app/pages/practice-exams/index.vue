@@ -5,11 +5,20 @@
         نماذج الاختبارات
       </h1>
 
-      <div v-if="loading" class="flex justify-center py-20">
-        <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 text-primary-500 animate-spin" />
+      <div
+        v-if="loading"
+        class="flex justify-center py-20"
+      >
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="w-10 h-10 text-primary-500 animate-spin"
+        />
       </div>
 
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div
+        v-else
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+      >
         <NuxtLink
           v-for="pe in practiceExams"
           :key="pe.id"
@@ -17,7 +26,10 @@
         >
           <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-primary-400 hover:shadow-md transition-all cursor-pointer">
             <div class="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center mb-4">
-              <UIcon name="i-heroicons-document-text" class="w-6 h-6 text-primary-600" />
+              <UIcon
+                name="i-heroicons-document-text"
+                class="w-6 h-6 text-primary-600"
+              />
             </div>
             <h3 class="font-bold text-gray-900 dark:text-white mb-1">
               {{ pe.name || pe.title }}

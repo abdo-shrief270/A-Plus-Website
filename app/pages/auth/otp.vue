@@ -2,7 +2,10 @@
   <div class="flex flex-col items-center justify-center min-h-screen p-6 bg-white dark:bg-gray-900">
     <div class="w-full max-w-md">
       <div class="border border-gray-200 dark:border-gray-700 rounded-2xl p-8 shadow-sm text-center">
-        <UIcon name="i-heroicons-shield-check" class="w-16 h-16 text-primary-600 mx-auto mb-4" />
+        <UIcon
+          name="i-heroicons-shield-check"
+          class="w-16 h-16 text-primary-600 mx-auto mb-4"
+        />
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
           التحقق من الهوية
         </h1>
@@ -11,7 +14,10 @@
         </p>
 
         <!-- OTP Input -->
-        <div class="flex justify-center gap-3 mb-8 direction-ltr" dir="ltr">
+        <div
+          class="flex justify-center gap-3 mb-8 direction-ltr"
+          dir="ltr"
+        >
           <input
             v-for="(_, i) in 6"
             :key="i"

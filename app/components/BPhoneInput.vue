@@ -1,5 +1,8 @@
 <template>
-  <div class="w-full relative" dir="ltr">
+  <div
+    class="w-full relative"
+    dir="ltr"
+  >
     <!-- Optional label if not wrapped in UFormField -->
     <div
       v-if="label"
@@ -10,7 +13,10 @@
       <p class="capitalize text-gray-900 dark:text-white text-sm">
         {{ $t(label) }}
       </p>
-      <span v-if="required" class="text-red-500">*</span>
+      <span
+        v-if="required"
+        class="text-red-500"
+      >*</span>
     </div>
 
     <div class="relative w-full shadow-sm rounded-lg group">
@@ -19,7 +25,7 @@
         v-bind="telOptions"
         class="vue-tel-input-custom"
         :class="{
-          'error-tel': error || (phoneIsValid && !phoneIsValid.valid),
+          'error-tel': error || (phoneIsValid && !phoneIsValid.valid)
         }"
         @country-changed="onCountryChanged"
         @validate="onValidate"
@@ -36,7 +42,10 @@
       class="mt-1 text-xs text-red-500 flex items-center gap-1 font-medium"
       dir="rtl"
     >
-      <UIcon name="i-heroicons-exclamation-circle-20-solid" class="w-4 h-4" />
+      <UIcon
+        name="i-heroicons-exclamation-circle-20-solid"
+        class="w-4 h-4"
+      />
       <template v-if="phoneIsValid && !phoneIsValid.valid">
         {{ $t("errors.invalid_phone") }}
       </template>
@@ -48,90 +57,90 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
-import PhoneIcon from "./icons/PhoneIcon.vue";
+import { ref, computed, watch } from 'vue'
+import PhoneIcon from './icons/PhoneIcon.vue'
 
 const props = defineProps({
   modelValue: {
     type: [String, null],
-    required: true,
+    required: true
   },
   error: {
     type: Boolean,
-    default: false,
+    default: false
   },
   errorMessage: {
     type: String,
-    default: "errors.default",
+    default: 'errors.default'
   },
   required: {
     type: Boolean,
-    default: false,
+    default: false
   },
   label: {
     type: String,
-    default: "",
+    default: ''
   },
   placeholder: {
     type: String,
-    default: "signup.phone_placeholder",
+    default: 'signup.phone_placeholder'
   },
   defaultCountry: {
     type: String,
-    default: "EG",
-  },
-});
+    default: 'EG'
+  }
+})
 
-const emit = defineEmits(["update:modelValue", "country", "blur"]);
+const emit = defineEmits(['update:modelValue', 'country', 'blur'])
 
 const computedPhone = computed({
   get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value?.trim()),
-});
+  set: value => emit('update:modelValue', value?.trim())
+})
 
-const phoneIsValid = ref(null);
+const phoneIsValid = ref(null)
 
 const telOptions = computed(() => ({
   autoFormat: false,
   defaultCountry: props.defaultCountry,
-  mode: "auto",
+  mode: 'auto',
   dropdownOptions: {
     showSearchBox: true,
     showFlags: true,
     showDialCodeInSelection: true,
-    autocomplete: "off",
+    autocomplete: 'off'
   },
   inputOptions: {
-    autocomplete: "off",
+    autocomplete: 'off',
     showDialCode: true,
-    type: "text",
+    type: 'text',
     maxlength: 15,
-    placeholder: props.placeholder ? useI18n().t(props.placeholder) : "",
+    placeholder: props.placeholder ? useI18n().t(props.placeholder) : ''
   },
-  validCharactersOnly: true,
-}));
+  validCharactersOnly: true
+}))
 
 const onCountryChanged = (country) => {
   if (country?.dialCode) {
-    emit("country", `+${country.dialCode}`);
+    emit('country', `+${country.dialCode}`)
   }
-};
+}
 
 const onValidate = (val) => {
   phoneIsValid.value = {
     ...val,
-    valid: val.valid !== undefined ? val.valid : true,
-  };
-};
+    valid: val.valid !== undefined ? val.valid : true
+  }
+}
 
 watch(
   () => props.modelValue,
   (newVal) => {
     if (!newVal) {
-      phoneIsValid.value = null;
+      phoneIsValid.value = null
     }
-  },
-);
+  }
+)
 </script>
 
 <style lang="scss">

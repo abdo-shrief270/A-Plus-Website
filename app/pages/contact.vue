@@ -8,7 +8,10 @@
         <div
           class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-6"
         >
-          <UIcon name="i-heroicons-envelope-open" class="w-8 h-8" />
+          <UIcon
+            name="i-heroicons-envelope-open"
+            class="w-8 h-8"
+          />
         </div>
         <h1
           class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl"
@@ -45,19 +48,24 @@
               color="neutral"
               variant="soft"
               @click="resetForm"
-              >إرسال رسالة أخرى</UButton
             >
+              إرسال رسالة أخرى
+            </UButton>
           </div>
 
           <UForm
             v-else
             :state="state"
             :schema="schema"
-            @submit="onSubmit"
             class="space-y-6"
+            @submit="onSubmit"
           >
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <UFormField label="الاسم الكامل" name="name" required>
+              <UFormField
+                label="الاسم الكامل"
+                name="name"
+                required
+              >
                 <UInput
                   v-model="state.name"
                   icon="i-heroicons-user"
@@ -65,7 +73,11 @@
                 />
               </UFormField>
 
-              <UFormField label="رقم الجوال" name="phone" required>
+              <UFormField
+                label="رقم الجوال"
+                name="phone"
+                required
+              >
                 <UInput
                   v-model="state.phone"
                   type="tel"
@@ -76,7 +88,10 @@
               </UFormField>
             </div>
 
-            <UFormField label="البريد الإلكتروني" name="email">
+            <UFormField
+              label="البريد الإلكتروني"
+              name="email"
+            >
               <UInput
                 v-model="state.email"
                 type="email"
@@ -85,7 +100,11 @@
               />
             </UFormField>
 
-            <UFormField label="موضوع الرسالة" name="subject" required>
+            <UFormField
+              label="موضوع الرسالة"
+              name="subject"
+              required
+            >
               <USelectMenu
                 v-model="state.subject"
                 :options="[
@@ -93,14 +112,18 @@
                   'مشكلة تقنية',
                   'اقتراح',
                   'شكوى',
-                  'أخرى',
+                  'أخرى'
                 ]"
                 placeholder="اختر نوع الاستفسار..."
                 icon="i-heroicons-tag"
               />
             </UFormField>
 
-            <UFormField label="نص الرسالة" name="message" required>
+            <UFormField
+              label="نص الرسالة"
+              name="message"
+              required
+            >
               <UTextarea
                 v-model="state.message"
                 :rows="5"
@@ -124,9 +147,10 @@
 
             <p class="text-center text-xs text-gray-500 mt-4">
               بالنقر على إرسال، أنت توافق على معالجة بياناتك ตาม
-              <NuxtLink to="/terms" class="text-primary-600 hover:underline"
-                >سياسة الخصوصية</NuxtLink
-              >
+              <NuxtLink
+                to="/terms"
+                class="text-primary-600 hover:underline"
+              >سياسة الخصوصية</NuxtLink>
               الخاصة بنا.
             </p>
           </UForm>
@@ -145,7 +169,10 @@
               <p
                 class="text-sm text-gray-500 flex items-center justify-center md:justify-start gap-2"
               >
-                <UIcon name="i-heroicons-envelope" class="w-4 h-4" />
+                <UIcon
+                  name="i-heroicons-envelope"
+                  class="w-4 h-4"
+                />
                 support@aplus.com
               </p>
             </div>
@@ -156,7 +183,10 @@
               <p
                 class="text-sm text-gray-500 flex items-center justify-center md:justify-start gap-2"
               >
-                <UIcon name="i-heroicons-clock" class="w-4 h-4" /> الأحد -
+                <UIcon
+                  name="i-heroicons-clock"
+                  class="w-4 h-4"
+                /> الأحد -
                 الخميس | 9 ص - 5 م
               </p>
             </div>
@@ -168,62 +198,62 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
-import { contactService } from "@/services/api/contact.service";
-import type { FormSubmitEvent } from "@nuxt/ui";
+import { z } from 'zod'
+import { contactService } from '@/services/api/contact.service'
+import type { FormSubmitEvent } from '@nuxt/ui'
 
-useSeoMeta({ title: "تواصل معنا | A Plus" });
+useSeoMeta({ title: 'تواصل معنا | A Plus' })
 
-const loading = ref(false);
-const successFlash = ref(false);
+const loading = ref(false)
+const successFlash = ref(false)
 
 const schema = z.object({
-  name: z.string().min(2, "الاسم يجب أن يحتوي على حرفين على الأقل"),
+  name: z.string().min(2, 'الاسم يجب أن يحتوي على حرفين على الأقل'),
   email: z
     .string()
-    .email("البريد الإلكتروني غير صالح")
+    .email('البريد الإلكتروني غير صالح')
     .optional()
-    .or(z.literal("")),
-  phone: z.string().min(8, "رقم الجوال مطلوب").max(20, "رقم الهاتف طويل جداً"),
-  subject: z.string().min(2, "يرجى تحديد الموضوع"),
+    .or(z.literal('')),
+  phone: z.string().min(8, 'رقم الجوال مطلوب').max(20, 'رقم الهاتف طويل جداً'),
+  subject: z.string().min(2, 'يرجى تحديد الموضوع'),
   message: z
     .string()
-    .min(10, "النص قصير جداً. يرجى كتابة 10 أحرف على الأقل بوضوح"),
-});
-type Schema = z.output<typeof schema>;
+    .min(10, 'النص قصير جداً. يرجى كتابة 10 أحرف على الأقل بوضوح')
+})
+type Schema = z.output<typeof schema>
 
 const state = reactive({
-  name: "",
-  email: "",
-  phone: "",
-  subject: "",
-  message: "",
-});
+  name: '',
+  email: '',
+  phone: '',
+  subject: '',
+  message: ''
+})
 
 function resetForm() {
-  state.name = "";
-  state.email = "";
-  state.phone = "";
-  state.subject = "";
-  state.message = "";
-  successFlash.value = false;
+  state.name = ''
+  state.email = ''
+  state.phone = ''
+  state.subject = ''
+  state.message = ''
+  successFlash.value = false
 }
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  loading.value = true;
+  loading.value = true
   try {
-    const payload = { ...event.data };
-    if (!payload.email) delete payload.email; // Don't send empty optional fields
+    const payload = { ...event.data }
+    if (!payload.email) delete payload.email // Don't send empty optional fields
 
-    await contactService.submitContactForm(payload);
-    successFlash.value = true;
+    await contactService.submitContactForm(payload)
+    successFlash.value = true
   } catch (error: any) {
-    const msg =
-      error.response?.data?.message ||
-      "حدث خطأ أثناء الإرسال، نرجو المحاولة لاحقاً";
-    alert(msg); // Optional: Use a toast system instance if available outside the dashboard layout
+    const msg
+      = error.response?.data?.message
+        || 'حدث خطأ أثناء الإرسال، نرجو المحاولة لاحقاً'
+    alert(msg) // Optional: Use a toast system instance if available outside the dashboard layout
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

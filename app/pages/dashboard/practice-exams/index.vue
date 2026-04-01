@@ -23,7 +23,10 @@
       />
     </div>
 
-    <div v-if="loading" class="flex justify-center py-20">
+    <div
+      v-if="loading"
+      class="flex justify-center py-20"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-10 h-10 text-primary-500 animate-spin"
@@ -46,7 +49,10 @@
       </p>
     </div>
 
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      v-else
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    >
       <NuxtLink
         v-for="exam in practiceExams"
         :key="exam.id"
@@ -57,10 +63,21 @@
           <div
             class="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 flex items-center justify-center group-hover:scale-110 transition-transform"
           >
-            <UIcon name="i-heroicons-document-text" class="w-6 h-6" />
+            <UIcon
+              name="i-heroicons-document-text"
+              class="w-6 h-6"
+            />
           </div>
-          <UBadge v-if="exam.duration" color="neutral" variant="soft" size="sm">
-            <UIcon name="i-heroicons-clock" class="w-3 h-3 mr-1" />
+          <UBadge
+            v-if="exam.duration"
+            color="neutral"
+            variant="soft"
+            size="sm"
+          >
+            <UIcon
+              name="i-heroicons-clock"
+              class="w-3 h-3 mr-1"
+            />
             {{ exam.duration }} دقيقة
           </UBadge>
         </div>
@@ -79,15 +96,24 @@
           class="flex items-center justify-between mt-auto pt-4 border-t border-gray-100 dark:border-gray-700"
         >
           <div class="flex items-center gap-4 text-xs text-gray-500">
-            <span v-if="exam.questions_count" class="flex items-center gap-1">
+            <span
+              v-if="exam.questions_count"
+              class="flex items-center gap-1"
+            >
               <UIcon
                 name="i-heroicons-clipboard-document-list"
                 class="w-4 h-4"
               />
               {{ exam.questions_count }} سؤال
             </span>
-            <span v-if="exam.passing_score" class="flex items-center gap-1">
-              <UIcon name="i-heroicons-check-badge" class="w-4 h-4" />
+            <span
+              v-if="exam.passing_score"
+              class="flex items-center gap-1"
+            >
+              <UIcon
+                name="i-heroicons-check-badge"
+                class="w-4 h-4"
+              />
               النجاح: {{ exam.passing_score }}%
             </span>
           </div>
@@ -101,7 +127,10 @@
     </div>
 
     <!-- Pagination Mockup -->
-    <div v-if="practiceExams.length > 0" class="flex justify-center mt-8">
+    <div
+      v-if="practiceExams.length > 0"
+      class="flex justify-center mt-8"
+    >
       <UPagination
         v-model="page"
         :page-count="15"
@@ -112,43 +141,43 @@
 </template>
 
 <script setup lang="ts">
-import { questionsService } from "@/services/api/questions.service";
+import { questionsService } from '@/services/api/questions.service'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
-useSeoMeta({ title: "الاختبارات التجريبية | A Plus" });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
+useSeoMeta({ title: 'الاختبارات التجريبية | A Plus' })
 
-const loading = ref(true);
-const practiceExams = ref<any[]>([]);
-const meta = ref<any>(null);
+const loading = ref(true)
+const practiceExams = ref<any[]>([])
+const meta = ref<any>(null)
 
-const searchQuery = ref("");
-const page = ref(1);
+const searchQuery = ref('')
+const page = ref(1)
 
 onMounted(async () => {
-  await fetchExams();
-});
+  await fetchExams()
+})
 
 watch(page, () => {
-  fetchExams();
-});
+  fetchExams()
+})
 
 async function fetchExams() {
-  loading.value = true;
+  loading.value = true
   try {
     const res = await questionsService.getPracticeExams({
       page: page.value,
-      search: searchQuery.value || undefined,
-    });
+      search: searchQuery.value || undefined
+    })
 
-    const data = res.data?.data || res.data;
+    const data = res.data?.data || res.data
     practiceExams.value = Array.isArray(data)
       ? data
-      : data?.practice_exams || data?.exams || [];
-    meta.value = res.data?.meta || data?.meta || null;
+      : data?.practice_exams || data?.exams || []
+    meta.value = res.data?.meta || data?.meta || null
   } catch (error) {
-    console.error("Failed to load practice exams", error);
+    console.error('Failed to load practice exams', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

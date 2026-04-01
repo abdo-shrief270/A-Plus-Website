@@ -21,17 +21,17 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
    * GET /practice-exams
    * List all mock tests and evaluation models.
    */
-  const fetchPracticeExams = async (params: { 
-    search?: string; 
-    paginate?: boolean; 
-    per_page?: number; 
-    page?: number 
+  const fetchPracticeExams = async (params: {
+    search?: string
+    paginate?: boolean
+    per_page?: number
+    page?: number
   } = {}) => {
     isLoading.value = true
     error.value = null
     try {
       const result = await axios.get<PaginatedData<PracticeExam> | PracticeExam[]>('/practice-exams', { params })
-      
+
       if (Array.isArray(result)) {
         practiceExams.value = result
         pagination.value = null
@@ -79,7 +79,7 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
     pagination,
     isLoading,
     error,
-    
+
     // Actions
     fetchPracticeExams,
     startPracticeSession

@@ -52,7 +52,11 @@
             @submit="onSubmit"
           >
             <div class="grid grid-cols-2 gap-4">
-              <UFormField label="الاسم الكامل" name="name" class="col-span-2">
+              <UFormField
+                label="الاسم الكامل"
+                name="name"
+                class="col-span-2"
+              >
                 <UInput
                   v-model="state.name"
                   placeholder="أدخل اسمك الكامل"
@@ -124,7 +128,10 @@
                 />
               </UFormField>
 
-              <UFormField label="كلمة المرور" name="password">
+              <UFormField
+                label="كلمة المرور"
+                name="password"
+              >
                 <UInput
                   v-model="state.password"
                   type="password"
@@ -147,7 +154,10 @@
                 />
               </UFormField>
 
-              <UFormField label="الجنس" name="gender">
+              <UFormField
+                label="الجنس"
+                name="gender"
+              >
                 <USelect
                   v-model="state.gender"
                   :items="genderOptions"
@@ -159,7 +169,10 @@
                 />
               </UFormField>
 
-              <UFormField label="الاختبار" name="exam_id">
+              <UFormField
+                label="الاختبار"
+                name="exam_id"
+              >
                 <USelect
                   v-model="state.exam_id"
                   :items="examOptions"
@@ -184,7 +197,7 @@
                     size="lg"
                     class="w-full justify-start text-right bg-transparent border-gray-300 dark:border-gray-700/50 hover:bg-transparent"
                     :class="[
-                      !state.exam_date && 'text-gray-500 dark:text-gray-400',
+                      !state.exam_date && 'text-gray-500 dark:text-gray-400'
                     ]"
                   >
                     <UIcon
@@ -194,8 +207,8 @@
                     {{
                       state.exam_date
                         ? formatter.format(
-                            state.exam_date.toDate(getLocalTimeZone()),
-                          )
+                          state.exam_date.toDate(getLocalTimeZone())
+                        )
                         : "اختر تاريخ الاختبار"
                     }}
                   </UButton>
@@ -227,112 +240,112 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
-import type { FormSubmitEvent } from "#ui/types";
-import { authService } from "@/services/api/auth.service";
-import { examService } from "@/services/api/exam.service";
-import { useAuthStore } from "@/stores/auth";
-import { useRedirect } from "@/composables/useRedirect";
-import { useUsernameCheck } from "@/composables/useUsernameCheck";
+import { z } from 'zod'
+import type { FormSubmitEvent } from '#ui/types'
+import { authService } from '@/services/api/auth.service'
+import { examService } from '@/services/api/exam.service'
+import { useAuthStore } from '@/stores/auth'
+import { useRedirect } from '@/composables/useRedirect'
+import { useUsernameCheck } from '@/composables/useUsernameCheck'
 import {
   getLocalTimeZone,
   DateFormatter,
-  type CalendarDate,
-} from "@internationalized/date";
+  type CalendarDate
+} from '@internationalized/date'
 
-definePageMeta({ layout: "fullscreen", middleware: "guest" });
-useSeoMeta({ title: "تسجيل طالب | A Plus" });
+definePageMeta({ layout: 'fullscreen', middleware: 'guest' })
+useSeoMeta({ title: 'تسجيل طالب | A Plus' })
 
-const authStore = useAuthStore();
-const { redirectByRole } = useRedirect();
-const usernameCheck = useUsernameCheck();
+const authStore = useAuthStore()
+const { redirectByRole } = useRedirect()
+const usernameCheck = useUsernameCheck()
 
-const loading = ref(false);
-const examsLoading = ref(false);
+const loading = ref(false)
+const examsLoading = ref(false)
 
 // خيارات الجنس المعدلة لتناسب الـ Schema
 const genderOptions = [
-  { label: "ذكر", value: "male" },
-  { label: "أنثى", value: "female" },
-];
+  { label: 'ذكر', value: 'male' },
+  { label: 'أنثى', value: 'female' }
+]
 
-const examOptions = ref<{ label: string; value: number }[]>([]);
+const examOptions = ref<{ label: string, value: number }[]>([])
 
 const schema = z
   .object({
-    name: z.string().min(2, "الاسم مطلوب (٢ أحرف على الأقل)"),
-    user_name: z.string().min(3, "اسم المستخدم مطلوب"),
-    country_code: z.string().min(1, "كود الدولة مطلوب"),
-    phone: z.string().min(7, "رقم الهاتف مطلوب"),
+    name: z.string().min(2, 'الاسم مطلوب (٢ أحرف على الأقل)'),
+    user_name: z.string().min(3, 'اسم المستخدم مطلوب'),
+    country_code: z.string().min(1, 'كود الدولة مطلوب'),
+    phone: z.string().min(7, 'رقم الهاتف مطلوب'),
     email: z
       .string()
-      .email("بريد إلكتروني غير صالح")
+      .email('بريد إلكتروني غير صالح')
       .optional()
-      .or(z.literal("")),
-    password: z.string().min(8, "كلمة المرور ٨ أحرف على الأقل"),
-    password_confirmation: z.string().min(8, "تأكيد كلمة المرور مطلوب"),
-    gender: z.enum(["male", "female"], { message: "الجنس مطلوب" }),
-    exam_id: z.number({ required_error: "الاختبار مطلوب" }),
-    exam_date: z.any().refine((val) => !!val, "تاريخ الاختبار مطلوب"),
+      .or(z.literal('')),
+    password: z.string().min(8, 'كلمة المرور ٨ أحرف على الأقل'),
+    password_confirmation: z.string().min(8, 'تأكيد كلمة المرور مطلوب'),
+    gender: z.enum(['male', 'female'], { message: 'الجنس مطلوب' }),
+    exam_id: z.number({ required_error: 'الاختبار مطلوب' }),
+    exam_date: z.any().refine(val => !!val, 'تاريخ الاختبار مطلوب')
   })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: "كلمات المرور غير متطابقة",
-    path: ["password_confirmation"],
-  });
+  .refine(data => data.password === data.password_confirmation, {
+    message: 'كلمات المرور غير متطابقة',
+    path: ['password_confirmation']
+  })
 
-type Schema = z.output<typeof schema>;
+type Schema = z.output<typeof schema>
 
 const state = reactive({
-  name: "",
-  user_name: "",
-  country_code: "+20",
-  phone: "",
-  email: "",
-  password: "",
-  password_confirmation: "",
-  gender: undefined as "male" | "female" | undefined,
+  name: '',
+  user_name: '',
+  country_code: '+20',
+  phone: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
+  gender: undefined as 'male' | 'female' | undefined,
   exam_id: undefined as number | undefined,
-  exam_date: undefined as CalendarDate | undefined,
-});
+  exam_date: undefined as CalendarDate | undefined
+})
 
-const formatter = new DateFormatter("ar-EG", { dateStyle: "long" });
+const formatter = new DateFormatter('ar-EG', { dateStyle: 'long' })
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  if (usernameCheck.status.value !== "available") {
-    return;
+  if (usernameCheck.status.value !== 'available') {
+    return
   }
 
-  loading.value = true;
+  loading.value = true
   try {
     const dataToSend = {
       ...event.data,
-      exam_date: event.data.exam_date.toString(),
-    };
-    const res = await authService.registerStudent(dataToSend);
-    const authData = res?.data || res;
-    await authStore.storeUser(authData);
-    redirectByRole(authData.user);
+      exam_date: event.data.exam_date.toString()
+    }
+    const res = await authService.registerStudent(dataToSend)
+    const authData = res?.data || res
+    await authStore.storeUser(authData)
+    redirectByRole(authData.user)
   } catch (err) {
-    console.error("Register Error:", err);
+    console.error('Register Error:', err)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 onMounted(async () => {
-  examsLoading.value = true;
+  examsLoading.value = true
   try {
-    const res = await examService.list();
+    const res = await examService.list()
     // تأكد من مسار البيانات في الـ Response الخاص بك
-    const exams = res.data?.data?.exams || res.data?.data || [];
+    const exams = res.data?.data?.exams || res.data?.data || []
     examOptions.value = exams.map((e: any) => ({
       label: e.name,
-      value: Number(e.id),
-    }));
+      value: Number(e.id)
+    }))
   } catch (err) {
-    console.error("Fetch Exams Error:", err);
+    console.error('Fetch Exams Error:', err)
   } finally {
-    examsLoading.value = false;
+    examsLoading.value = false
   }
-});
+})
 </script>

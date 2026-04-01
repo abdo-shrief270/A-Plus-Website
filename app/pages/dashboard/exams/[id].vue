@@ -19,14 +19,20 @@
       </div>
     </div>
 
-    <div v-if="loading" class="flex justify-center py-20">
+    <div
+      v-if="loading"
+      class="flex justify-center py-20"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-10 h-10 text-primary-500 animate-spin"
       />
     </div>
 
-    <div v-else class="space-y-8">
+    <div
+      v-else
+      class="space-y-8"
+    >
       <!-- Subjects Grid -->
       <section>
         <div class="flex items-center justify-between mb-4">
@@ -38,7 +44,12 @@
               class="w-6 h-6 text-primary-500"
             />
             المواد الدراسية
-            <UBadge color="neutral" variant="subtle" size="sm" class="ml-2">
+            <UBadge
+              color="neutral"
+              variant="subtle"
+              size="sm"
+              class="ml-2"
+            >
               {{ subjects.length }}
             </UBadge>
           </h2>
@@ -48,7 +59,9 @@
           v-if="subjects.length === 0"
           class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 text-center"
         >
-          <p class="text-gray-500">لا توجد مواد مضافة لهذه المرحلة بعد.</p>
+          <p class="text-gray-500">
+            لا توجد مواد مضافة لهذه المرحلة بعد.
+          </p>
         </div>
 
         <div
@@ -93,7 +106,12 @@
               class="w-6 h-6 text-primary-500"
             />
             أقسام المرحلة (Sections)
-            <UBadge color="neutral" variant="subtle" size="sm" class="ml-2">
+            <UBadge
+              color="neutral"
+              variant="subtle"
+              size="sm"
+              class="ml-2"
+            >
               {{ sections.length }}
             </UBadge>
           </h2>
@@ -103,7 +121,9 @@
           v-if="sections.length === 0"
           class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 text-center"
         >
-          <p class="text-gray-500">لا توجد أقسام متفرعة لهذه المرحلة بعد.</p>
+          <p class="text-gray-500">
+            لا توجد أقسام متفرعة لهذه المرحلة بعد.
+          </p>
         </div>
 
         <div
@@ -129,20 +149,20 @@
 </template>
 
 <script setup lang="ts">
-import { useAcademicStore } from "@/stores/academic";
-import { examsService } from "@/services/api/exams.service";
+import { useAcademicStore } from '@/stores/academic'
+import { examsService } from '@/services/api/exams.service'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
 
-const route = useRoute();
-const academicStore = useAcademicStore();
+const route = useRoute()
+const academicStore = useAcademicStore()
 
-const examId = route.params.id as string;
-const loading = ref(true);
+const examId = route.params.id as string
+const loading = ref(true)
 
-const exam = ref<any>(null);
-const subjects = ref<any[]>([]);
-const sections = ref<any[]>([]);
+const exam = ref<any>(null)
+const subjects = ref<any[]>([])
+const sections = ref<any[]>([])
 
 onMounted(async () => {
   try {
@@ -150,22 +170,22 @@ onMounted(async () => {
     const [examRes, subjectsData, sectionsData] = await Promise.all([
       examsService.getExamDetails(examId),
       academicStore.fetchSubjectsForExam(examId),
-      academicStore.fetchSectionsForExam(examId),
-    ]);
+      academicStore.fetchSectionsForExam(examId)
+    ])
 
-    const payload = examRes.data?.data || examRes.data;
-    exam.value = payload?.exam || payload;
+    const payload = examRes.data?.data || examRes.data
+    exam.value = payload?.exam || payload
 
     useSeoMeta({
-      title: `${exam.value?.name_ar || exam.value?.name || "تفاصيل المرحلة"} | A Plus`,
-    });
+      title: `${exam.value?.name_ar || exam.value?.name || 'تفاصيل المرحلة'} | A Plus`
+    })
 
-    subjects.value = subjectsData || [];
-    sections.value = sectionsData || [];
+    subjects.value = subjectsData || []
+    sections.value = sectionsData || []
   } catch (error) {
-    console.error("Failed to load exam layout", error);
+    console.error('Failed to load exam layout', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-});
+})
 </script>

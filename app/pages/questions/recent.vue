@@ -103,9 +103,7 @@
             :page-count="questionsStore.recentPagination.per_page"
             class="rtl"
             :ui="{
-              list: 'flex items-center gap-1',
-              base: 'rounded-lg font-bold',
-              rounded: 'rounded-lg'
+              list: 'flex items-center gap-1'
             }"
           />
         </div>
@@ -125,18 +123,12 @@ useSeoMeta({
 })
 
 const questionsStore = useQuestionsStore()
-const currentPage = ref(1)
 
-async function fetchRecent(page = 1) {
-  await questionsStore.fetchRecent({ page, per_page: 15 })
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-watch(currentPage, (val) => {
-  fetchRecent(val)
+const { currentPage } = usePagination({
+  onPageChange: page => questionsStore.fetchRecent({ page, per_page: 15 })
 })
 
 onMounted(() => {
-  fetchRecent()
+  questionsStore.fetchRecent({ page: currentPage.value, per_page: 15 })
 })
 </script>

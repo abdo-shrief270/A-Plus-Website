@@ -8,7 +8,7 @@
         src="~/assets/images/auth/authBg.png"
         class="absolute w-full h-full object-cover"
         alt="Background"
-      />
+      >
 
       <div
         class="z-[100] mt-32 w-full flex flex-col items-center justify-start text-center px-8"
@@ -44,7 +44,10 @@
             class="space-y-4"
             @submit="onUsernameSubmit"
           >
-            <UFormField :label="$t('login.username')" name="user_name">
+            <UFormField
+              :label="$t('login.username')"
+              name="user_name"
+            >
               <UInput
                 v-model="state.user_name"
                 type="text"
@@ -56,7 +59,12 @@
               />
             </UFormField>
 
-            <UButton type="submit" block size="lg" :loading="loading">
+            <UButton
+              type="submit"
+              block
+              size="lg"
+              :loading="loading"
+            >
               التالي
             </UButton>
 
@@ -106,7 +114,10 @@
             class="space-y-4"
             @submit="onPasswordSubmit"
           >
-            <UFormField :label="$t('login.password')" name="password">
+            <UFormField
+              :label="$t('login.password')"
+              name="password"
+            >
               <UInput
                 v-model="state.password"
                 :type="showPassword ? 'text' : 'password'"
@@ -117,8 +128,8 @@
                   showPassword ? 'i-heroicons-eye-slash' : 'i-heroicons-eye'
                 "
                 class="w-full"
-                @click:trailing="showPassword = !showPassword"
                 autofocus
+                @click:trailing="showPassword = !showPassword"
               />
             </UFormField>
 
@@ -131,7 +142,12 @@
               </NuxtLink>
             </div>
 
-            <UButton type="submit" block size="lg" :loading="loading">
+            <UButton
+              type="submit"
+              block
+              size="lg"
+              :loading="loading"
+            >
               {{ $t("login.submit") }}
             </UButton>
           </UForm>
@@ -226,7 +242,10 @@
             class="space-y-4"
             @submit="onVerifyOtpSubmit"
           >
-            <UFormField label="رمز التحقق (OTP)" name="otp">
+            <UFormField
+              label="رمز التحقق (OTP)"
+              name="otp"
+            >
               <UInput
                 v-model="state.otp"
                 type="text"
@@ -238,7 +257,12 @@
               />
             </UFormField>
 
-            <UButton type="submit" block size="lg" :loading="loading">
+            <UButton
+              type="submit"
+              block
+              size="lg"
+              :loading="loading"
+            >
               تأكيد الرمز والدخول
             </UButton>
           </UForm>
@@ -249,144 +273,144 @@
 </template>
 
 <script setup lang="ts">
-import { z } from "zod";
-import type { FormSubmitEvent } from "#ui/types";
-import { useAuthService } from "@/composables/useAuth";
-import { useAuthStore } from "@/stores/auth";
-import { useRedirect } from "@/composables/useRedirect";
-import { useDeviceId } from "@/utils/device";
+import { z } from 'zod'
+import type { FormSubmitEvent } from '#ui/types'
+import { useAuthService } from '@/composables/useAuth'
+import { useAuthStore } from '@/stores/auth'
+import { useRedirect } from '@/composables/useRedirect'
+import { useDeviceId } from '@/utils/device'
 
 definePageMeta({
-  layout: "fullscreen",
-  middleware: "guest",
-});
+  layout: 'fullscreen',
+  middleware: 'guest'
+})
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 useSeoMeta({
-  title: t("login.meta.title"),
-  description: t("login.meta.description"),
-});
+  title: t('login.meta.title'),
+  description: t('login.meta.description')
+})
 
-const { loginCheck, login, sendOtp, verifyOtp, loading } = useAuthService();
-const authStore = useAuthStore();
-const { redirectByRole } = useRedirect();
-const toast = useToast();
+const { loginCheck, login, sendOtp, verifyOtp, loading } = useAuthService()
+const authStore = useAuthStore()
+const { redirectByRole } = useRedirect()
+const toast = useToast()
 
-const step = ref(1);
-const showPassword = ref(false);
+const step = ref(1)
+const showPassword = ref(false)
 
 const authCheckData = reactive({
   has_2fa: false,
-  exists: false,
-});
+  exists: false
+})
 
 const usernameSchema = z.object({
   user_name: z
     .string()
-    .min(1, t("validation.required", { field: t("login.username") })),
-});
+    .min(1, t('validation.required', { field: t('login.username') }))
+})
 
 const passwordSchema = z.object({
   password: z
     .string()
-    .min(1, t("validation.required", { field: t("login.password") })),
-});
+    .min(1, t('validation.required', { field: t('login.password') }))
+})
 
 const otpSchema = z.object({
-  otp: z.string().min(6, "رمز التحقق يجب أن يكون 6 أرقام على الأقل"),
-});
+  otp: z.string().min(6, 'رمز التحقق يجب أن يكون 6 أرقام على الأقل')
+})
 
 const state = reactive({
-  user_name: "",
-  password: "",
-  otp: "",
-  device_id: useDeviceId(),
-});
+  user_name: '',
+  password: '',
+  otp: '',
+  device_id: useDeviceId()
+})
 
 // Step 1: Handle Username Form Submit
 async function onUsernameSubmit(
-  event: FormSubmitEvent<z.output<typeof usernameSchema>>,
+  event: FormSubmitEvent<z.output<typeof usernameSchema>>
 ) {
   try {
-    const response = await loginCheck({ user_name: event.data.user_name });
-    const authData = response?.data || response;
+    const response = await loginCheck({ user_name: event.data.user_name })
+    const authData = response?.data || response
 
     // Store returned flags
-    authCheckData.exists = authData.exists;
-    authCheckData.has_2fa = authData.has_2fa;
+    authCheckData.exists = authData.exists
+    authCheckData.has_2fa = authData.has_2fa
 
     if (!authCheckData.exists) {
-      return;
+      return
     }
 
     if (authCheckData.has_2fa) {
-      step.value = 3; // Proceed directly to OTP choice
+      step.value = 3 // Proceed directly to OTP choice
     } else {
-      step.value = 2; // Proceed to Password input
+      step.value = 2 // Proceed to Password input
     }
   } catch (error: any) {
-    console.error("Login Check error:", error);
+    console.error('Login Check error:', error)
   }
 }
 
 // Step 2: Handle Password Form Submit
 async function onPasswordSubmit(
-  event: FormSubmitEvent<z.output<typeof passwordSchema>>,
+  event: FormSubmitEvent<z.output<typeof passwordSchema>>
 ) {
   try {
     // Attempt standard login
     const response = await login({
       user_name: state.user_name,
       password: event.data.password,
-      device_id: state.device_id,
-    });
+      device_id: state.device_id
+    })
 
-    const authData = response?.data || response;
+    const authData = response?.data || response
 
     // If successful but 2FA is required, go to OTP options
     if (authData.requires_2fa) {
-      step.value = 3;
-      return;
+      step.value = 3
+      return
     }
 
     // Otherwise, we got the token and user!
-    await authStore.storeUser(authData);
-    redirectByRole(authData.user);
+    await authStore.storeUser(authData)
+    redirectByRole(authData.user)
   } catch (error) {
-    console.error("Login password error:", error);
+    console.error('Login password error:', error)
   }
 }
 
 // Step 3: Handle OTP Request
-async function onSendOtp(method: "sms" | "whatsapp" | "email") {
+async function onSendOtp(method: 'sms' | 'whatsapp' | 'email') {
   try {
     await sendOtp({
       user_name: state.user_name,
-      method,
-    });
-    step.value = 4; // Proceed to Verify OTP input
+      method
+    })
+    step.value = 4 // Proceed to Verify OTP input
   } catch (error) {
-    console.error("Send OTP error:", error);
+    console.error('Send OTP error:', error)
   }
 }
 
 // Step 4: Verify OTP
 async function onVerifyOtpSubmit(
-  event: FormSubmitEvent<z.output<typeof otpSchema>>,
+  event: FormSubmitEvent<z.output<typeof otpSchema>>
 ) {
   try {
     const response = await verifyOtp({
       token: state.user_name, // Typically the username is the token for login 2FA
       otp: event.data.otp,
-      type: "login",
-    });
+      type: 'login'
+    })
 
-    const authData = response?.data || response;
-    await authStore.storeUser(authData);
-    redirectByRole(authData.user);
+    const authData = response?.data || response
+    await authStore.storeUser(authData)
+    redirectByRole(authData.user)
   } catch (error) {
-    console.error("Verify OTP error:", error);
+    console.error('Verify OTP error:', error)
   }
 }
 </script>

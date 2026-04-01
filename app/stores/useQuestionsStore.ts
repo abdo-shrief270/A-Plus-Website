@@ -13,6 +13,14 @@ interface QuestionsResponse {
   }
 }
 
+interface CategoryQuestionsResponse extends QuestionsResponse {
+  category: any
+}
+
+interface SubjectQuestionsResponse extends QuestionsResponse {
+  subject: any
+}
+
 interface QuestionDetailResponse {
   question: Question
 }
@@ -28,11 +36,17 @@ export const useQuestionsStore = defineStore('questions', () => {
   const trendingQuestions = ref<Question[]>([])
   const recentQuestions = ref<Question[]>([])
   const searchResults = ref<Question[]>([])
+  const categoryQuestions = ref<Question[]>([])
+  const subjectQuestions = ref<Question[]>([])
   const currentQuestion = ref<Question | null>(null)
+  const currentCategory = ref<any>(null)
+  const currentSubject = ref<any>(null)
 
-  const trendingPagination = ref<Omit<PaginatedData<Question>, 'data'> | null>(null)
-  const recentPagination = ref<Omit<PaginatedData<Question>, 'data'> | null>(null)
-  const searchPagination = ref<Omit<PaginatedData<Question>, 'data'> | null>(null)
+  const trendingPagination = ref<Omit<PaginatedData<Question>, 'data'>>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
+  const recentPagination = ref<Omit<PaginatedData<Question>, 'data'>>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
+  const searchPagination = ref<Omit<PaginatedData<Question>, 'data'>>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
+  const categoryPagination = ref<Omit<PaginatedData<Question>, 'data'>>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
+  const subjectPagination = ref<Omit<PaginatedData<Question>, 'data'>>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
 
   const isLoading = ref(false)
   const error = ref<string | null>(null)
@@ -147,10 +161,79 @@ export const useQuestionsStore = defineStore('questions', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<any>(`/categories/${categoryId}/questions`, { params })
+      const queryParams = { ...params }
+      if (typeof queryParams.paginate === 'boolean') {
+        queryParams.paginate = queryParams.paginate ? (1 as any) : (0 as any)
+      }
+
+      const result = await axios.get<CategoryQuestionsResponse>(`/categories/${categoryId}/questions`, { params: queryParams }) as any
+
+      // The interceptor might have already unwrapped 'data'
+      // but we handle both cases for safety
+      const questions = result?.questions || []
+      const paginationData = result?.pagination
+      const categoryData = result?.category
+
+      categoryQuestions.value = questions
+      if (categoryData) currentCategory.value = categoryData
+
+      if (paginationData) {
+        const total = Number(paginationData.total) || 0
+        const perPage = Number(paginationData.per_page) || 15
+        const lastPage = Number(paginationData.last_page) || Math.ceil(total / perPage) || 1
+        const currentPageVal = Number(paginationData.current_page) || 1
+
+        categoryPagination.value = {
+          current_page: currentPageVal,
+          per_page: perPage,
+          total: total,
+          last_page: lastPage
+        }
+      }
       return result
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch category questions'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * GET /subjects/{id}/questions
+   */
+  const fetchSubjectQuestions = async (subjectId: number | string, params: { paginate?: boolean, per_page?: number, page?: number } = {}) => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const queryParams = { ...params }
+      if (typeof queryParams.paginate === 'boolean') {
+        queryParams.paginate = queryParams.paginate ? (1 as any) : (0 as any)
+      }
+
+      const result = await axios.get<SubjectQuestionsResponse>(`/subjects/${subjectId}/questions`, { params: queryParams }) as any
+      const data = result?.questions || []
+      const paginationData = result?.pagination
+      const subjectData = result?.subject
+
+      if (data) subjectQuestions.value = data
+      if (subjectData) currentSubject.value = subjectData
+
+      if (paginationData) {
+        const total = Number(paginationData.total) || 0
+        const perPage = Number(paginationData.per_page) || 15
+        const lastPage = Number(paginationData.last_page) || Math.ceil(total / perPage) || 1
+
+        subjectPagination.value = {
+          current_page: Number(paginationData.current_page) || 1,
+          per_page: perPage,
+          total: total,
+          last_page: lastPage
+        }
+      }
+      return result
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to fetch subject questions'
       throw err
     } finally {
       isLoading.value = false
@@ -198,10 +281,16 @@ export const useQuestionsStore = defineStore('questions', () => {
     trendingQuestions,
     recentQuestions,
     searchResults,
+    categoryQuestions,
+    subjectQuestions,
     currentQuestion,
+    currentCategory,
+    currentSubject,
     trendingPagination,
     recentPagination,
     searchPagination,
+    categoryPagination,
+    subjectPagination,
     isLoading,
     error,
 
@@ -211,6 +300,7 @@ export const useQuestionsStore = defineStore('questions', () => {
     searchQuestions,
     fetchQuestionById,
     fetchCategoryQuestions,
+    fetchSubjectQuestions,
     fetchArticleQuestions,
     submitAnswer
   }

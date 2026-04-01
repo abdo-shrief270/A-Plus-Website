@@ -85,15 +85,31 @@
                   </div>
 
                   <div class="p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-200 dark:border-gray-700">
-                    <div class="text-xs font-black text-gray-400 mb-2 uppercase">القيمة الأولى</div>
-                    <p class="text-gray-900 dark:text-white font-bold mb-4">{{ questionsStore.currentQuestion.comparison.value_1.text }}</p>
-                    <img v-if="questionsStore.currentQuestion.comparison.value_1.image_path" :src="questionsStore.currentQuestion.comparison.value_1.image_path" class="rounded-lg w-full max-h-40 object-contain">
+                    <div class="text-xs font-black text-gray-400 mb-2 uppercase">
+                      القيمة الأولى
+                    </div>
+                    <p class="text-gray-900 dark:text-white font-bold mb-4">
+                      {{ questionsStore.currentQuestion.comparison.value_1.text }}
+                    </p>
+                    <img
+                      v-if="questionsStore.currentQuestion.comparison.value_1.image_path"
+                      :src="questionsStore.currentQuestion.comparison.value_1.image_path"
+                      class="rounded-lg w-full max-h-40 object-contain"
+                    >
                   </div>
 
                   <div class="p-6 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-200 dark:border-gray-700">
-                    <div class="text-xs font-black text-gray-400 mb-2 uppercase">القيمة الثانية</div>
-                    <p class="text-gray-900 dark:text-white font-bold mb-4">{{ questionsStore.currentQuestion.comparison.value_2.text }}</p>
-                    <img v-if="questionsStore.currentQuestion.comparison.value_2.image_path" :src="questionsStore.currentQuestion.comparison.value_2.image_path" class="rounded-lg w-full max-h-40 object-contain">
+                    <div class="text-xs font-black text-gray-400 mb-2 uppercase">
+                      القيمة الثانية
+                    </div>
+                    <p class="text-gray-900 dark:text-white font-bold mb-4">
+                      {{ questionsStore.currentQuestion.comparison.value_2.text }}
+                    </p>
+                    <img
+                      v-if="questionsStore.currentQuestion.comparison.value_2.image_path"
+                      :src="questionsStore.currentQuestion.comparison.value_2.image_path"
+                      class="rounded-lg w-full max-h-40 object-contain"
+                    >
                   </div>
                 </div>
               </div>
@@ -142,8 +158,14 @@
                       {{ String.fromCharCode(65 + index) }}
                     </div>
                     <div class="flex-grow">
-                      <p class="text-gray-800 dark:text-gray-200 font-bold leading-relaxed">{{ answer.text }}</p>
-                      <img v-if="answer.image_path" :src="answer.image_path" class="mt-2 rounded-lg max-h-24 object-contain">
+                      <p class="text-gray-800 dark:text-gray-200 font-bold leading-relaxed">
+                        {{ answer.text }}
+                      </p>
+                      <img
+                        v-if="answer.image_path"
+                        :src="answer.image_path"
+                        class="mt-2 rounded-lg max-h-24 object-contain"
+                      >
                     </div>
 
                     <UIcon
@@ -162,39 +184,51 @@
 
               <!-- Action Bar -->
               <div class="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-50 dark:border-gray-800">
-                <div v-if="isSubmitted" class="flex items-center gap-3">
-                   <div :class="result?.is_correct ? 'text-success-600' : 'text-error-600'" class="flex items-center gap-2 font-black">
-                     <UIcon :name="result?.is_correct ? 'i-heroicons-check-badge' : 'i-heroicons-exclamation-triangle'" class="w-6 h-6" />
-                     {{ result?.is_correct ? 'إجابة صحيحة تهانينا!' : 'للأسف، إجابة خاطئة' }}
-                   </div>
+                <div
+                  v-if="isSubmitted"
+                  class="flex items-center gap-3"
+                >
+                  <div
+                    :class="result?.is_correct ? 'text-success-600' : 'text-error-600'"
+                    class="flex items-center gap-2 font-black"
+                  >
+                    <UIcon
+                      :name="result?.is_correct ? 'i-heroicons-check-badge' : 'i-heroicons-exclamation-triangle'"
+                      class="w-6 h-6"
+                    />
+                    {{ result?.is_correct ? 'إجابة صحيحة تهانينا!' : 'للأسف، إجابة خاطئة' }}
+                  </div>
                 </div>
-                <div v-else class="text-sm text-gray-400 font-bold">
+                <div
+                  v-else
+                  class="text-sm text-gray-400 font-bold"
+                >
                   اختر الإجابة الصحيحة ثم اضغط على زر الإرسال
                 </div>
 
                 <div class="flex items-center gap-3 w-full sm:w-auto">
-                   <UButton
-                     v-if="!isSubmitted"
-                     color="primary"
-                     size="xl"
-                     class="rounded-2xl px-12 font-black w-full"
-                     :disabled="!selectedAnswer"
-                     :loading="submitting"
-                     @click="handleAnswer"
-                   >
-                     تأكيد الإجابة
-                   </UButton>
-                   <UButton
-                     v-else
-                     color="neutral"
-                     variant="soft"
-                     size="xl"
-                     class="rounded-2xl px-8 font-bold w-full"
-                     icon="i-heroicons-arrow-path"
-                     @click="resetState"
-                   >
-                     حاول مرة أخرى
-                   </UButton>
+                  <UButton
+                    v-if="!isSubmitted"
+                    color="primary"
+                    size="xl"
+                    class="rounded-2xl px-12 font-black w-full"
+                    :disabled="!selectedAnswer"
+                    :loading="submitting"
+                    @click="handleAnswer"
+                  >
+                    تأكيد الإجابة
+                  </UButton>
+                  <UButton
+                    v-else
+                    color="neutral"
+                    variant="soft"
+                    size="xl"
+                    class="rounded-2xl px-8 font-bold w-full"
+                    icon="i-heroicons-arrow-path"
+                    @click="resetState"
+                  >
+                    حاول مرة أخرى
+                  </UButton>
                 </div>
               </div>
             </div>
@@ -211,23 +245,42 @@
               >
                 <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50 dark:border-gray-800">
                   <div class="w-10 h-10 rounded-xl bg-secondary-50 dark:bg-secondary-900/20 flex items-center justify-center">
-                    <UIcon name="i-heroicons-academic-cap" class="w-6 h-6 text-secondary-500" />
+                    <UIcon
+                      name="i-heroicons-academic-cap"
+                      class="w-6 h-6 text-secondary-500"
+                    />
                   </div>
                   <div>
-                    <h3 class="text-lg font-black text-gray-900 dark:text-white">شرح تفصيلي</h3>
-                    <p class="text-xs text-gray-400">افهم طريقة الحل الصحيحة</p>
+                    <h3 class="text-lg font-black text-gray-900 dark:text-white">
+                      شرح تفصيلي
+                    </h3>
+                    <p class="text-xs text-gray-400">
+                      افهم طريقة الحل الصحيحة
+                    </p>
                   </div>
                 </div>
 
                 <div class="prose dark:prose-invert max-w-none">
-                  <p class="text-gray-700 dark:text-gray-300 leading-relaxed text-lg" v-html="formattedExplanation"></p>
+                  <p
+                    class="text-gray-700 dark:text-gray-300 leading-relaxed text-lg"
+                    v-html="formattedExplanation"
+                  />
                 </div>
 
-                <div v-if="questionsStore.currentQuestion.explanation.image_path" class="mt-6 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800">
-                  <img :src="questionsStore.currentQuestion.explanation.image_path" class="w-full object-contain">
+                <div
+                  v-if="questionsStore.currentQuestion.explanation.image_path"
+                  class="mt-6 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800"
+                >
+                  <img
+                    :src="questionsStore.currentQuestion.explanation.image_path"
+                    class="w-full object-contain"
+                  >
                 </div>
 
-                <div v-if="questionsStore.currentQuestion.explanation.video_url" class="mt-8">
+                <div
+                  v-if="questionsStore.currentQuestion.explanation.video_url"
+                  class="mt-8"
+                >
                   <UButton
                     color="error"
                     variant="soft"
@@ -247,7 +300,9 @@
           <!-- Sidebar Context -->
           <div class="lg:col-span-4 space-y-6">
             <div class="bg-gradient-to-br from-primary-600 to-primary-800 rounded-3xl p-6 text-white shadow-xl shadow-primary-500/20 sticky top-24">
-              <h3 class="text-sm font-black uppercase tracking-widest text-primary-200 mb-4">معلومات السؤال</h3>
+              <h3 class="text-sm font-black uppercase tracking-widest text-primary-200 mb-4">
+                معلومات السؤال
+              </h3>
               <div class="space-y-4">
                 <div class="flex justify-between items-center py-2 border-b border-white/10">
                   <span class="text-primary-100 text-sm">رمز السؤال</span>
@@ -278,13 +333,16 @@
 
             <!-- Helpful Tips -->
             <div class="bg-secondary-50 dark:bg-secondary-900/10 rounded-3xl p-6 border border-secondary-100 dark:border-secondary-800">
-               <h4 class="text-secondary-600 dark:text-secondary-400 font-black mb-2 flex items-center gap-2">
-                 <UIcon name="i-heroicons-light-bulb" class="w-5 h-5" />
-                 نصيحة سريعة
-               </h4>
-               <p class="text-sm text-secondary-800 dark:text-secondary-300 leading-relaxed">
-                 عند مواجهة سؤال صعب، حاول استبعاد الخيارات الخاطئة الواضحة أولاً لزيادة فرصك في اختيار الإجابة الصحيحة.
-               </p>
+              <h4 class="text-secondary-600 dark:text-secondary-400 font-black mb-2 flex items-center gap-2">
+                <UIcon
+                  name="i-heroicons-light-bulb"
+                  class="w-5 h-5"
+                />
+                نصيحة سريعة
+              </h4>
+              <p class="text-sm text-secondary-800 dark:text-secondary-300 leading-relaxed">
+                عند مواجهة سؤال صعب، حاول استبعاد الخيارات الخاطئة الواضحة أولاً لزيادة فرصك في اختيار الإجابة الصحيحة.
+              </p>
             </div>
           </div>
         </div>

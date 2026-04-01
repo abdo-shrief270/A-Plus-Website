@@ -6,7 +6,10 @@
         <h1
           class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2"
         >
-          <UIcon name="i-heroicons-fire" class="w-8 h-8 text-orange-500" />
+          <UIcon
+            name="i-heroicons-fire"
+            class="w-8 h-8 text-orange-500"
+          />
           الدورات الأكثر إقبالاً
         </h1>
         <p class="text-sm text-gray-500 mt-1">
@@ -26,7 +29,10 @@
       />
     </div>
 
-    <div v-if="loading" class="flex justify-center py-20">
+    <div
+      v-if="loading"
+      class="flex justify-center py-20"
+    >
       <UIcon
         name="i-heroicons-arrow-path"
         class="w-10 h-10 text-primary-500 animate-spin"
@@ -40,7 +46,10 @@
       <div
         class="w-20 h-20 rounded-2xl bg-orange-50 dark:bg-orange-900/20 text-orange-500 flex items-center justify-center mx-auto mb-6"
       >
-        <UIcon name="i-heroicons-fire" class="w-10 h-10" />
+        <UIcon
+          name="i-heroicons-fire"
+          class="w-10 h-10"
+        />
       </div>
       <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
         لا توجد دورات شائعة حالياً
@@ -67,7 +76,7 @@
             v-if="course.image || course.cover_image"
             :src="course.image || course.cover_image"
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
+          >
           <div
             v-else
             class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-500/10 to-rose-600/20 group-hover:scale-105 transition-transform duration-500"
@@ -82,7 +91,10 @@
           <div
             class="absolute bottom-3 left-3 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm px-3 py-1.5 rounded-lg text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1 shadow-sm"
           >
-            <UIcon name="i-heroicons-users" class="w-4 h-4 text-orange-500" />
+            <UIcon
+              name="i-heroicons-users"
+              class="w-4 h-4 text-orange-500"
+            />
             {{ course.students_count || Math.floor(Math.random() * 500) + 50 }}
             طالب
           </div>
@@ -107,7 +119,10 @@
               }}
             </span>
             <div class="flex items-center text-xs text-amber-500 font-bold">
-              <UIcon name="i-heroicons-star-solid" class="w-3.5 h-3.5 mr-0.5" />
+              <UIcon
+                name="i-heroicons-star-solid"
+                class="w-3.5 h-3.5 mr-0.5"
+              />
               {{ course.rating || "4.8" }}
             </div>
           </div>
@@ -120,8 +135,8 @@
 
           <p class="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">
             {{
-              course.description ||
-              "تعلم المهارات الأساسية والمتقدمة في هذه الدورة المتميزة."
+              course.description
+                || "تعلم المهارات الأساسية والمتقدمة في هذه الدورة المتميزة."
             }}
           </p>
 
@@ -131,11 +146,11 @@
             <span
               v-if="course.price === 0 || !course.price"
               class="font-bold text-emerald-600 dark:text-emerald-400"
-              >مجاني</span
-            >
-            <span v-else class="font-bold text-gray-900 dark:text-white"
-              >{{ course.price }} ر.س</span
-            >
+            >مجاني</span>
+            <span
+              v-else
+              class="font-bold text-gray-900 dark:text-white"
+            >{{ course.price }} ر.س</span>
 
             <UIcon
               name="i-heroicons-arrow-left"
@@ -149,36 +164,36 @@
 </template>
 
 <script setup lang="ts">
-import { studentsService } from "@/services/api/students.service";
+import { studentsService } from '@/services/api/students.service'
 
-definePageMeta({ layout: "dashboard", middleware: ["auth"] });
-useSeoMeta({ title: "الدورات الأكثر إقبالاً | A Plus" });
+definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
+useSeoMeta({ title: 'الدورات الأكثر إقبالاً | A Plus' })
 
-const loading = ref(true);
-const courses = ref<any[]>([]);
+const loading = ref(true)
+const courses = ref<any[]>([])
 
-const searchQuery = ref("");
+const searchQuery = ref('')
 
 onMounted(async () => {
-  await fetchTrendingCourses();
-});
+  await fetchTrendingCourses()
+})
 
 async function fetchTrendingCourses() {
-  loading.value = true;
+  loading.value = true
   try {
     const res = await studentsService.getTrendingCourses({
-      search: searchQuery.value || undefined,
-    });
+      search: searchQuery.value || undefined
+    })
 
     // Check various common wrappers `data.data`, `data.courses`, `data.trending_courses`
-    const payload = res.data?.data || res.data;
+    const payload = res.data?.data || res.data
     courses.value = Array.isArray(payload)
       ? payload
-      : payload?.trending_courses || payload?.courses || [];
+      : payload?.trending_courses || payload?.courses || []
   } catch (error) {
-    console.error("Failed to load trending courses", error);
+    console.error('Failed to load trending courses', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>

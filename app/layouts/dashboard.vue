@@ -1,11 +1,17 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900" dir="rtl">
+  <div
+    class="min-h-screen bg-gray-50 dark:bg-gray-900"
+    dir="rtl"
+  >
     <div class="flex h-screen">
       <!-- Sidebar -->
       <aside class="w-64 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col">
         <!-- Logo -->
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-          <NuxtLink to="/" class="flex items-center gap-2">
+          <NuxtLink
+            to="/"
+            class="flex items-center gap-2"
+          >
             <div class="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center">
               <span class="text-white font-bold text-lg">A+</span>
             </div>
@@ -20,21 +26,29 @@
             class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             active-class="bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-semibold"
           >
-            <UIcon name="i-heroicons-home" class="w-5 h-5" />
+            <UIcon
+              name="i-heroicons-home"
+              class="w-5 h-5"
+            />
             <span>الرئيسية</span>
           </NuxtLink>
 
           <!-- School-only nav -->
           <template v-if="isSchool">
             <div class="pt-3 pb-1 px-4">
-              <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">إدارة الطلاب</p>
+              <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                إدارة الطلاب
+              </p>
             </div>
             <NuxtLink
               to="/dashboard/students"
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               active-class="bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-semibold"
             >
-              <UIcon name="i-heroicons-user-group" class="w-5 h-5" />
+              <UIcon
+                name="i-heroicons-user-group"
+                class="w-5 h-5"
+              />
               <span>الطلاب</span>
             </NuxtLink>
             <NuxtLink
@@ -42,7 +56,10 @@
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               active-class="bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-semibold"
             >
-              <UIcon name="i-heroicons-user-plus" class="w-5 h-5" />
+              <UIcon
+                name="i-heroicons-user-plus"
+                class="w-5 h-5"
+              />
               <span>إضافة طالب</span>
             </NuxtLink>
             <NuxtLink
@@ -50,7 +67,10 @@
               class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               active-class="bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-semibold"
             >
-              <UIcon name="i-heroicons-arrow-up-tray" class="w-5 h-5" />
+              <UIcon
+                name="i-heroicons-arrow-up-tray"
+                class="w-5 h-5"
+              />
               <span>استيراد الطلاب</span>
             </NuxtLink>
           </template>
@@ -58,20 +78,27 @@
           <!-- Parent nav -->
           <template v-if="isParent">
             <div class="pt-3 pb-1 px-4">
-              <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">متابعة الأبناء</p>
+              <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                متابعة الأبناء
+              </p>
             </div>
           </template>
 
           <!-- Shared -->
           <div class="pt-3 pb-1 px-4">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">الحساب</p>
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              الحساب
+            </p>
           </div>
           <NuxtLink
             to="/dashboard/profile"
             class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             active-class="bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-semibold"
           >
-            <UIcon name="i-heroicons-user-circle" class="w-5 h-5" />
+            <UIcon
+              name="i-heroicons-user-circle"
+              class="w-5 h-5"
+            />
             <span>الملف الشخصي</span>
           </NuxtLink>
           <NuxtLink
@@ -79,14 +106,20 @@
             class="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             active-class="bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 font-semibold"
           >
-            <UIcon name="i-heroicons-device-phone-mobile" class="w-5 h-5" />
+            <UIcon
+              name="i-heroicons-device-phone-mobile"
+              class="w-5 h-5"
+            />
             <span>الأجهزة</span>
           </NuxtLink>
         </nav>
 
         <!-- User Menu Footer -->
         <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-          <UDropdown :items="userMenuItems" :popper="{ placement: 'top' }">
+          <UDropdown
+            :items="userMenuItems"
+            :popper="{ placement: 'top' }"
+          >
             <div class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors">
               <div class="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
                 <span class="text-primary-700 dark:text-primary-400 font-bold text-sm">
@@ -101,7 +134,10 @@
                   {{ roleLabel }}
                 </p>
               </div>
-              <UIcon name="i-heroicons-chevron-up-down" class="w-4 h-4 text-gray-400" />
+              <UIcon
+                name="i-heroicons-chevron-up-down"
+                class="w-4 h-4 text-gray-400"
+              />
             </div>
           </UDropdown>
         </div>

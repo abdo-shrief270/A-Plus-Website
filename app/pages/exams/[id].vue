@@ -42,7 +42,10 @@
     </header>
 
     <div class="container mx-auto px-4 py-8">
-      <div v-if="examsStore.isLoading" class="flex flex-col items-center justify-center py-32">
+      <div
+        v-if="examsStore.isLoading"
+        class="flex flex-col items-center justify-center py-32"
+      >
         <UIcon
           name="i-heroicons-arrow-path"
           class="w-12 h-12 text-primary-500 animate-spin mb-4"
@@ -50,7 +53,10 @@
         <span class="text-gray-500 animate-pulse">جاري تحميل الأقسام والمواد...</span>
       </div>
 
-      <div v-else class="flex flex-col lg:flex-row gap-8">
+      <div
+        v-else
+        class="flex flex-col lg:flex-row gap-8"
+      >
         <!-- Sidebar Navigation -->
         <aside class="w-full lg:w-80 flex-shrink-0">
           <div class="sticky top-28 space-y-6">
@@ -153,7 +159,9 @@
                   v-if="examsStore.sections.length === 0"
                   class="p-8 text-center"
                 >
-                  <p class="text-xs text-gray-400">لا توجد أقسام متاحة</p>
+                  <p class="text-xs text-gray-400">
+                    لا توجد أقسام متاحة
+                  </p>
                 </div>
               </div>
             </div>
