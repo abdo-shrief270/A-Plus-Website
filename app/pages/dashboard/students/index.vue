@@ -1,187 +1,254 @@
 <template>
   <div>
-    <div class="mb-6 flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-        الطلاب
-      </h1>
-      <div class="flex gap-3">
-        <NuxtLink to="/dashboard/students/import">
-          <UButton color="neutral" variant="outline" icon="i-heroicons-arrow-up-tray">
-            استيراد
-          </UButton>
-        </NuxtLink>
-        <NuxtLink to="/dashboard/students/create">
-          <UButton icon="i-heroicons-plus">
-            إضافة طالب
-          </UButton>
-        </NuxtLink>
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+          إدارة الطلاب
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">
+          استعرض قائمة الطلاب المسجلين بالمنصة وأدر حساباتهم
+        </p>
+      </div>
+      <div class="flex items-center gap-3">
+        <UButton
+          color="neutral"
+          variant="soft"
+          icon="i-heroicons-arrow-down-tray"
+        >
+          تصدير / استيراد اكسيل
+        </UButton>
+        <UButton color="primary" icon="i-heroicons-plus"> إضافة طالب </UButton>
       </div>
     </div>
 
-    <!-- Filters -->
-    <div class="flex flex-wrap gap-3 mb-5">
-      <UInput v-model="filters.search" placeholder="بحث بالاسم..." icon="i-heroicons-magnifying-glass" class="w-56" @input="debouncedFetch" />
-      <UInput v-model="filters.exam_id" placeholder="ID الاختبار" class="w-36" @input="debouncedFetch" />
+    <!-- Filters & Actions -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-4 mb-6 flex flex-col sm:flex-row gap-4 justify-between shadow-sm"
+    >
+      <div class="flex flex-col sm:flex-row gap-4 flex-1">
+        <UInput
+          v-model="searchQuery"
+          icon="i-heroicons-magnifying-glass"
+          placeholder="ابحث بالاسم، الإيميل، أو رقم الهاتف..."
+          class="w-full sm:max-w-md"
+        />
+        <USelectMenu
+          v-model="statusFilter"
+          :options="[
+            { label: 'نشط', value: 'active' },
+            { label: 'معلق', value: 'suspended' },
+          ]"
+          placeholder="حالة الحساب"
+          class="w-full sm:w-48"
+        />
+      </div>
     </div>
 
-    <!-- Table -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-      <div v-if="loading" class="flex justify-center py-16">
-        <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-primary-500 animate-spin" />
-      </div>
-
-      <table v-else class="w-full text-sm">
-        <thead class="bg-gray-50 dark:bg-gray-700">
-          <tr>
-            <th class="text-right px-4 py-3 text-gray-600 dark:text-gray-300 font-semibold">
-              الاسم
-            </th>
-            <th class="text-right px-4 py-3 text-gray-600 dark:text-gray-300 font-semibold">
-              اسم المستخدم
-            </th>
-            <th class="text-right px-4 py-3 text-gray-600 dark:text-gray-300 font-semibold">
-              رقم الهوية
-            </th>
-            <th class="text-right px-4 py-3 text-gray-600 dark:text-gray-300 font-semibold">
-              الاختبار
-            </th>
-            <th class="px-4 py-3" />
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-          <tr
-            v-for="student in students"
-            :key="student.id"
-            class="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+    <!-- Data Table -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden shadow-sm"
+    >
+      <UTable
+        :rows="students"
+        :columns="columns"
+        :loading="loading"
+        loading-state="{ icon: 'i-heroicons-arrow-path', label: 'جاري التحميل...' }"
+        empty-state="{ icon: 'i-heroicons-users', label: 'لا يوجد طلاب مطابقين للبحث' }"
+        :ui="{ divide: 'divide-gray-100 dark:divide-gray-700' }"
+      >
+        <!-- Custom Name / Avatar Column -->
+        <template #name-data="{ row }">
+          <NuxtLink
+            :to="`/dashboard/students/${row.id}`"
+            class="flex items-center gap-3 group"
           >
-            <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
-              {{ student.user?.name || student.name }}
-            </td>
-            <td class="px-4 py-3 text-gray-500">
-              {{ student.user?.user_name || student.user_name }}
-            </td>
-            <td class="px-4 py-3 text-gray-500">
-              {{ student.id_number }}
-            </td>
-            <td class="px-4 py-3 text-gray-500">
-              {{ student.exam?.name }}
-            </td>
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-2 justify-end">
-                <NuxtLink :to="`/dashboard/students/${student.id}`">
-                  <UButton size="xs" color="neutral" variant="ghost" icon="i-heroicons-pencil-square" />
-                </NuxtLink>
-                <UButton size="xs" color="error" variant="ghost" icon="i-heroicons-trash" @click="confirmDelete(student)" />
-              </div>
-            </td>
-          </tr>
-          <tr v-if="students.length === 0">
-            <td colspan="5" class="text-center py-12 text-gray-400">
-              لا يوجد طلاب
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            <UAvatar
+              :src="row.avatar || row.profile_image"
+              :alt="row.name_ar || row.name"
+              size="sm"
+              :ui="{ rounded: 'rounded-lg' }"
+              class="bg-primary-50 dark:bg-primary-900/20 text-primary-600 font-bold"
+            >
+              {{ (row.name_ar || row.name || "ط").charAt(0).toUpperCase() }}
+            </UAvatar>
+            <div>
+              <p
+                class="font-bold text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors"
+              >
+                {{ row.name_ar || row.name || row.username }}
+              </p>
+              <p class="text-xs text-gray-500">{{ row.email || row.phone }}</p>
+            </div>
+          </NuxtLink>
+        </template>
 
-      <!-- Pagination -->
-      <div v-if="pagination.last_page > 1" class="flex items-center justify-between p-4 border-t border-gray-100 dark:border-gray-700">
-        <span class="text-sm text-gray-500">{{ pagination.total }} طالب</span>
-        <div class="flex items-center gap-3">
-          <UButton :disabled="pagination.current_page <= 1" color="neutral" variant="outline" size="xs" icon="i-heroicons-chevron-right" @click="changePage(pagination.current_page - 1)" />
-          <span class="text-sm">{{ pagination.current_page }} / {{ pagination.last_page }}</span>
-          <UButton :disabled="pagination.current_page >= pagination.last_page" color="neutral" variant="outline" size="xs" icon="i-heroicons-chevron-left" @click="changePage(pagination.current_page + 1)" />
-        </div>
+        <!-- Status Column -->
+        <template #status-data="{ row }">
+          <UBadge
+            :color="row.status === 'suspended' ? 'error' : 'success'"
+            variant="subtle"
+            size="sm"
+          >
+            {{ row.status === "suspended" ? "معلق" : "نشط" }}
+          </UBadge>
+        </template>
+
+        <!-- Registraion Date -->
+        <template #created_at-data="{ row }">
+          <span class="text-gray-500 whitespace-nowrap text-sm">
+            {{ row.created_at?.split("T")[0] || "غير متوفر" }}
+          </span>
+        </template>
+
+        <!-- Actions -->
+        <template #actions-data="{ row }">
+          <div class="flex justify-end gap-2">
+            <UTooltip text="عرض الملف الشخصي">
+              <UButton
+                size="sm"
+                color="neutral"
+                variant="ghost"
+                icon="i-heroicons-eye"
+                :to="`/dashboard/students/${row.id}`"
+              />
+            </UTooltip>
+            <UTooltip text="تعديل">
+              <UButton
+                size="sm"
+                color="neutral"
+                variant="ghost"
+                icon="i-heroicons-pencil-square"
+              />
+            </UTooltip>
+            <UDropdown :items="getActionItems(row)">
+              <UButton
+                size="sm"
+                color="neutral"
+                variant="ghost"
+                icon="i-heroicons-ellipsis-vertical"
+              />
+            </UDropdown>
+          </div>
+        </template>
+      </UTable>
+
+      <!-- Pagination Footer -->
+      <div
+        v-if="meta?.total > meta?.per_page"
+        class="p-4 border-t border-gray-100 dark:border-gray-700 flex justify-center"
+      >
+        <UPagination
+          v-model="page"
+          :page-count="meta.per_page"
+          :total="meta.total"
+        />
       </div>
     </div>
-
-    <!-- Delete Confirmation Modal -->
-    <UModal v-model:open="deleteModal">
-      <template #content>
-        <div class="p-6">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            طلب حذف الطالب
-          </h3>
-          <p class="text-gray-600 dark:text-gray-400 mb-4">
-            هذا الإجراء يحتاج موافقة المشرف. أدخل سبب الحذف:
-          </p>
-          <UInput v-model="deleteReason" placeholder="سبب الحذف..." class="w-full mb-4" />
-          <div class="flex gap-3 justify-end">
-            <UButton color="neutral" variant="outline" @click="deleteModal = false">
-              إلغاء
-            </UButton>
-            <UButton color="error" :loading="deleting" @click="onDelete">
-              إرسال الطلب
-            </UButton>
-          </div>
-        </div>
-      </template>
-    </UModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useDebounceFn } from '@vueuse/core'
-import { studentService } from '@/services/api/student.service'
-import { showToast } from '@/utils/helpers/toast.helper'
+import { studentsService } from "@/services/api/students.service";
 
-definePageMeta({
-  layout: 'dashboard',
-  middleware: ['auth', 'role']
-})
-useSeoMeta({ title: 'الطلاب | A Plus' })
+definePageMeta({ layout: "dashboard", middleware: ["auth"] });
+useSeoMeta({ title: "الطلاب | A Plus" });
 
-const loading = ref(true)
-const students = ref<any[]>([])
-const pagination = ref({ current_page: 1, last_page: 1, total: 0 })
-const filters = reactive({ search: '', exam_id: '' })
+const loading = ref(true);
+const students = ref<any[]>([]);
+const meta = ref<any>(null);
 
-const deleteModal = ref(false)
-const deleteReason = ref('')
-const deleting = ref(false)
-const selectedStudent = ref<any>(null)
+const searchQuery = ref("");
+const statusFilter = ref(null);
+const page = ref(1);
 
-async function fetchStudents(page = 1) {
-  loading.value = true
+const columns = [
+  { key: "name", label: "الطالب" },
+  { key: "parent_phone", label: "ولي الأمر" },
+  { key: "grade", label: "المرحلة" },
+  { key: "status", label: "الحالة" },
+  { key: "created_at", label: "تاريخ التسجيل" },
+  { key: "actions", label: "" },
+];
+
+onMounted(async () => {
+  await fetchStudents();
+});
+
+// Watch inputs and page change with a slight debouncing for search
+let searchTimeout: any;
+watch([searchQuery, statusFilter, page], () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    fetchStudents();
+  }, 300);
+});
+
+async function fetchStudents() {
+  loading.value = true;
   try {
-    const res = await studentService.list({ ...filters, page })
-    students.value = res.data?.data?.data || res.data?.data || []
-    const meta = res.data?.data?.meta || {}
-    pagination.value = {
-      current_page: meta.current_page || 1,
-      last_page: meta.last_page || 1,
-      total: meta.total || students.value.length
+    const res = await studentsService.getStudents({
+      page: page.value,
+      search: searchQuery.value || undefined,
+      status: statusFilter.value?.value || undefined,
+    });
+
+    const payload = res.data?.data || res.data;
+    students.value = Array.isArray(payload)
+      ? payload
+      : payload?.students || payload?.data || [];
+    meta.value = res.data?.meta ||
+      payload?.meta || { total: students.value.length, per_page: 15 };
+  } catch (error) {
+    console.error("Failed to load students", error);
+  } finally {
+    loading.value = false;
+  }
+}
+
+function getActionItems(row: any) {
+  return [
+    [
+      {
+        label: "عرض الدرجات",
+        icon: "i-heroicons-chart-bar",
+        click: () => navigateTo(`/dashboard/student-stats?student=${row.id}`),
+      },
+      { label: "مراسلة الطالب", icon: "i-heroicons-chat-bubble-left-ellipsis" },
+    ],
+    [
+      {
+        label: "تعليق الحساب",
+        icon: "i-heroicons-no-symbol",
+        color: "red" as const,
+        click: () => console.log("Suspend student"),
+      },
+      {
+        label: "طلب حذف الحساب",
+        icon: "i-heroicons-trash",
+        color: "red" as const,
+        click: () => requestDeletion(row.id),
+      },
+    ],
+  ];
+}
+
+async function requestDeletion(id: number) {
+  if (
+    confirm(
+      "هل أنت متأكد من تقديم طلب لحذف حساب هذا الطالب بالكامل؟ لا يمكن التراجع عن هذا الإجراء.",
+    )
+  ) {
+    try {
+      await studentsService.requestStudentDeletion(
+        id,
+        "حذف يدوي من لوحة التحكم",
+      );
+      // Could show a toast success here
+      alert("تم إرسال طلب الحذف بنجاح إلى الإدارة.");
+    } catch (e) {
+      alert("حدث خطأ أثناء إرسال طلب الحذف.");
     }
-  } catch {
-    //
-  } finally {
-    loading.value = false
   }
 }
-
-const debouncedFetch = useDebounceFn(() => fetchStudents(), 400)
-
-function changePage(page: number) { fetchStudents(page) }
-
-function confirmDelete(student: any) {
-  selectedStudent.value = student
-  deleteReason.value = ''
-  deleteModal.value = true
-}
-
-async function onDelete() {
-  if (!selectedStudent.value) return
-  deleting.value = true
-  try {
-    await studentService.destroy(selectedStudent.value.id, deleteReason.value)
-    showToast('نجح', 'تم إرسال طلب الحذف للمشرف', 'success')
-    deleteModal.value = false
-    fetchStudents(pagination.value.current_page)
-  } catch {
-    //
-  } finally {
-    deleting.value = false
-  }
-}
-
-onMounted(() => fetchStudents())
 </script>

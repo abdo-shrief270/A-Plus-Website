@@ -1,181 +1,286 @@
 <template>
-  <div>
-    <div class="mb-6 flex items-center gap-3">
-      <NuxtLink to="/dashboard/students">
-        <UButton color="neutral" variant="ghost" icon="i-heroicons-arrow-right" />
-      </NuxtLink>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-        استيراد الطلاب
-      </h1>
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-8">
+      <UButton
+        icon="i-heroicons-arrow-right"
+        color="neutral"
+        variant="ghost"
+        to="/dashboard/students"
+        class="rtl:-scale-x-100"
+      />
+      <div>
+        <h1
+          class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3"
+        >
+          استيراد حسابات الطلاب
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">
+          قم برفع ملف Excel (CSV/XLSX) أو لصق بيانات JSON لإضافة مجموعة دفعة
+          واحدة
+        </p>
+      </div>
     </div>
 
-    <UTabs :items="tabs" class="mb-6">
-      <!-- JSON Bulk Tab -->
-      <template #bulk>
-        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            الصق مصفوفة JSON تحتوي بيانات الطلاب. مثال:
-          </p>
-          <pre class="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 text-xs text-gray-700 dark:text-gray-300 mb-4 overflow-auto">[
-  {
-    "name": "أحمد محمد",
-    "user_name": "ahmed_m",
-    "country_code": "+966",
-    "phone": "0501234567",
-    "password": "password123",
-    "gender": "male",
-    "exam_id": 1,
-    "exam_date": "2026-06-01",
-    "id_number": "1234567890"
-  }
-]</pre>
-          <UTextarea
-            v-model="bulkJson"
-            placeholder="الصق JSON هنا..."
-            :rows="8"
-            class="w-full mb-4 font-mono text-sm"
-          />
-          <UButton :loading="bulkLoading" :disabled="!bulkJson.trim()" @click="onBulkImport">
-            استيراد من JSON
-          </UButton>
-        </div>
-      </template>
-
-      <!-- File Upload Tab -->
-      <template #file>
-        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
-          <div
-            class="border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors"
-            :class="isDragOver ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/10' : 'border-gray-300 dark:border-gray-600 hover:border-primary-400'"
-            @dragover.prevent="isDragOver = true"
-            @dragleave="isDragOver = false"
-            @drop.prevent="onDrop"
-            @click="fileInput?.click()"
+    <div class="space-y-6">
+      <!-- Upload Excel Section -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 shadow-sm"
+      >
+        <div
+          class="flex items-center justify-between mb-6 border-b border-gray-100 dark:border-gray-700 pb-4"
+        >
+          <h3
+            class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2"
           >
-            <UIcon name="i-heroicons-arrow-up-tray" class="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              اسحب ملف هنا أو انقر للاختيار
-            </p>
-            <p class="text-sm text-gray-400">
-              CSV أو Excel (.xlsx) — حد أقصى 10MB
-            </p>
-            <input ref="fileInput" type="file" accept=".csv,.xlsx,.xls" class="hidden" @change="onFileSelect">
-          </div>
-
-          <div v-if="selectedFile" class="mt-4 flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <UIcon name="i-heroicons-document-text" class="w-5 h-5 text-primary-600" />
-            <span class="text-sm font-medium text-gray-800 dark:text-gray-200 flex-1">{{ selectedFile.name }}</span>
-            <UButton size="xs" color="error" variant="ghost" icon="i-heroicons-x-mark" @click="selectedFile = null" />
-          </div>
-
-          <UButton v-if="selectedFile" class="mt-4" :loading="fileLoading" @click="onFileImport">
-            رفع واستيراد
+            <UIcon
+              name="i-heroicons-table-cells"
+              class="w-6 h-6 text-emerald-500"
+            />
+            استيراد ملف Excel أو CSV
+          </h3>
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-heroicons-arrow-down-tray"
+          >
+            تحميل نموذج فارغ
           </UButton>
         </div>
-      </template>
-    </UTabs>
 
-    <!-- Import Result -->
-    <div v-if="importResult" class="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 mt-4">
-      <h3 class="font-bold text-gray-900 dark:text-white mb-4">
-        نتيجة الاستيراد
-      </h3>
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div class="bg-success-50 dark:bg-success-900/20 rounded-lg p-4 text-center">
-          <p class="text-3xl font-bold text-success-600">
-            {{ importResult.total_created }}
-          </p>
-          <p class="text-sm text-success-700">
-            تم الإنشاء
-          </p>
+        <div
+          class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-10 text-center hover:border-emerald-500 dark:hover:border-emerald-500 transition-colors cursor-pointer group"
+          :class="{
+            'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10':
+              fileData,
+          }"
+          @click="triggerFileInput"
+        >
+          <input
+            type="file"
+            ref="fileInput"
+            class="hidden"
+            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+            @change="handleFileUpload"
+          />
+
+          <div v-if="!fileData" class="space-y-3">
+            <div
+              class="w-16 h-16 bg-gray-50 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/30 transition-colors"
+            >
+              <UIcon
+                name="i-heroicons-document-arrow-up"
+                class="w-8 h-8 text-gray-400 group-hover:text-emerald-500"
+              />
+            </div>
+            <p class="font-bold text-gray-900 dark:text-white">
+              اسحب الملف وأفلته هنا أو اضغط للاستعراض
+            </p>
+            <p class="text-sm text-gray-500">
+              يدعم صيغ .XLSX و .CSV بحجم أقصى 5MB
+            </p>
+          </div>
+
+          <div v-else class="space-y-4">
+            <UIcon
+              name="i-heroicons-document-text"
+              class="w-16 h-16 text-emerald-500 mx-auto"
+            />
+            <p class="font-bold text-gray-900 dark:text-white">
+              {{ fileData.name }}
+            </p>
+            <p class="text-sm text-gray-500">
+              {{ (fileData.size / 1024).toFixed(2) }} KB
+            </p>
+            <UButton
+              color="neutral"
+              variant="soft"
+              size="sm"
+              @click.stop="fileData = null"
+            >
+              إلغاء الملف
+            </UButton>
+          </div>
         </div>
-        <div class="bg-error-50 dark:bg-error-900/20 rounded-lg p-4 text-center">
-          <p class="text-3xl font-bold text-error-600">
-            {{ importResult.total_failed }}
-          </p>
-          <p class="text-sm text-error-700">
-            فشل
-          </p>
+
+        <div class="mt-6 flex justify-end">
+          <UButton
+            color="emerald"
+            icon="i-heroicons-check"
+            :loading="isUploading"
+            :disabled="!fileData"
+            @click="uploadExcelFile"
+            class="px-8"
+          >
+            بدء الاستيراد
+          </UButton>
         </div>
       </div>
-      <div v-if="importResult.errors?.length" class="mt-3">
-        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-          الأخطاء:
+
+      <!-- JSON Input Section -->
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 shadow-sm"
+      >
+        <h3
+          class="text-lg font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-4 flex items-center gap-2"
+        >
+          <UIcon
+            name="i-heroicons-code-bracket"
+            class="w-6 h-6 text-primary-500"
+          />
+          إضافة مجمعة بواسطة JSON
+        </h3>
+
+        <p class="text-sm text-gray-500 mb-4">
+          يمكنك لصق مصفوفة من العناصر (JSON Array) تحوي كائنات ببيانات الطلاب:
+          <code>{ name, email, phone, parent_phone }</code>
         </p>
-        <ul class="text-sm text-error-600 space-y-1">
-          <li v-for="(err, idx) in importResult.errors" :key="idx" class="flex items-start gap-2">
-            <UIcon name="i-heroicons-x-circle" class="w-4 h-4 flex-shrink-0 mt-0.5" />
-            {{ err }}
-          </li>
-        </ul>
+
+        <UTextarea
+          v-model="jsonContent"
+          placeholder='[ {"name": "طالب تجريبي", "phone": "0500000000", "parent_phone": "0511111111", "email": "test@domain.com"} ]'
+          :rows="8"
+          class="font-mono text-left w-full"
+          dir="ltr"
+        />
+
+        <div class="mt-6 flex justify-between items-center">
+          <div class="text-sm">
+            <span
+              v-if="jsonParseError"
+              class="text-red-500 font-bold flex items-center gap-1"
+            >
+              <UIcon name="i-heroicons-exclamation-triangle" />
+              {{ jsonParseError }}
+            </span>
+            <span
+              v-else-if="parsedJsonCount > 0"
+              class="text-emerald-500 font-bold flex items-center gap-1"
+            >
+              <UIcon name="i-heroicons-check-circle" /> تم التعرف على
+              {{ parsedJsonCount }} سجل صحيح
+            </span>
+          </div>
+
+          <UButton
+            color="primary"
+            icon="i-heroicons-paper-airplane"
+            :loading="isJsonSubmitting"
+            :disabled="
+              !jsonContent || !!jsonParseError || parsedJsonCount === 0
+            "
+            @click="submitJson"
+            class="px-8"
+          >
+            تنفيذ JSON
+          </UButton>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { studentService } from '@/services/api/student.service'
-import { showToast } from '@/utils/helpers/toast.helper'
+import { studentsService } from "@/services/api/students.service";
+import { showToast } from "@/utils/helpers/toast.helper";
 
-definePageMeta({ layout: 'dashboard', middleware: ['auth', 'role'] })
-useSeoMeta({ title: 'استيراد الطلاب | A Plus' })
+definePageMeta({ layout: "dashboard", middleware: ["auth"] });
+useSeoMeta({ title: "استيراد الطلاب | A Plus" });
 
-const tabs = [
-  { label: 'JSON (جماعي)', slot: 'bulk', icon: 'i-heroicons-code-bracket' },
-  { label: 'ملف CSV/Excel', slot: 'file', icon: 'i-heroicons-document-arrow-up' }
-]
+// File Upload State
+const fileInput = ref<HTMLInputElement | null>(null);
+const fileData = ref<File | null>(null);
+const isUploading = ref(false);
 
-// Bulk JSON state
-const bulkJson = ref('')
-const bulkLoading = ref(false)
+// JSON Upload State
+const jsonContent = ref("");
+const isJsonSubmitting = ref(false);
 
-// File upload state
-const isDragOver = ref(false)
-const selectedFile = ref<File | null>(null)
-const fileLoading = ref(false)
-const fileInput = ref<HTMLInputElement | null>(null)
-
-const importResult = ref<any>(null)
-
-async function onBulkImport() {
+const jsonParseError = computed(() => {
+  if (!jsonContent.value) return "";
   try {
-    const students = JSON.parse(bulkJson.value)
-    if (!Array.isArray(students)) throw new Error('يجب أن تكون البيانات مصفوفة JSON')
-    bulkLoading.value = true
-    const res = await studentService.bulkCreate(students)
-    importResult.value = res.data?.data
-    showToast('نجح', res.data?.message || 'اكتمل الاستيراد', 'success')
-    bulkJson.value = ''
-  } catch (e: any) {
-    showToast('خطأ', e.message || 'JSON غير صالح', 'error')
-  } finally {
-    bulkLoading.value = false
+    const parsed = JSON.parse(jsonContent.value);
+    if (!Array.isArray(parsed))
+      return "البيانات المدخلة يجب أن تكون مصفوفة JSON Array []";
+    // Deep check
+    for (const item of parsed) {
+      if (!item.name || !item.parent_phone) {
+        return "أحد السجلات ينقصه بيانات أساسية (name أو parent_phone)";
+      }
+    }
+    return "";
+  } catch (e) {
+    return "صيغة JSON غير صحيحة";
+  }
+});
+
+const parsedJsonCount = computed(() => {
+  if (jsonParseError.value || !jsonContent.value) return 0;
+  return JSON.parse(jsonContent.value).length;
+});
+
+function triggerFileInput() {
+  fileInput.value?.click();
+}
+
+function handleFileUpload(event: Event) {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    fileData.value = target.files[0];
   }
 }
 
-function onDrop(e: DragEvent) {
-  isDragOver.value = false
-  const file = e.dataTransfer?.files[0]
-  if (file) selectedFile.value = file
-}
+async function uploadExcelFile() {
+  if (!fileData.value) return;
 
-function onFileSelect(e: Event) {
-  const file = (e.target as HTMLInputElement).files?.[0]
-  if (file) selectedFile.value = file
-}
-
-async function onFileImport() {
-  if (!selectedFile.value) return
-  fileLoading.value = true
+  isUploading.value = true;
   try {
-    const res = await studentService.importFile(selectedFile.value)
-    importResult.value = res.data?.data
-    showToast('نجح', res.data?.message || 'اكتمل الاستيراد', 'success')
-    selectedFile.value = null
-  } catch {
-    //
+    const formData = new FormData();
+    formData.append("file", fileData.value);
+
+    // Add endpoint dynamically if we want
+    await studentsService.importStudents(formData);
+
+    showToast(
+      "نجاح",
+      `تم استيراد قائمة الطلاب بنجاح من الملف ${fileData.value.name}`,
+      "success",
+    );
+    fileData.value = null; // reset
+  } catch (error: any) {
+    showToast(
+      "خطأ",
+      error.response?.data?.message || "فشل في قراءة ومعالجة الملف",
+      "error",
+    );
   } finally {
-    fileLoading.value = false
+    isUploading.value = false;
+  }
+}
+
+async function submitJson() {
+  if (jsonParseError.value || !jsonContent.value) return;
+
+  isJsonSubmitting.value = true;
+  try {
+    const parsedData = JSON.parse(jsonContent.value);
+
+    await studentsService.bulkCreateStudents({ students: parsedData });
+
+    showToast(
+      "نجاح",
+      `تم إضافة ${parsedJsonCount.value} سجلات بنجاح`,
+      "success",
+    );
+    jsonContent.value = ""; // reset
+  } catch (error: any) {
+    showToast(
+      "خطأ",
+      error.response?.data?.message || "حدث خطأ أثناء إدراج البيانات",
+      "error",
+    );
+  } finally {
+    isJsonSubmitting.value = false;
   }
 }
 </script>

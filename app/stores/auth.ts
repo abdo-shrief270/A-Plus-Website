@@ -105,6 +105,18 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async logoutUser() {
+      // Import authService here to avoid circular dependencies if auth.service.ts uses the store
+      const { authService } = await import('@/services/api/auth.service')
+
+      try {
+        // Attempt to invalidate the token on the server side
+        await authService.logout()
+      } catch (error) {
+        // Ignore errors (e.g. token already expired or network issue)
+        // We still want to proceed with client-side cleanup
+        console.warn('Backend logout failed, proceeding with local cleanup', error)
+      }
+
       return new Promise((resolve) => {
         if (import.meta.client) {
           localStorage.removeItem('APlus-user')
