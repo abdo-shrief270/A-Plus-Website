@@ -30,9 +30,10 @@ export interface Exam {
 
 export interface Section {
   id: number
-  title: string
+  name: string
   exam_id: number
   parent_id?: number | null
+  categories?: Category[]
   children?: Section[]
 }
 

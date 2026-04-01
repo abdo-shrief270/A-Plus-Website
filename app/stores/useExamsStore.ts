@@ -1,7 +1,28 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useAxios } from '../composables/useAxios'
-import type { Exam, PaginatedData } from '../types/question-bank'
+import type { Exam, PaginatedData, Section } from '../types/question-bank'
+
+interface ExamsResponse {
+  exams: Exam[]
+  data?: Exam[]
+  current_page?: number
+  per_page?: number
+  total?: number
+  last_page?: number
+}
+
+interface ExamDetailsResponse {
+  exam: Exam
+}
+
+interface SectionsResponse {
+  sections: Section[]
+}
+
+interface SubjectsResponse {
+  subjects: any[]
+}
 
 /**
  * Exams Store
@@ -12,7 +33,7 @@ export const useExamsStore = defineStore('exams', () => {
 
   const exams = ref<Exam[]>([])
   const currentExam = ref<Exam | null>(null)
-  const sections = ref<any[]>([])
+  const sections = ref<Section[]>([])
   const subjects = ref<any[]>([])
   const pagination = ref<Omit<PaginatedData<Exam>, 'data'> | null>(null)
   const isLoading = ref(false)
@@ -21,26 +42,27 @@ export const useExamsStore = defineStore('exams', () => {
   /**
    * Fetch all exams with optional search and pagination
    */
-  const fetchExams = async (params: { search?: string; per_page?: number; page?: number } = {}) => {
+  const fetchExams = async (params: { search?: string, per_page?: number, page?: number } = {}) => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<any>('/exams', { params })
+      const result = await axios.get<ExamsResponse>('/exams', { params }) as any
 
-      // Handle the wrapping observed in the API: { exams: [] }
+      // Handle wrapper: { exams: [] }
       if (result && result.exams) {
-        exams.value = result.exams as Exam[]
+        exams.value = result.exams
         pagination.value = null
       } else if (result && result.data) {
-        exams.value = result.data as Exam[]
+        // Fallback for paginated structures if they exist
+        exams.value = result.data
         pagination.value = {
-          current_page: result.current_page,
-          per_page: result.per_page,
-          total: result.total,
-          last_page: result.last_page
+          current_page: result.current_page || 1,
+          per_page: result.per_page || 15,
+          total: result.total || 0,
+          last_page: result.last_page || 1
         }
       } else {
-        exams.value = result as unknown as Exam[]
+        exams.value = Array.isArray(result) ? (result as unknown as Exam[]) : []
       }
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch exams'
@@ -57,9 +79,9 @@ export const useExamsStore = defineStore('exams', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<any>(`/exams/${id}`)
-      // Handle the wrapping observed in the API: { exam: {} }
-      const data = result?.exam || result
+      const result = await axios.get<ExamDetailsResponse>(`/exams/${id}`) as any
+      // Handle wrapper: { exam: {} }
+      const data = result?.exam || (result as unknown as Exam)
       currentExam.value = data
       return data
     } catch (err: any) {
@@ -77,9 +99,10 @@ export const useExamsStore = defineStore('exams', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<any>(`/exams/${id}/sections`)
-      const data = result?.sections || result
-      sections.value = data
+      const result = await axios.get<SectionsResponse>(`/exams/${id}/sections`) as any
+      // Handle wrapper: { sections: [] }
+      const data = result?.sections || (result as unknown as Section[])
+      sections.value = Array.isArray(data) ? data : []
       return data
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch sections'
@@ -96,9 +119,9 @@ export const useExamsStore = defineStore('exams', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<any>(`/exams/${id}/subjects`)
-      const data = result?.subjects || result
-      subjects.value = data
+      const result = await axios.get<SubjectsResponse>(`/exams/${id}/subjects`) as any
+      const data = result?.subjects || (result as unknown as any[])
+      subjects.value = Array.isArray(data) ? data : []
       return data
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch subjects'
