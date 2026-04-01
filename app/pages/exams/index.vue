@@ -8,7 +8,7 @@
         <UInput v-model="search" placeholder="ابحث..." icon="i-heroicons-magnifying-glass" size="sm" class="w-60" />
       </div>
 
-      <div v-if="loading" class="flex justify-center py-20">
+      <div v-if="examsStore.isLoading" class="flex justify-center py-20">
         <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 text-primary-500 animate-spin" />
       </div>
 
@@ -55,29 +55,21 @@
 </template>
 
 <script setup lang="ts">
-import { examService } from '@/services/api/exam.service'
+import { useExamsStore } from '@/stores/useExamsStore'
 
 definePageMeta({ middleware: ['auth'] })
 useSeoMeta({ title: 'الاختبارات | A Plus' })
 
-const loading = ref(true)
-const exams = ref<any[]>([])
+const examsStore = useExamsStore()
 const search = ref('')
 
 const filteredExams = computed(() =>
-  exams.value.filter(e =>
-    !search.value || e.name?.toLowerCase().includes(search.value.toLowerCase())
+  examsStore.exams.filter(e =>
+    !search.value || e.title?.toLowerCase().includes(search.value.toLowerCase()) || e.name?.toLowerCase().includes(search.value.toLowerCase())
   )
 )
 
 onMounted(async () => {
-  try {
-    const res = await examService.list()
-    exams.value = res.data?.data?.exams || []
-  } catch {
-    //
-  } finally {
-    loading.value = false
-  }
+  await examsStore.fetchExams()
 })
 </script>

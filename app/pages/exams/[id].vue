@@ -7,11 +7,11 @@
           <UButton color="neutral" variant="ghost" icon="i-heroicons-arrow-right" />
         </NuxtLink>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-          {{ exam?.name || 'تفاصيل الاختبار' }}
+          {{ examsStore.currentExam?.name || 'تفاصيل الاختبار' }}
         </h1>
       </div>
 
-      <div v-if="loading" class="flex justify-center py-20">
+      <div v-if="examsStore.isLoading" class="flex justify-center py-20">
         <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 text-primary-500 animate-spin" />
       </div>
 
@@ -21,12 +21,12 @@
 
         <!-- Subjects Tab -->
         <div v-if="activeTab === 0">
-          <div v-if="subjectsLoading" class="flex justify-center py-10">
+          <div v-if="examsStore.isLoading" class="flex justify-center py-10">
             <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-primary-500 animate-spin" />
           </div>
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <NuxtLink
-              v-for="subject in subjects"
+              v-for="subject in examsStore.subjects"
               :key="subject.id"
               :to="`/subjects/${subject.id}/questions`"
             >
@@ -51,12 +51,12 @@
 
         <!-- Sections Tab -->
         <div v-if="activeTab === 1">
-          <div v-if="sectionsLoading" class="flex justify-center py-10">
+          <div v-if="examsStore.isLoading" class="flex justify-center py-10">
             <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 text-primary-500 animate-spin" />
           </div>
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <NuxtLink
-              v-for="section in sections"
+              v-for="section in examsStore.sections"
               :key="section.id"
               :to="`/categories/${section.id}/questions`"
             >
@@ -84,19 +84,14 @@
 </template>
 
 <script setup lang="ts">
-import { examService } from '@/services/api/exam.service'
+import { useExamsStore } from '@/stores/useExamsStore'
 
 definePageMeta({ middleware: ['auth'] })
 
 const route = useRoute()
 const examId = computed(() => route.params.id as string)
 
-const loading = ref(true)
-const subjectsLoading = ref(false)
-const sectionsLoading = ref(false)
-const exam = ref<any>(null)
-const subjects = ref<any[]>([])
-const sections = ref<any[]>([])
+const examsStore = useExamsStore()
 const activeTab = ref(0)
 
 const tabs = [
@@ -105,23 +100,14 @@ const tabs = [
 ]
 
 useSeoMeta({
-  title: computed(() => `${exam.value?.name || 'اختبار'} | A Plus`)
+  title: computed(() => `${examsStore.currentExam?.name || 'اختبار'} | A Plus`)
 })
 
 onMounted(async () => {
-  try {
-    const [detailRes, subjectsRes, sectionsRes] = await Promise.all([
-      examService.detail(examId.value),
-      examService.subjects(examId.value),
-      examService.sections(examId.value)
-    ])
-    exam.value = detailRes.data?.data?.exam
-    subjects.value = subjectsRes.data?.data?.subjects || []
-    sections.value = sectionsRes.data?.data?.sections || []
-  } catch {
-    //
-  } finally {
-    loading.value = false
-  }
+  await Promise.all([
+    examsStore.fetchExamById(examId.value),
+    examsStore.fetchExamSubjects(examId.value),
+    examsStore.fetchExamSections(examId.value)
+  ])
 })
 </script>
