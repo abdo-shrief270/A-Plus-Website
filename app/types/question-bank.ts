@@ -49,16 +49,35 @@ export interface Answer {
   id: number
   text: string
   image_path?: string | null
+  order?: number
 }
 
 export interface Question {
   id: number
   text: string
   difficulty: 'easy' | 'medium' | 'hard'
-  type: 'multiple_choice' | 'true_false' | 'matching' | 'essay'
-  answers: Answer[]
-  explanation?: string | null
+  is_new?: boolean
   image_path?: string | null
+  comparison?: {
+    value_1: { text: string, image_path: string | null }
+    value_2: { text: string, image_path: string | null }
+  } | null
+  explanation?: {
+    text: string
+    image_path?: string | null
+    video_url?: string | null
+  }
+  answers: Answer[]
+  belongs_to?: {
+    exam?: { id: number, name: string }
+    section?: { id: number, name: string }
+    category?: { id: number, name: string }
+    article?: { id: number, title: string } | null
+  } | null
+  type: {
+    id: number
+    name: string
+  }
   category_id?: number
   subject_id?: number
 }

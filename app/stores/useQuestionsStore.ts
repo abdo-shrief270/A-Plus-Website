@@ -3,6 +3,20 @@ import { ref } from 'vue'
 import { useAxios } from '../composables/useAxios'
 import type { Question, QuestionSubmissionResult, PaginatedData } from '../types/question-bank'
 
+interface QuestionsResponse {
+  questions: Question[]
+  pagination?: {
+    current_page: number
+    per_page: number
+    total: number
+    last_page: number
+  }
+}
+
+interface QuestionDetailResponse {
+  question: Question
+}
+
 /**
  * Questions Store
  * Handles various question lists, single question details, and submission (answering).
@@ -15,7 +29,7 @@ export const useQuestionsStore = defineStore('questions', () => {
   const recentQuestions = ref<Question[]>([])
   const searchResults = ref<Question[]>([])
   const currentQuestion = ref<Question | null>(null)
-  
+
   const trendingPagination = ref<Omit<PaginatedData<Question>, 'data'> | null>(null)
   const recentPagination = ref<Omit<PaginatedData<Question>, 'data'> | null>(null)
   const searchPagination = ref<Omit<PaginatedData<Question>, 'data'> | null>(null)
@@ -26,17 +40,22 @@ export const useQuestionsStore = defineStore('questions', () => {
   /**
    * GET /questions/trending
    */
-  const fetchTrending = async (params: { page?: number; per_page?: number } = {}) => {
+  const fetchTrending = async (params: { page?: number, per_page?: number } = {}) => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<PaginatedData<Question>>('/questions/trending', { params })
-      trendingQuestions.value = result.data
-      trendingPagination.value = {
-        current_page: result.current_page,
-        per_page: result.per_page,
-        total: result.total,
-        last_page: result.last_page
+      const result = await axios.get<QuestionsResponse>('/questions/trending', { params }) as any
+      const data = result?.questions || []
+      const paginationData = result?.pagination
+
+      trendingQuestions.value = data
+      if (paginationData) {
+        trendingPagination.value = {
+          current_page: paginationData.current_page,
+          per_page: paginationData.per_page,
+          total: paginationData.total,
+          last_page: paginationData.last_page
+        }
       }
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch trending questions'
@@ -49,17 +68,22 @@ export const useQuestionsStore = defineStore('questions', () => {
   /**
    * GET /questions/recent
    */
-  const fetchRecent = async (params: { page?: number; per_page?: number } = {}) => {
+  const fetchRecent = async (params: { page?: number, per_page?: number } = {}) => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<PaginatedData<Question>>('/questions/recent', { params })
-      recentQuestions.value = result.data
-      recentPagination.value = {
-        current_page: result.current_page,
-        per_page: result.per_page,
-        total: result.total,
-        last_page: result.last_page
+      const result = await axios.get<QuestionsResponse>('/questions/recent', { params }) as any
+      const data = result?.questions || []
+      const paginationData = result?.pagination
+
+      recentQuestions.value = data
+      if (paginationData) {
+        recentPagination.value = {
+          current_page: paginationData.current_page,
+          per_page: paginationData.per_page,
+          total: paginationData.total,
+          last_page: paginationData.last_page
+        }
       }
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch recent questions'
@@ -72,17 +96,22 @@ export const useQuestionsStore = defineStore('questions', () => {
   /**
    * GET /questions/search
    */
-  const searchQuestions = async (params: { q: string; per_page?: number; page?: number }) => {
+  const searchQuestions = async (params: { q: string, per_page?: number, page?: number }) => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<PaginatedData<Question>>('/questions/search', { params })
-      searchResults.value = result.data
-      searchPagination.value = {
-        current_page: result.current_page,
-        per_page: result.per_page,
-        total: result.total,
-        last_page: result.last_page
+      const result = await axios.get<QuestionsResponse>('/questions/search', { params }) as any
+      const data = result?.questions || []
+      const paginationData = result?.pagination
+
+      searchResults.value = data
+      if (paginationData) {
+        searchPagination.value = {
+          current_page: paginationData.current_page,
+          per_page: paginationData.per_page,
+          total: paginationData.total,
+          last_page: paginationData.last_page
+        }
       }
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Search failed'
@@ -99,7 +128,8 @@ export const useQuestionsStore = defineStore('questions', () => {
     isLoading.value = true
     error.value = null
     try {
-      const data = await axios.get<Question>(`/questions/${id}`)
+      const result = await axios.get<QuestionDetailResponse>(`/questions/${id}`) as any
+      const data = result?.question || (result as unknown as Question)
       currentQuestion.value = data
       return data
     } catch (err: any) {
@@ -113,11 +143,11 @@ export const useQuestionsStore = defineStore('questions', () => {
   /**
    * GET /categories/{id}/questions
    */
-  const fetchCategoryQuestions = async (categoryId: number | string, params: { paginate?: boolean; per_page?: number; page?: number } = {}) => {
+  const fetchCategoryQuestions = async (categoryId: number | string, params: { paginate?: boolean, per_page?: number, page?: number } = {}) => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<PaginatedData<Question> | Question[]>(`/categories/${categoryId}/questions`, { params })
+      const result = await axios.get<any>(`/categories/${categoryId}/questions`, { params })
       return result
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch category questions'
@@ -148,7 +178,7 @@ export const useQuestionsStore = defineStore('questions', () => {
    * POST /questions/answer
    * Authenticated endpoint to submit an answer.
    */
-  const submitAnswer = async (payload: { question_id: number; answer_id: number }) => {
+  const submitAnswer = async (payload: { question_id: number, answer_id: number }) => {
     isLoading.value = true
     error.value = null
     try {
@@ -174,7 +204,7 @@ export const useQuestionsStore = defineStore('questions', () => {
     searchPagination,
     isLoading,
     error,
-    
+
     // Actions
     fetchTrending,
     fetchRecent,

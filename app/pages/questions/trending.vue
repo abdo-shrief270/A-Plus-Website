@@ -1,64 +1,124 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-    <div class="max-w-4xl mx-auto">
-      <div class="mb-6 flex items-center gap-3">
-        <NuxtLink to="/">
-          <UButton color="neutral" variant="ghost" icon="i-heroicons-arrow-right" />
-        </NuxtLink>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-          الأسئلة الرائجة
-        </h1>
-      </div>
-
-      <!-- Question Cards -->
-      <div v-if="loading" class="flex justify-center py-20">
-        <UIcon name="i-heroicons-arrow-path" class="w-10 h-10 text-primary-500 animate-spin" />
-      </div>
-
-      <div v-else>
-        <div class="space-y-4 mb-6">
-          <NuxtLink
-            v-for="q in questions"
-            :key="q.id"
-            :to="`/questions/${q.id}`"
-          >
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-primary-400 hover:shadow-md transition-all cursor-pointer">
-              <p class="text-gray-900 dark:text-white font-medium mb-3">
-                {{ q.text || q.content }}
+  <div class="min-h-screen bg-[#f8fafc] dark:bg-gray-950">
+    <!-- Header Section -->
+    <div class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20">
+      <div class="container mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <NuxtLink
+              to="/exams"
+              class="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-primary-500 hover:bg-primary-50 transition-all"
+            >
+              <UIcon
+                name="i-heroicons-arrow-right"
+                class="w-5 h-5"
+              />
+            </NuxtLink>
+            <div>
+              <h1 class="text-xl font-black text-gray-900 dark:text-white">
+                الأسئلة الشائعة
+              </h1>
+              <p class="text-xs text-gray-500 font-medium">
+                أكثر الأسئلة حلاً وتفاعلاً على المنصة
               </p>
-              <div v-if="q.image_path" class="mb-3">
-                <img :src="q.image_path" alt="صورة السؤال" class="rounded-lg max-h-32 object-contain">
-              </div>
-              <div class="flex items-center gap-2">
-                <UBadge v-if="q.subject_name" color="primary" variant="soft" size="xs">
-                  {{ q.subject_name }}
-                </UBadge>
-                <UBadge v-if="q.difficulty" color="warning" variant="soft" size="xs">
-                  {{ q.difficulty }}
-                </UBadge>
-              </div>
             </div>
-          </NuxtLink>
+          </div>
+
+          <div class="hidden sm:flex items-center gap-2">
+            <NuxtLink to="/questions/recent">
+              <UButton
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                class="rounded-lg"
+              >
+                الأحدث
+              </UButton>
+            </NuxtLink>
+            <NuxtLink to="/questions/search">
+              <UButton
+                color="primary"
+                variant="soft"
+                size="sm"
+                icon="i-heroicons-magnifying-glass"
+                class="rounded-lg"
+              >
+                بحث متقدم
+              </UButton>
+            </NuxtLink>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="container mx-auto px-4 py-8">
+      <div
+        v-if="questionsStore.isLoading"
+        class="flex flex-col items-center justify-center py-24"
+      >
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="w-12 h-12 text-primary-500 animate-spin mb-4"
+        />
+        <span class="text-gray-500 animate-pulse font-medium">جاري المزامنة مع بنك الأسئلة...</span>
+      </div>
+
+      <div
+        v-else-if="questionsStore.trendingQuestions.length === 0"
+        class="text-center py-32 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm"
+      >
+        <div class="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6">
+          <UIcon
+            name="i-heroicons-face-frown"
+            class="w-10 h-10 text-gray-300"
+          />
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          لا توجد أسئلة رائجة حالياً
+        </h3>
+        <p class="text-gray-500 max-w-sm mx-auto">
+          يبدو أننا نقوم بتحديث البيانات، يرجى العودة لاحقاً أو استكشاف أحدث الأسئلة.
+        </p>
+        <NuxtLink
+          to="/questions/recent"
+          class="mt-6 inline-block"
+        >
+          <UButton
+            color="primary"
+            variant="solid"
+            class="rounded-xl px-6"
+          >
+            تصفح أحدث الأسئلة
+          </UButton>
+        </NuxtLink>
+      </div>
+
+      <div
+        v-else
+        class="max-w-4xl mx-auto space-y-6"
+      >
+        <QuestionCard
+          v-for="question in questionsStore.trendingQuestions"
+          :key="question.id"
+          :question="question"
+        />
 
         <!-- Pagination -->
-        <div class="flex items-center justify-center gap-4">
-          <UButton
-            :disabled="pagination.current_page <= 1"
-            color="neutral"
-            variant="outline"
-            icon="i-heroicons-chevron-right"
-            @click="changePage(pagination.current_page - 1)"
-          />
-          <span class="text-sm text-gray-600 dark:text-gray-400">
-            صفحة {{ pagination.current_page }} من {{ pagination.last_page }}
-          </span>
-          <UButton
-            :disabled="pagination.current_page >= pagination.last_page"
-            color="neutral"
-            variant="outline"
-            icon="i-heroicons-chevron-left"
-            @click="changePage(pagination.current_page + 1)"
+        <div
+          v-if="questionsStore.trendingPagination && questionsStore.trendingPagination.last_page > 1"
+          class="mt-12 flex justify-center bg-white dark:bg-gray-900 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm"
+        >
+          <UPagination
+            v-model="currentPage"
+            :total="questionsStore.trendingPagination.total"
+            :page-count="questionsStore.trendingPagination.per_page"
+            class="rtl"
+            :ui="{
+              wrapper: 'flex items-center gap-1',
+              base: 'rounded-lg font-bold',
+              rounded: 'rounded-lg'
+            }"
           />
         </div>
       </div>
@@ -67,33 +127,28 @@
 </template>
 
 <script setup lang="ts">
-import { questionService } from '@/services/api/question.service'
+import { useQuestionsStore } from '@/stores/useQuestionsStore'
 
-definePageMeta({ middleware: ['auth'] })
-useSeoMeta({ title: 'أسئلة رائجة | A Plus' })
+// Public page
+definePageMeta({ layout: 'default' })
+useSeoMeta({
+  title: 'الأسئلة الشائعة - تدرب على أكثر الأسئلة حلاً | A Plus',
+  description: 'استكشف مجموعة من الأسئلة الأكثر حلاً وتفاعلاً في بنك الأسئلة A Plus. تدرب الآن وحسن مستواك الدراسي.'
+})
 
-const loading = ref(true)
-const questions = ref<any[]>([])
-const pagination = ref({ current_page: 1, last_page: 1, per_page: 15, total: 0 })
+const questionsStore = useQuestionsStore()
+const currentPage = ref(1)
 
-async function fetchPage(page = 1) {
-  loading.value = true
-  try {
-    const res = await questionService.trending({ page, per_page: 15 })
-    const d = res.data?.data
-    questions.value = d?.questions || []
-    if (d?.pagination) pagination.value = d.pagination
-  } catch {
-    //
-  } finally {
-    loading.value = false
-  }
+async function fetchTrending(page = 1) {
+  await questionsStore.fetchTrending({ page, per_page: 15 })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-function changePage(page: number) {
-  fetchPage(page)
-  window.scrollTo(0, 0)
-}
+watch(currentPage, (val) => {
+  fetchTrending(val)
+})
 
-onMounted(() => fetchPage())
+onMounted(() => {
+  fetchTrending()
+})
 </script>
