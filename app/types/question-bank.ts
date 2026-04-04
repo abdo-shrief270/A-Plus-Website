@@ -4,44 +4,40 @@ export interface ApiResponse<T> {
   data: T
 }
 
-export interface PaginatedData<T> {
-  data: T[]
+export interface Pagination {
   current_page: number
   per_page: number
   total: number
   last_page: number
 }
 
+export interface PaginatedData<T> {
+  data: T[]
+  pagination: Pagination
+}
+
 export type PaginatedApiResponse<T> = ApiResponse<PaginatedData<T>>
 
 export interface Exam {
   id: number
-  title?: string
-  name?: string
+  name: string
+  slug: string
   description?: string
-  image_path?: string
-  subjects_count?: number
-  sections_count?: number
-  type?: string
-  year?: string | number
-  created_at?: string
-  updated_at?: string
+  image?: string
+  is_active?: boolean
+  sections?: Section[]
 }
 
 export interface Section {
   id: number
   name: string
-  exam_id: number
-  parent_id?: number | null
   categories?: Category[]
-  children?: Section[]
 }
 
 export interface Category {
   id: number
   name: string
   description?: string
-  image_path?: string
   questions_count?: number
 }
 
@@ -55,37 +51,35 @@ export interface Answer {
 export interface Question {
   id: number
   text: string
-  difficulty: 'easy' | 'medium' | 'hard'
-  is_new?: boolean
   image_path?: string | null
+  difficulty: 'easy' | 'medium' | 'hard'
+  is_new: boolean
   comparison?: {
-    value_1: { text: string, image_path: string | null }
-    value_2: { text: string, image_path: string | null }
+    value_1: { text: string; image_path: string | null }
+    value_2: { text: string; image_path: string | null }
   } | null
-  explanation?: {
+  explanation: {
     text: string
-    image_path?: string | null
-    video_url?: string | null
+    image_path: string | null
+    video_url: string | null
   }
   answers: Answer[]
   belongs_to?: {
-    exam?: { id: number, name: string }
-    section?: { id: number, name: string }
-    category?: { id: number, name: string }
-    article?: { id: number, title: string } | null
+    exam?: { id: number; name: string }
+    section?: { id: number; name: string }
+    category?: { id: number; name: string }
+    article?: { id: number; title: string } | null
   } | null
   type: {
     id: number
     name: string
   }
-  category_id?: number
-  subject_id?: number
 }
 
 export interface QuestionSubmissionResult {
   is_correct: boolean
   score_earned: number
-  correct_answer?: Answer
+  correct_answer?: number // ID of the correct answer
 }
 
 export interface Article {
@@ -93,15 +87,26 @@ export interface Article {
   title: string
   content: string
   image_path?: string | null
-  created_at?: string
+  is_active?: boolean
+  questions_count?: number
+  category?: {
+    id: number
+    name: string
+    section: {
+      id: number
+      name: string
+      exam: { id: number; name: string }
+    }
+  }
 }
 
 export interface PracticeExam {
   id: number
   title: string
   description?: string
-  time_limit?: number // in minutes
-  questions_count?: number
+  duration_minutes: number
+  total_questions: number
+  exam: { id: number; name: string }
   questions?: Question[]
 }
 
@@ -109,9 +114,14 @@ export interface Course {
   id: number
   title: string
   slug: string
-  description?: string
-  price: number
-  sale_price?: number
-  image_path?: string
-  is_enrolled?: boolean
+  description: string
+  image: string
+  price: string | number
+  level: 'beginner' | 'intermediate' | 'advanced'
+  rating: string | number
+  total_hours: number
+  lectures_count: number
+  enrollments_count: number
+  start_date: string | null
+  end_date: string | null
 }

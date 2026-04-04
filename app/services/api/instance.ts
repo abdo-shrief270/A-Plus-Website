@@ -5,7 +5,6 @@ import { useDeviceInfo } from '@/composables/useDeviceInfo'
 
 export default function createAxiosInstance(): AxiosInstance {
   const config = useRuntimeConfig()
-  const token = useCookie('APlus-token')
 
   // Get device headers (only available on client side)
   const deviceHeaders = import.meta.client ? useDeviceInfo().getHeaders() : {}
@@ -16,9 +15,17 @@ export default function createAxiosInstance(): AxiosInstance {
       'Accept': 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
       'Content-Language': 'ar',
-      ...(token.value && { Authorization: `Bearer ${token.value}` }),
       ...deviceHeaders
     }
+  })
+
+  // Request interceptor to dynamically add the token
+  axiosInstance.interceptors.request.use((config) => {
+    const token = useCookie('APlus-token').value
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
   })
 
   // Response interceptor

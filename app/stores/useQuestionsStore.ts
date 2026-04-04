@@ -1,33 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useApi } from '../composables/useApi'
-import type { Question, QuestionSubmissionResult, PaginatedData } from '../types/question-bank'
-
-interface QuestionsResponse {
-  questions: Question[]
-  pagination?: {
-    current_page: number
-    per_page: number
-    total: number
-    last_page: number
-  }
-}
-
-interface CategoryQuestionsResponse extends QuestionsResponse {
-  category: any
-}
-
-interface SubjectQuestionsResponse extends QuestionsResponse {
-  subject: any
-}
-
-interface QuestionDetailResponse {
-  question: Question
-}
+import type { Question, QuestionSubmissionResult, Article, Course, Pagination } from '../types/question-bank'
 
 /**
  * Questions Store
- * Handles various question lists, single question details, and submission (answering).
+ * Handles various question lists, single question details, articles, and courses.
  */
 export const useQuestionsStore = defineStore('questions', () => {
   const api = new useApi('questions', 'v2')
@@ -37,16 +15,25 @@ export const useQuestionsStore = defineStore('questions', () => {
   const recentQuestions = ref<Question[]>([])
   const searchResults = ref<Question[]>([])
   const categoryQuestions = ref<Question[]>([])
-  const subjectQuestions = ref<Question[]>([])
   const currentQuestion = ref<Question | null>(null)
-  const currentCategory = ref<any>(null)
-  const currentSubject = ref<any>(null)
 
-  const trendingPagination = ref<Omit<PaginatedData<Question>, 'data'>>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
-  const recentPagination = ref<Omit<PaginatedData<Question>, 'data'>>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
-  const searchPagination = ref<Omit<PaginatedData<Question>, 'data'>>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
-  const categoryPagination = ref<Omit<PaginatedData<Question>, 'data'>>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
-  const subjectPagination = ref<Omit<PaginatedData<Question>, 'data'>>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
+  // Articles State
+  const categoryArticles = ref<Article[]>([])
+  const currentArticle = ref<Article | null>(null)
+  const articleQuestions = ref<Question[]>([])
+
+  // Courses State
+  const trendingCourses = ref<Course[]>([])
+
+  // Category State
+  const currentCategory = ref<Record<string, unknown> | null>(null)
+
+  // Pagination State
+  const trendingPagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
+  const recentPagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
+  const searchPagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
+  const categoryPagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
+  const articlePagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
 
   const isLoading = ref(false)
   const error = ref<string | null>(null)
@@ -54,25 +41,26 @@ export const useQuestionsStore = defineStore('questions', () => {
   /**
    * GET /questions/trending
    */
-  const fetchTrending = async (params: { page?: number, per_page?: number } = {}) => {
+  const fetchTrending = async (params: { page?: number, per_page?: number } = {}, append = false) => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await api.get(params, 'trending') as any
-      const data = result?.questions || []
-      const paginationData = result?.pagination
+      const result = await api.get(params, 'trending') as Record<string, unknown>
+      const data = (result?.questions as Question[]) || []
+      const paginationData = result?.pagination as Pagination
 
-      trendingQuestions.value = data
-      if (paginationData) {
-        trendingPagination.value = {
-          current_page: paginationData.current_page,
-          per_page: paginationData.per_page,
-          total: paginationData.total,
-          last_page: paginationData.last_page
-        }
+      if (append) {
+        trendingQuestions.value = [...trendingQuestions.value, ...data]
+      } else {
+        trendingQuestions.value = data
       }
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to fetch trending questions'
+
+      if (paginationData) {
+        trendingPagination.value = paginationData
+      }
+      return result
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to fetch trending questions'
       throw err
     } finally {
       isLoading.value = false
@@ -82,25 +70,26 @@ export const useQuestionsStore = defineStore('questions', () => {
   /**
    * GET /questions/recent
    */
-  const fetchRecent = async (params: { page?: number, per_page?: number } = {}) => {
+  const fetchRecent = async (params: { page?: number, per_page?: number } = {}, append = false) => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await api.get(params, 'recent') as any
-      const data = result?.questions || []
-      const paginationData = result?.pagination
+      const result = await api.get(params, 'recent') as Record<string, unknown>
+      const data = (result?.questions as Question[]) || []
+      const paginationData = result?.pagination as Pagination
 
-      recentQuestions.value = data
-      if (paginationData) {
-        recentPagination.value = {
-          current_page: paginationData.current_page,
-          per_page: paginationData.per_page,
-          total: paginationData.total,
-          last_page: paginationData.last_page
-        }
+      if (append) {
+        recentQuestions.value = [...recentQuestions.value, ...data]
+      } else {
+        recentQuestions.value = data
       }
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to fetch recent questions'
+
+      if (paginationData) {
+        recentPagination.value = paginationData
+      }
+      return result
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to fetch recent questions'
       throw err
     } finally {
       isLoading.value = false
@@ -110,25 +99,26 @@ export const useQuestionsStore = defineStore('questions', () => {
   /**
    * GET /questions/search
    */
-  const searchQuestions = async (params: { q: string, per_page?: number, page?: number }) => {
+  const searchQuestions = async (params: { q: string, per_page?: number, page?: number }, append = false) => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await api.get(params, 'search') as any
-      const data = result?.questions || []
-      const paginationData = result?.pagination
+      const result = await api.get(params, 'search') as Record<string, unknown>
+      const data = (result?.questions as Question[]) || []
+      const paginationData = result?.pagination as Pagination
 
-      searchResults.value = data
-      if (paginationData) {
-        searchPagination.value = {
-          current_page: paginationData.current_page,
-          per_page: paginationData.per_page,
-          total: paginationData.total,
-          last_page: paginationData.last_page
-        }
+      if (append) {
+        searchResults.value = [...searchResults.value, ...data]
+      } else {
+        searchResults.value = data
       }
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Search failed'
+
+      if (paginationData) {
+        searchPagination.value = paginationData
+      }
+      return result
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Search failed'
       throw err
     } finally {
       isLoading.value = false
@@ -142,13 +132,12 @@ export const useQuestionsStore = defineStore('questions', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await api.show(id) as any
-      // Handle various data wrapping scenarios
+      const result = await api.show(id) as Record<string, unknown>
       const data = result?.question || result?.data || result
       currentQuestion.value = data as Question
       return data as Question
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to fetch question details'
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to fetch question details'
       throw err
     } finally {
       isLoading.value = false
@@ -158,7 +147,7 @@ export const useQuestionsStore = defineStore('questions', () => {
   /**
    * GET /categories/{id}/questions
    */
-  const fetchCategoryQuestions = async (categoryId: number | string, params: { paginate?: boolean, per_page?: number, page?: number } = {}) => {
+  const fetchCategoryQuestions = async (categoryId: number | string, params: { paginate?: boolean, per_page?: number, page?: number } = {}, append = false) => {
     isLoading.value = true
     error.value = null
     try {
@@ -168,33 +157,26 @@ export const useQuestionsStore = defineStore('questions', () => {
       }
 
       const categoryApi = new useApi(`categories/${categoryId}/questions`, 'v2')
-      const result = await categoryApi.get(queryParams) as any
+      const result = await categoryApi.get(queryParams) as Record<string, unknown>
 
-      // The interceptor might have already unwrapped 'data'
-      // but we handle both cases for safety
-      const questions = result?.questions || []
-      const paginationData = result?.pagination
-      const categoryData = result?.category
+      const questions = (result?.questions as Question[]) || []
+      const paginationData = result?.pagination as Pagination
+      const categoryData = result?.category as Record<string, unknown>
 
-      categoryQuestions.value = questions
+      if (append) {
+        categoryQuestions.value = [...categoryQuestions.value, ...questions]
+      } else {
+        categoryQuestions.value = questions
+      }
+
       if (categoryData) currentCategory.value = categoryData
 
       if (paginationData) {
-        const total = Number(paginationData.total) || 0
-        const perPage = Number(paginationData.per_page) || 15
-        const lastPage = Number(paginationData.last_page) || Math.ceil(total / perPage) || 1
-        const currentPageVal = Number(paginationData.current_page) || 1
-
-        categoryPagination.value = {
-          current_page: currentPageVal,
-          per_page: perPage,
-          total: total,
-          last_page: lastPage
-        }
+        categoryPagination.value = paginationData
       }
       return result
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to fetch category questions'
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to fetch category questions'
       throw err
     } finally {
       isLoading.value = false
@@ -202,41 +184,18 @@ export const useQuestionsStore = defineStore('questions', () => {
   }
 
   /**
-   * GET /subjects/{id}/questions
+   * GET /categories/{id}/articles
    */
-  const fetchSubjectQuestions = async (subjectId: number | string, params: { paginate?: boolean, per_page?: number, page?: number } = {}) => {
+  const fetchCategoryArticles = async (categoryId: number | string) => {
     isLoading.value = true
     error.value = null
     try {
-      const queryParams = { ...params }
-      if (typeof queryParams.paginate === 'boolean') {
-        queryParams.paginate = queryParams.paginate ? (1 as any) : (0 as any)
-      }
-
-      const subjectApi = new useApi(`subjects/${subjectId}/questions`, 'v2')
-      const result = await subjectApi.get(queryParams) as any
-      const data = result?.questions || []
-      const paginationData = result?.pagination
-      const subjectData = result?.subject
-
-      if (data) subjectQuestions.value = data
-      if (subjectData) currentSubject.value = subjectData
-
-      if (paginationData) {
-        const total = Number(paginationData.total) || 0
-        const perPage = Number(paginationData.per_page) || 15
-        const lastPage = Number(paginationData.last_page) || Math.ceil(total / perPage) || 1
-
-        subjectPagination.value = {
-          current_page: Number(paginationData.current_page) || 1,
-          per_page: perPage,
-          total: total,
-          last_page: lastPage
-        }
-      }
+      const categoryApi = new useApi(`categories/${categoryId}/articles`, 'v2')
+      const result = await categoryApi.get() as Record<string, unknown>
+      categoryArticles.value = (result?.articles as Article[]) || []
       return result
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to fetch subject questions'
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to fetch articles'
       throw err
     } finally {
       isLoading.value = false
@@ -244,17 +203,69 @@ export const useQuestionsStore = defineStore('questions', () => {
   }
 
   /**
-   * GET /articles/{id}/questions
+   * Articles Actions
    */
-  const fetchArticleQuestions = async (articleId: number | string) => {
+  const fetchArticleById = async (id: number | string) => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const articleApi = new useApi('articles', 'v2')
+      const result = await articleApi.show(id) as Record<string, unknown>
+      const data = result?.article || result?.data || result
+      currentArticle.value = data as Article
+      // If questions are returned in the detail response (Section 5.1)
+      if (result?.questions) {
+        articleQuestions.value = result.questions as Question[]
+      }
+      return data
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to fetch article details'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  const fetchArticleQuestions = async (articleId: number | string, params: { per_page?: number, page?: number } = {}, append = false) => {
     isLoading.value = true
     error.value = null
     try {
       const articleApi = new useApi(`articles/${articleId}/questions`, 'v2')
-      const result = await articleApi.get() as any
+      const result = await articleApi.get(params) as Record<string, unknown>
+      const questions = (result?.questions as Question[]) || []
+      const paginationData = result?.pagination as Pagination
+
+      if (append) {
+        articleQuestions.value = [...articleQuestions.value, ...questions]
+      } else {
+        articleQuestions.value = questions
+      }
+
+      if (paginationData) {
+        articlePagination.value = paginationData
+      }
       return result
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to fetch article questions'
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to fetch article questions'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  /**
+   * Courses Actions
+   */
+  const fetchTrendingCourses = async (params: { limit?: number } = {}) => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const coursesApi = new useApi('trending-courses', 'v2')
+      const result = await coursesApi.get(params) as unknown as Course[]
+      trendingCourses.value = result || []
+      return result
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to fetch trending courses'
       throw err
     } finally {
       isLoading.value = false
@@ -263,16 +274,15 @@ export const useQuestionsStore = defineStore('questions', () => {
 
   /**
    * POST /questions/answer
-   * Authenticated endpoint to submit an answer.
    */
-  const submitAnswer = async (payload: { question_id: number, answer_id: number }) => {
+  const submitAnswer = async (payload: { question_id: number, answer_id?: number, user_answer?: string }) => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await api.post('answer', payload) as any
-      return result?.data || result
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to submit answer'
+      const result = await api.post('answer', payload) as Record<string, unknown>
+      return (result?.data || result) as QuestionSubmissionResult
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to submit answer'
       throw err
     } finally {
       isLoading.value = false
@@ -285,15 +295,17 @@ export const useQuestionsStore = defineStore('questions', () => {
     recentQuestions,
     searchResults,
     categoryQuestions,
-    subjectQuestions,
     currentQuestion,
+    categoryArticles,
+    currentArticle,
+    articleQuestions,
+    trendingCourses,
     currentCategory,
-    currentSubject,
     trendingPagination,
     recentPagination,
     searchPagination,
     categoryPagination,
-    subjectPagination,
+    articlePagination,
     isLoading,
     error,
 
@@ -303,8 +315,10 @@ export const useQuestionsStore = defineStore('questions', () => {
     searchQuestions,
     fetchQuestionById,
     fetchCategoryQuestions,
-    fetchSubjectQuestions,
+    fetchCategoryArticles,
+    fetchArticleById,
     fetchArticleQuestions,
+    fetchTrendingCourses,
     submitAnswer
   }
 })

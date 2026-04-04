@@ -1,72 +1,46 @@
-import { ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import type { Pagination } from '~/types/question-bank'
 
-interface UsePaginationOptions {
-  /**
-   * Callback to fetch data when page changes.
-   */
-  onPageChange?: (page: number) => void | Promise<void>
-  /**
-   * Default page if not in query.
-   */
-  defaultPage?: number
-  /**
-   * Whether to scroll to top on page change.
-   */
-  scrollToTop?: boolean
-}
+export function usePagination(defaultPerPage = 15) {
+  const currentPage = ref(1)
+  const perPage = ref(defaultPerPage)
+  const total = ref(0)
+  const lastPage = ref(1)
 
-/**
- * usePagination
- * Synchronizes a page ref with the URL 'page' query parameter.
- */
-export const usePagination = (options: UsePaginationOptions = {}) => {
-  const route = useRoute()
-  const router = useRouter()
+  const setPagination = (meta: Pagination) => {
+    currentPage.value = meta.current_page
+    perPage.value = meta.per_page
+    total.value = meta.total
+    lastPage.value = meta.last_page
+  }
 
-  const {
-    onPageChange,
-    defaultPage = 1,
-    scrollToTop = true
-  } = options
+  const hasNext = computed(() => currentPage.value < lastPage.value)
+  const hasPrev = computed(() => currentPage.value > 1)
 
-  // Initialize from query param or default
-  const currentPage = ref(Number(route.query.page) || defaultPage)
+  const nextPage = () => {
+    if (hasNext.value) currentPage.value++
+  }
 
-  // Watch for internal page changes (e.g. from UPagination)
-  // and update the URL query
-  watch(currentPage, (newPage, oldPage) => {
-    if (newPage === oldPage) return
+  const prevPage = () => {
+    if (hasPrev.value) currentPage.value--
+  }
 
-    // Update URL query
-    router.push({
-      query: {
-        ...route.query,
-        page: newPage.toString()
-      }
-    })
-
-    // Execute callback
-    if (onPageChange) {
-      onPageChange(newPage)
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= lastPage.value) {
+      currentPage.value = page
     }
-
-    if (scrollToTop) {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  })
-
-  // Watch for external URL changes (e.g. browser back button)
-  // and sync back to the ref
-  watch(() => route.query.page, (newQueryPage) => {
-    const pageVal = Number(newQueryPage) || defaultPage
-    if (pageVal !== currentPage.value) {
-      currentPage.value = pageVal
-      // Note: the watch(currentPage) above will trigger onPageChange
-    }
-  })
+  }
 
   return {
-    currentPage
+    currentPage,
+    perPage,
+    total,
+    lastPage,
+    hasNext,
+    hasPrev,
+    setPagination,
+    nextPage,
+    prevPage,
+    goToPage
   }
 }

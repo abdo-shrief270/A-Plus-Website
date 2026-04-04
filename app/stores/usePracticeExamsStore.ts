@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useApi } from '../composables/useApi'
-import type { PracticeExam, PaginatedData } from '../types/question-bank'
+import type { PracticeExam, Pagination, Question } from '../types/question-bank'
 
 /**
  * Practice Exams Store
@@ -13,39 +13,44 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
   // State
   const practiceExams = ref<PracticeExam[]>([])
   const currentPracticeExam = ref<PracticeExam | null>(null)
-  const pagination = ref<Omit<PaginatedData<PracticeExam>, 'data'> | null>(null)
+  const pagination = ref<Pagination | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
+  // Session State
+  const currentQuestionIndex = ref(0)
+  const userAnswers = ref<Record<number, number | string>>({}) // question_id -> answer_id or text
+  const timeRemaining = ref(0) // in seconds
+  const isSessionActive = ref(false)
+  const results = ref<Record<number, { is_correct: boolean; score_earned: number; correct_answer?: number }>>({})
+
+  const currentQuestion = computed(() => {
+    return currentPracticeExam.value?.questions?.[currentQuestionIndex.value] || null
+  })
+
   /**
    * GET /practice-exams
-   * List all mock tests and evaluation models.
    */
   const fetchPracticeExams = async (params: {
-    search?: string
-    paginate?: boolean
-    per_page?: number
-    page?: number
+    search?: string;
+    paginate?: boolean;
+    per_page?: number;
+    page?: number;
   } = {}) => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await api.get(params) as any
+      const result = await api.get(params) as Record<string, unknown>
 
       if (Array.isArray(result)) {
-        practiceExams.value = result
+        practiceExams.value = result as unknown as PracticeExam[]
         pagination.value = null
       } else {
-        practiceExams.value = result.data
-        pagination.value = {
-          current_page: result.current_page,
-          per_page: result.per_page,
-          total: result.total,
-          last_page: result.last_page
-        }
+        practiceExams.value = (result.practice_exams || result.data) as PracticeExam[]
+        pagination.value = (result.pagination || result) as Pagination
       }
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to fetch practice exams'
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to fetch practice exams'
       throw err
     } finally {
       isLoading.value = false
@@ -60,17 +65,37 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
     isLoading.value = true
     error.value = null
     try {
-      // The API returns the full detail of the practice exam including its questions
-      const result = await api.show(id) as any
-      const data = result?.data || result
+      const result = await api.show(id) as Record<string, unknown>
+      const data = (result?.practice_exam || result?.data || result) as PracticeExam
       currentPracticeExam.value = data
+      
+      // Initialize session
+      currentQuestionIndex.value = 0
+      userAnswers.value = {}
+      results.value = {}
+      timeRemaining.value = (data.duration_minutes || 0) * 60
+      isSessionActive.value = true
+      
       return data
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Failed to start practice session'
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to start practice session'
       throw err
     } finally {
       isLoading.value = false
     }
+  }
+
+  const setAnswer = (questionId: number, answer: number | string) => {
+    userAnswers.value[questionId] = answer
+  }
+
+  const setResult = (questionId: number, result: { is_correct: boolean; score_earned: number; correct_answer?: number }) => {
+    results.value[questionId] = result
+  }
+
+  const endSession = () => {
+    isSessionActive.value = false
+    // Finalize state if needed
   }
 
   return {
@@ -80,9 +105,18 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
     pagination,
     isLoading,
     error,
+    currentQuestionIndex,
+    userAnswers,
+    timeRemaining,
+    isSessionActive,
+    results,
+    currentQuestion,
 
     // Actions
     fetchPracticeExams,
-    startPracticeSession
+    startPracticeSession,
+    setAnswer,
+    setResult,
+    endSession
   }
 })
