@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useAxios } from '../composables/useAxios'
+import { useApi } from '../composables/useApi'
 import type { PracticeExam, PaginatedData } from '../types/question-bank'
 
 /**
@@ -8,7 +8,7 @@ import type { PracticeExam, PaginatedData } from '../types/question-bank'
  * Manages full practice test sessions and mock exams.
  */
 export const usePracticeExamsStore = defineStore('practiceExams', () => {
-  const axios = useAxios()
+  const api = new useApi('practice-exams', 'v2')
 
   // State
   const practiceExams = ref<PracticeExam[]>([])
@@ -30,7 +30,7 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<PaginatedData<PracticeExam> | PracticeExam[]>('/practice-exams', { params })
+      const result = await api.get(params) as any
 
       if (Array.isArray(result)) {
         practiceExams.value = result
@@ -61,7 +61,8 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
     error.value = null
     try {
       // The API returns the full detail of the practice exam including its questions
-      const data = await axios.get<PracticeExam>(`/practice-exams/${id}`)
+      const result = await api.show(id) as any
+      const data = result?.data || result
       currentPracticeExam.value = data
       return data
     } catch (err: any) {

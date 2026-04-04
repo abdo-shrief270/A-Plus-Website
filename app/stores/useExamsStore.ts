@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useAxios } from '../composables/useAxios'
+import { useApi } from '../composables/useApi'
 import type { Exam, PaginatedData, Section } from '../types/question-bank'
 
 interface ExamsResponse {
@@ -29,7 +29,7 @@ interface SubjectsResponse {
  * Manages study stages/exams and their hiearchical sections.
  */
 export const useExamsStore = defineStore('exams', () => {
-  const axios = useAxios()
+  const api = new useApi('exams', 'v2')
 
   const exams = ref<Exam[]>([])
   const currentExam = ref<Exam | null>(null)
@@ -46,7 +46,7 @@ export const useExamsStore = defineStore('exams', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<ExamsResponse>('/exams', { params }) as any
+      const result = await api.get(params) as any
 
       // Handle wrapper: { exams: [] }
       if (result && result.exams) {
@@ -79,7 +79,7 @@ export const useExamsStore = defineStore('exams', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<ExamDetailsResponse>(`/exams/${id}`) as any
+      const result = await api.show(id) as any
       // Handle wrapper: { exam: {} }
       const data = result?.exam || (result as unknown as Exam)
       currentExam.value = data
@@ -99,7 +99,7 @@ export const useExamsStore = defineStore('exams', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<SectionsResponse>(`/exams/${id}/sections`) as any
+      const result = await api.get(null, `${id}/sections`) as any
       // Handle wrapper: { sections: [] }
       const data = result?.sections || (result as unknown as Section[])
       sections.value = Array.isArray(data) ? data : []
@@ -119,7 +119,7 @@ export const useExamsStore = defineStore('exams', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<SubjectsResponse>(`/exams/${id}/subjects`) as any
+      const result = await api.get(null, `${id}/subjects`) as any
       const data = result?.subjects || (result as unknown as any[])
       subjects.value = Array.isArray(data) ? data : []
       return data

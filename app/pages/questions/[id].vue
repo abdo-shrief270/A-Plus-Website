@@ -197,6 +197,12 @@
                       class="w-6 h-6"
                     />
                     {{ result?.is_correct ? 'إجابة صحيحة تهانينا!' : 'للأسف، إجابة خاطئة' }}
+                    <span
+                      v-if="result?.score_earned"
+                      class="text-xs opacity-80"
+                    >
+                      ({{ result.score_earned }} نقطة)
+                    </span>
                   </div>
                 </div>
                 <div

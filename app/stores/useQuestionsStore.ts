@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useAxios } from '../composables/useAxios'
+import { useApi } from '../composables/useApi'
 import type { Question, QuestionSubmissionResult, PaginatedData } from '../types/question-bank'
 
 interface QuestionsResponse {
@@ -30,7 +30,7 @@ interface QuestionDetailResponse {
  * Handles various question lists, single question details, and submission (answering).
  */
 export const useQuestionsStore = defineStore('questions', () => {
-  const axios = useAxios()
+  const api = new useApi('questions', 'v2')
 
   // State
   const trendingQuestions = ref<Question[]>([])
@@ -58,7 +58,7 @@ export const useQuestionsStore = defineStore('questions', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<QuestionsResponse>('/questions/trending', { params }) as any
+      const result = await api.get(params, 'trending') as any
       const data = result?.questions || []
       const paginationData = result?.pagination
 
@@ -86,7 +86,7 @@ export const useQuestionsStore = defineStore('questions', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<QuestionsResponse>('/questions/recent', { params }) as any
+      const result = await api.get(params, 'recent') as any
       const data = result?.questions || []
       const paginationData = result?.pagination
 
@@ -114,7 +114,7 @@ export const useQuestionsStore = defineStore('questions', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<QuestionsResponse>('/questions/search', { params }) as any
+      const result = await api.get(params, 'search') as any
       const data = result?.questions || []
       const paginationData = result?.pagination
 
@@ -142,10 +142,11 @@ export const useQuestionsStore = defineStore('questions', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<QuestionDetailResponse>(`/questions/${id}`) as any
-      const data = result?.question || (result as unknown as Question)
-      currentQuestion.value = data
-      return data
+      const result = await api.show(id) as any
+      // Handle various data wrapping scenarios
+      const data = result?.question || result?.data || result
+      currentQuestion.value = data as Question
+      return data as Question
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch question details'
       throw err
@@ -166,7 +167,8 @@ export const useQuestionsStore = defineStore('questions', () => {
         queryParams.paginate = queryParams.paginate ? (1 as any) : (0 as any)
       }
 
-      const result = await axios.get<CategoryQuestionsResponse>(`/categories/${categoryId}/questions`, { params: queryParams }) as any
+      const categoryApi = new useApi(`categories/${categoryId}/questions`, 'v2')
+      const result = await categoryApi.get(queryParams) as any
 
       // The interceptor might have already unwrapped 'data'
       // but we handle both cases for safety
@@ -211,7 +213,8 @@ export const useQuestionsStore = defineStore('questions', () => {
         queryParams.paginate = queryParams.paginate ? (1 as any) : (0 as any)
       }
 
-      const result = await axios.get<SubjectQuestionsResponse>(`/subjects/${subjectId}/questions`, { params: queryParams }) as any
+      const subjectApi = new useApi(`subjects/${subjectId}/questions`, 'v2')
+      const result = await subjectApi.get(queryParams) as any
       const data = result?.questions || []
       const paginationData = result?.pagination
       const subjectData = result?.subject
@@ -247,7 +250,8 @@ export const useQuestionsStore = defineStore('questions', () => {
     isLoading.value = true
     error.value = null
     try {
-      const result = await axios.get<Question[]>(`/articles/${articleId}/questions`)
+      const articleApi = new useApi(`articles/${articleId}/questions`, 'v2')
+      const result = await articleApi.get() as any
       return result
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch article questions'
@@ -265,9 +269,8 @@ export const useQuestionsStore = defineStore('questions', () => {
     isLoading.value = true
     error.value = null
     try {
-      // Axial interceptor automatically handles data extraction and auth headers
-      const result = await axios.post<QuestionSubmissionResult>('/questions/answer', payload)
-      return result
+      const result = await api.post('answer', payload) as any
+      return result?.data || result
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to submit answer'
       throw err

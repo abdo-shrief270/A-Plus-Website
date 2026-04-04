@@ -51,16 +51,17 @@ export class useApi<T = any> {
     return `cache_${this.baseUrl}_${JSON.stringify(params)}`
   }
 
-  async get(params?: any) {
+  async get(params?: any, path: string = '') {
+    const url = path ? `${this.baseUrl}/${path}` : this.baseUrl
     this.loading.value = true
     this.error.value = null
     try {
-      const { data } = await this.axiosInstance.get(this.baseUrl, { params })
+      const { data } = await this.axiosInstance.get(url, { params })
       this.records.value = data?.data?.records || data?.data || []
       this.meta.value = data?.data?.meta || {}
       this.summary.value = data?.data?.summary || {}
       this.lastCacheParams = params
-      return data?.data || []
+      return data?.data || data || []
     } catch (err) {
       this.error.value = err
       throw err
@@ -96,8 +97,8 @@ export class useApi<T = any> {
     this.loading.value = true
     this.error.value = null
     try {
-      const { data } = await this.axiosInstance.get(`${this.baseUrl}/${id}`, params)
-      return data
+      const { data } = await this.axiosInstance.get(`${this.baseUrl}/${id}`, { params })
+      return data?.data || data
     } catch (err) {
       this.error.value = err
       throw err
