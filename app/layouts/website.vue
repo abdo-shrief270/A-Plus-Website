@@ -7,24 +7,31 @@
       <div class="container mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
           <!-- User Menu / Sign In -->
-          <div class="flex items-center">
-            <div v-if="!authStore.isLoggedIn">
+          <div class="flex items-center gap-2">
+            <template v-if="!authStore.isLoggedIn">
               <UButton
                 to="/auth/login"
-                class="bg-[#009688] hover:bg-[#00796B] text-white font-medium px-6 py-2 rounded-lg"
+                color="neutral"
+                variant="ghost"
+                class="font-medium"
               >
                 تسجيل الدخول
               </UButton>
-            </div>
-
-            <div v-else>
               <UButton
-                to="/dashboard"
-                class="bg-[#009688] hover:bg-[#00796B] text-white font-medium px-6 py-2 rounded-lg"
+                to="/auth/register"
+                class="rounded-lg px-6 font-bold"
               >
-                لوحة التحكم
+                ابدأ مجاناً
               </UButton>
-            </div>
+            </template>
+
+            <UButton
+              v-else
+              to="/dashboard"
+              class="rounded-lg px-6 font-bold"
+            >
+              لوحة التحكم
+            </UButton>
           </div>
 
           <!-- Mobile Menu Toggle -->
@@ -79,6 +86,8 @@
     <main>
       <slot />
     </main>
+
+    <SiteFooter />
   </div>
 </template>
 

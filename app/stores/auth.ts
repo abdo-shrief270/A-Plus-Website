@@ -74,7 +74,11 @@ export const useAuthStore = defineStore('auth', {
       const tokenCookie = useCookie<string | null>(TOKEN_COOKIE)
 
       if (!tokenCookie.value || !stored) {
-        await this.logoutUser()
+        // Guest: nothing to log out. Clear any partial local state quietly —
+        // do NOT call logoutUser() (it POSTs /auth/logout → 401 and redirects
+        // to /auth/login), which would bounce visitors off public pages.
+        this.user = null
+        this.token = null
         return null
       }
 

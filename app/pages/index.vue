@@ -1,9 +1,14 @@
 <template>
   <div>
     <HomeHero />
-    <HomeAbout />
+    <HomeStats />
+    <HomeHowItWorks />
+    <HomeAudiences />
+    <HomeCoursesPreview />
+    <HomePricing />
     <HomeTestimonials />
-    <HomeFooter />
+    <HomeFaq />
+    <HomeCta />
   </div>
 </template>
 
@@ -13,7 +18,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'الرئيسية | A Plus',
-  description: 'منصة A Plus التعليمية'
+  title: 'A+ | منصّتك للتفوق في اختبارات القدرات والتحصيلي',
+  description: 'بنك أسئلة ضخم، اختبارات محاكية، خطة دراسية ذكية، ومتابعة لحظية لتقدّمك. ابدأ تجربتك المجانية ٣ أيام بدون بطاقة بنكية.'
 })
 </script>

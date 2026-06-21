@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#f8fafc] dark:bg-gray-950">
+  <div class="min-h-screen bg-[#F5F7FA] dark:bg-gray-950">
     <!-- Hero Section -->
     <div class="relative overflow-hidden bg-primary-900 py-16 sm:py-24">
       <div class="absolute inset-0 overflow-hidden">
@@ -146,7 +146,7 @@
 import { useAcademicStore } from '@/stores/academic'
 
 // Public page, no auth middleware
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'website' })
 useSeoMeta({
   title: 'بنك الأسئلة - استعرض جميع الاختبارات | A Plus',
   description: 'تصفح قائمة الاختبارات والمراحل الدراسية المتوفرة في بنك الأسئلة A Plus. تدرب على آلاف الأسئلة الموثقة.'

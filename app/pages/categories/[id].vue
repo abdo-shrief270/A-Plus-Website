@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-[#f8fafc] dark:bg-gray-950 pb-20">
-    <header class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-30">
+  <div class="min-h-screen bg-[#F5F7FA] dark:bg-gray-950 pb-20">
+    <header class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
       <div class="container mx-auto px-4 h-20 flex items-center justify-between">
         <div class="flex items-center gap-4">
           <BButton
@@ -168,7 +168,7 @@ import { useQuestionsStore } from '@/stores/useQuestionsStore'
 import BInfiniteScroll from '@/components/BInfiniteScroll.vue'
 import QuestionCard from '~/components/question/QuestionCard.vue'
 
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'website' })
 
 const route = useRoute()
 const router = useRouter()

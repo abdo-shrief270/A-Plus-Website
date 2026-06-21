@@ -92,13 +92,17 @@
 </template>
 
 <script setup lang="ts">
-import { courseService } from '@/services/api/course.service'
+import { coursesService } from '@/services/api/courses.service'
+import { useAuthStore } from '@/stores/auth'
+import { showToast } from '@/utils/helpers/toast.helper'
 import type { Course } from '@/types/course'
 
+// Public: guests can browse the catalog. Interactive actions prompt sign-up.
 definePageMeta({
-  layout: 'website',
-  middleware: 'auth'
+  layout: 'website'
 })
+
+const authStore = useAuthStore()
 
 useSeoMeta({
   title: 'الدورات التدريبية - A+',
@@ -114,15 +118,19 @@ const filters = ref({
 
 // Fetch Data
 const { data: response, status, error, refresh } = await useAsyncData(
-  'trending-courses',
-  () => courseService.getTrendingCourses(20),
+  'public-courses',
+  () => coursesService.list({ per_page: 24 }),
   {
     lazy: true,
     server: false
   }
 )
 
-const courses = computed<Course[]>(() => response.value?.data || [])
+const courses = computed<Course[]>(() => {
+  const env = response.value?.data as any
+  const inner = env?.data ?? env // unwrap { status, message, data }
+  return Array.isArray(inner) ? inner : (inner?.data ?? []) // unwrap pagination
+})
 
 // Computed Filtered Courses
 const filteredCourses = computed(() => {
@@ -164,7 +172,11 @@ const filteredCourses = computed(() => {
 
 // Actions
 const handleEnroll = (course: Course) => {
-  // Navigate to course details or start enrollment process
-  navigateTo(`/courses/${course.slug}`)
+  // Guests must start a free trial / sign in before enrolling.
+  if (!authStore.isLoggedIn) {
+    showToast('ابدأ مجاناً', 'أنشئ حسابك للحصول على ٣ أيام وصول كامل ثم سجّل في الدورة', 'info')
+    return navigateTo('/auth/register')
+  }
+  navigateTo(`/dashboard/courses/${course.id}`)
 }
 </script>

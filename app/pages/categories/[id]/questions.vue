@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-[#f8fafc] dark:bg-gray-950">
+  <div class="min-h-screen bg-[#F5F7FA] dark:bg-gray-950">
     <!-- Header Section -->
-    <div class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 sticky top-0 z-20">
+    <div class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
       <div class="container mx-auto px-4 py-6">
         <div class="flex items-center gap-4">
           <NuxtLink
@@ -126,7 +126,7 @@
 import { useQuestionsStore } from '@/stores/useQuestionsStore'
 
 // Public page
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'website' })
 
 const route = useRoute()
 const router = useRouter()

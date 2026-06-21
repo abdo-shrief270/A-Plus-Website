@@ -1,60 +1,56 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen p-6 bg-white dark:bg-gray-900">
-    <div class="w-full max-w-md">
-      <div class="border border-gray-200 dark:border-gray-700 rounded-2xl p-8 shadow-sm text-center">
-        <UIcon
-          name="i-heroicons-shield-check"
-          class="w-16 h-16 text-primary-600 mx-auto mb-4"
-        />
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          التحقق من الهوية
-        </h1>
-        <p class="text-gray-600 dark:text-gray-400 mb-8">
-          أدخل رمز التحقق المرسل إليك
-        </p>
+  <div class="text-center">
+    <UIcon
+      name="i-heroicons-shield-check"
+      class="mx-auto mb-4 h-16 w-16 text-primary-600"
+    />
+    <h1 class="mb-2 text-2xl font-bold text-gray-900">
+      التحقق من الهوية
+    </h1>
+    <p class="mb-8 text-gray-600">
+      أدخل رمز التحقق المرسل إليك
+    </p>
 
-        <!-- OTP Input -->
-        <div
-          class="flex justify-center gap-3 mb-8 direction-ltr"
-          dir="ltr"
-        >
-          <input
-            v-for="(_, i) in 6"
-            :key="i"
-            :ref="(el) => { if (el) otpRefs[i] = el as HTMLInputElement }"
-            v-model="otpDigits[i]"
-            type="text"
-            inputmode="numeric"
-            maxlength="1"
-            class="w-12 h-14 text-center text-xl font-bold border-2 border-gray-300 rounded-xl focus:border-primary-500 focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-white transition-colors"
-            @input="onInput(i)"
-            @keydown.backspace="onBackspace(i)"
-            @paste.prevent="onPaste"
-          >
-        </div>
+    <!-- OTP Input -->
+    <div
+      class="mb-8 flex justify-center gap-3"
+      dir="ltr"
+    >
+      <input
+        v-for="(_, i) in 6"
+        :key="i"
+        :ref="(el) => { if (el) otpRefs[i] = el as HTMLInputElement }"
+        v-model="otpDigits[i]"
+        type="text"
+        inputmode="numeric"
+        maxlength="1"
+        class="h-14 w-12 rounded-xl border-2 border-gray-300 text-center text-xl font-bold transition-colors focus:border-primary-500 focus:outline-none"
+        @input="onInput(i)"
+        @keydown.backspace="onBackspace(i)"
+        @paste.prevent="onPaste"
+      >
+    </div>
 
-        <UButton
-          block
-          size="lg"
-          :loading="loading"
-          :disabled="otp.length < 6"
-          @click="onVerify"
-        >
-          تحقق
-        </UButton>
+    <UButton
+      block
+      size="lg"
+      :loading="loading"
+      :disabled="otp.length < 6"
+      @click="onVerify"
+    >
+      تحقق
+    </UButton>
 
-        <div class="mt-4 flex items-center justify-center gap-2">
-          <span class="text-sm text-gray-500">لم تستلم الرمز؟</span>
-          <UButton
-            variant="link"
-            size="sm"
-            :disabled="resendCooldown > 0"
-            @click="onResend"
-          >
-            {{ resendCooldown > 0 ? `إعادة الإرسال (${resendCooldown}s)` : 'إعادة الإرسال' }}
-          </UButton>
-        </div>
-      </div>
+    <div class="mt-4 flex items-center justify-center gap-2">
+      <span class="text-sm text-gray-500">لم تستلم الرمز؟</span>
+      <UButton
+        variant="link"
+        size="sm"
+        :disabled="resendCooldown > 0"
+        @click="onResend"
+      >
+        {{ resendCooldown > 0 ? `إعادة الإرسال (${resendCooldown}s)` : 'إعادة الإرسال' }}
+      </UButton>
     </div>
   </div>
 </template>
@@ -66,7 +62,7 @@ import { useRedirect } from '@/composables/useRedirect'
 import { showToast } from '@/utils/helpers/toast.helper'
 
 definePageMeta({
-  layout: 'fullscreen',
+  layout: 'auth',
   middleware: 'guest'
 })
 

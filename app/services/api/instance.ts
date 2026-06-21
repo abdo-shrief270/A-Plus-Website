@@ -79,11 +79,16 @@ function buildInstance(): AxiosInstance {
 
       const isAuthEndpoint = isRefreshAuthEndpoint(original?.url)
       const backendMessage = responseData?.message
+      // A guest (no session cookie) has nothing to refresh or log out. This
+      // matters on public pages (landing, catalog) that legitimately call
+      // public endpoints — a stray 401 there must never wipe state or bounce
+      // the visitor to /auth/login.
+      const hasSession = !!useCookie('APlus-token').value
 
       // Attempt token refresh exactly once per failed request, before triggering logout.
       // Skipped for auth endpoints (login/refresh/logout) — those bubble straight
       // through so the user sees the real backend message.
-      if (status === 401 && original && !original._retry && !isAuthEndpoint) {
+      if (status === 401 && original && !original._retry && !isAuthEndpoint && hasSession) {
         original._retry = true
 
         if (isRefreshing) {
@@ -121,8 +126,13 @@ function buildInstance(): AxiosInstance {
       // redirect side-effects when the failing call wasn't itself an auth
       // endpoint — otherwise we'd kick a user off the login page in response
       // to a wrong password or a "device pending approval" 401.
-      if (backendMessage) showToast('خطأ', backendMessage, 'error')
-      if (!isAuthEndpoint) handleResponseErrors(error)
+      // Only surface errors / run redirect side-effects for an actual session.
+      // Guests on public pages get a silent reject (the caller already handles
+      // its own empty/fallback state).
+      if (hasSession) {
+        if (backendMessage) showToast('خطأ', backendMessage, 'error')
+        if (!isAuthEndpoint) handleResponseErrors(error)
+      }
 
       return Promise.reject(error)
     }

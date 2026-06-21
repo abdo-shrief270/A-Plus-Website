@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#f8fafc] dark:bg-gray-950 pb-20">
+  <div class="min-h-screen bg-[#F5F7FA] dark:bg-gray-950 pb-20">
     <!-- Hero Section -->
     <div class="relative bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 overflow-hidden">
       <!-- Background Abstract Shape -->
@@ -66,7 +66,7 @@
     </div>
 
     <!-- Navigation Tabs (Breadcrumb style) -->
-    <div class="sticky top-0 z-30 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800">
+    <div class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800">
       <div class="container mx-auto px-4 h-16 flex items-center justify-between">
         <div class="flex items-center gap-4 overflow-x-auto no-scrollbar">
           <NuxtLink
@@ -229,7 +229,7 @@ import { useAcademicStore } from '@/stores/academic'
 import CategorySidebar from '~/components/question/CategorySidebar.vue'
 
 // Public page
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'website' })
 
 const route = useRoute()
 const examId = computed(() => route.params.id as string)
