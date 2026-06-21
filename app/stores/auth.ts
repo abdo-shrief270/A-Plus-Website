@@ -1,14 +1,25 @@
 import { defineStore } from 'pinia'
-import CryptoJS from 'crypto-js'
 import type { User, AuthResponse } from '@/types/auth'
+import { purgeAllApiCaches } from '@/utils/apiCache'
 
-const SECRET_KEY = import.meta.env.VITE_ENCRYPTION_KEY || 'aplus-secret-2026'
+const USER_STORAGE_KEY = 'APlus-user'
+const TOKEN_COOKIE = 'APlus-token'
+const TYPE_COOKIE = 'APlus-type'
+const TOKEN_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
 
 interface AuthState {
   user: User | null
   token: string | null
 }
 
+/**
+ * Auth store. Token lives in a cookie (so it's sent on SSR), user lives in
+ * localStorage as plain JSON. We deliberately do not encrypt the user blob:
+ * any key shipped to the browser is public, so client-side encryption is
+ * security theater. Real protection comes from HTTPS + HttpOnly cookies on
+ * the backend; if backend support lands, switch token to a server-set
+ * HttpOnly cookie and remove the cookie writes here.
+ */
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
     user: null,
@@ -18,121 +29,114 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     getUser: state => state.user,
     getToken: (state) => {
-      const token = useCookie('APlus-token')
+      const token = useCookie<string | null>(TOKEN_COOKIE)
       return state.token || token.value
     },
     isLoggedIn: (state) => {
-      const token = useCookie('APlus-token')
+      const token = useCookie<string | null>(TOKEN_COOKIE)
       return !!state.token || !!token.value
     },
-    // type is the raw field from v2 API: student | parent | school
     getUserType: state => state.user?.type || null,
     isStudent: state => state.user?.type === 'student',
     isParent: state => state.user?.type === 'parent',
     isSchool: state => state.user?.type === 'school',
-    // Alias kept for backward compatibility with role-based middleware
     getUserRole: state => state.user?.type || null
   },
 
   actions: {
-    async storeUser(data: AuthResponse) {
-      return new Promise((resolve, reject) => {
-        try {
-          // Unwrapped or wrapped response payloads
-          const user = (data as any).user || data.data?.user
-          const token = (data as any).token || data.data?.token
+    async storeUser(data: AuthResponse | { user?: User, token?: string, requires_2fa?: boolean }) {
+      const flat = data as { user?: User, token?: string }
+      const wrapped = (data as AuthResponse).data
+      const user = flat.user || wrapped?.user
+      const token = flat.token || wrapped?.token
 
-          if (!user || !token) {
-            throw new Error('Invalid user or token data')
-          }
+      if (!user || !token) {
+        throw new Error('Invalid auth response: missing user or token')
+      }
 
-          // Store encrypted user data in localStorage
-          const encryptedUserData = CryptoJS.AES.encrypt(
-            JSON.stringify(user),
-            SECRET_KEY
-          ).toString()
+      useCookie(TOKEN_COOKIE, { maxAge: TOKEN_MAX_AGE }).value = token
+      useCookie(TYPE_COOKIE, { maxAge: TOKEN_MAX_AGE }).value = user.type
 
-          // Token in cookie (7 days)
-          const tokenCookie = useCookie('APlus-token', { maxAge: 60 * 60 * 24 * 7 })
-          tokenCookie.value = token
+      if (import.meta.client) {
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user))
+      }
 
-          // Type stored unencrypted in cookie for middleware use (no sensitive data)
-          const typeCookie = useCookie('APlus-type', { maxAge: 60 * 60 * 24 * 7 })
-          typeCookie.value = user.type
-
-          if (import.meta.client) {
-            localStorage.setItem('APlus-user', encryptedUserData)
-          }
-
-          this.user = Object.freeze(user) as User
-          this.token = token
-          resolve(true)
-        } catch (error) {
-          console.error('Error in storeUser:', error)
-          reject(error)
-        }
-      })
+      this.user = Object.freeze(user) as User
+      this.token = token
+      return true
     },
 
     async fetchUser() {
       if (this.user?.name) return this.user
       if (import.meta.server) return null
 
-      const encryptedUserData = localStorage.getItem('APlus-user')
-      const tokenCookie = useCookie('APlus-token')
+      const stored = localStorage.getItem(USER_STORAGE_KEY)
+      const tokenCookie = useCookie<string | null>(TOKEN_COOKIE)
 
-      if (!tokenCookie.value || !encryptedUserData) {
+      if (!tokenCookie.value || !stored) {
         await this.logoutUser()
         return null
       }
 
       try {
-        const decryptedData = CryptoJS.AES.decrypt(
-          encryptedUserData,
-          SECRET_KEY
-        ).toString(CryptoJS.enc.Utf8)
-
-        if (!decryptedData) throw new Error('Failed to decrypt user data')
-
-        this.user = Object.freeze(JSON.parse(decryptedData)) as User
+        this.user = Object.freeze(JSON.parse(stored)) as User
         this.token = tokenCookie.value
         return this.user
       } catch (error) {
-        console.error('Decryption failed:', error)
+        console.error('Failed to parse stored user:', error)
         await this.logoutUser()
         return null
       }
     },
 
+    /**
+     * Pull the latest user from /v2/auth/me and replace the cached blob.
+     * Use this when the locally-cached user is missing fields that the
+     * backend has since added (e.g. the `student` relation for students
+     * who logged in before login responses started eager-loading it).
+     */
+    async refreshUser(): Promise<User | null> {
+      try {
+        const { authService } = await import('@/services/api/auth.service')
+        const res = await authService.me()
+        const data = res.data?.data ?? res.data ?? {}
+        const user = (data.user ?? data) as User | undefined
+        if (!user) return this.user
+        if (import.meta.client) {
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user))
+        }
+        this.user = Object.freeze(user) as User
+        return this.user
+      } catch (error) {
+        console.warn('refreshUser failed', error)
+        return this.user
+      }
+    },
+
     async logoutUser() {
-      // Import authService here to avoid circular dependencies if auth.service.ts uses the store
       const { authService } = await import('@/services/api/auth.service')
 
       try {
-        // Attempt to invalidate the token on the server side
         await authService.logout()
       } catch (error) {
-        // Ignore errors (e.g. token already expired or network issue)
-        // We still want to proceed with client-side cleanup
+        // Token may already be expired; proceed with local cleanup regardless.
         console.warn('Backend logout failed, proceeding with local cleanup', error)
       }
 
-      return new Promise((resolve) => {
-        if (import.meta.client) {
-          localStorage.removeItem('APlus-user')
-        }
+      if (import.meta.client) {
+        localStorage.removeItem(USER_STORAGE_KEY)
+        // Drop every cached API response so the next user can't see this user's data.
+        purgeAllApiCaches()
+      }
 
-        const tokenCookie = useCookie('APlus-token')
-        const typeCookie = useCookie('APlus-type')
-        tokenCookie.value = null
-        typeCookie.value = null
+      useCookie<string | null>(TOKEN_COOKIE).value = null
+      useCookie<string | null>(TYPE_COOKIE).value = null
 
-        this.user = null
-        this.token = null
+      this.user = null
+      this.token = null
 
-        navigateTo('/auth/login')
-        resolve(true)
-      })
+      await navigateTo('/auth/login')
+      return true
     }
   }
 })

@@ -23,7 +23,7 @@
           <div class="flex items-center gap-3">
             <NuxtLink to="/auth/register">
               <UButton
-                color="gray"
+                color="neutral"
                 variant="ghost"
                 icon="i-heroicons-arrow-right"
                 class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -107,10 +107,11 @@
                 class="col-span-2 relative z-50"
               >
                 <BPhoneInput
-                  v-model="state.phone"
+                  :model-value="state.phone ?? null"
                   :required="true"
                   :error="false"
                   :label="''"
+                  @update:model-value="(v) => (state.phone = v)"
                   @country="(code) => (state.country_code = code)"
                 />
               </UFormField>
@@ -179,7 +180,7 @@
                 size="xl"
                 :loading="loading"
                 class="w-full font-bold text-lg shadow-xl shadow-primary-500/20 hover:shadow-primary-500/40 hover:-translate-y-0.5 transition-all duration-300 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400"
-                :ui="{ rounded: 'rounded-xl' }"
+                :ui="{ base: 'rounded-xl' }"
               >
                 إنشاء الحساب
               </UButton>
@@ -192,12 +193,12 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 import { authService } from '@/services/api/auth.service'
 import { useAuthStore } from '@/stores/auth'
 import { useRedirect } from '@/composables/useRedirect'
 import { useUsernameCheck } from '@/composables/useUsernameCheck'
+import { parentRegisterSchema, type ParentRegisterInput } from '@/schemas/auth'
 
 definePageMeta({ layout: 'fullscreen', middleware: 'guest' })
 useSeoMeta({ title: 'تسجيل ولي أمر | A Plus' })
@@ -213,27 +214,8 @@ const genderOptions = [
   { label: 'أنثى', value: 'female' }
 ]
 
-const schema = z
-  .object({
-    name: z.string().min(2, 'الاسم مطلوب'),
-    user_name: z.string().min(3, 'اسم المستخدم مطلوب'),
-    country_code: z.string().min(1, 'كود الدولة مطلوب'),
-    phone: z.string().min(7, 'رقم الهاتف مطلوب'),
-    email: z
-      .string()
-      .email('بريد إلكتروني غير صالح')
-      .optional()
-      .or(z.literal('')),
-    password: z.string().min(8, 'كلمة المرور ٨ أحرف على الأقل'),
-    password_confirmation: z.string().min(8, 'تأكيد كلمة المرور مطلوب'),
-    gender: z.enum(['male', 'female'], { message: 'الجنس مطلوب' })
-  })
-  .refine(data => data.password === data.password_confirmation, {
-    message: 'كلمات المرور غير متطابقة',
-    path: ['password_confirmation']
-  })
-
-type Schema = z.output<typeof schema>
+const schema = parentRegisterSchema
+type Schema = ParentRegisterInput
 
 const state = reactive<Partial<Schema>>({
   name: '',

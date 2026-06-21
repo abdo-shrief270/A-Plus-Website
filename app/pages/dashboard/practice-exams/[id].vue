@@ -108,17 +108,32 @@
       </div>
 
       <div
-        class="p-8 border-t border-gray-100 dark:border-gray-700 flex justify-center"
+        class="p-8 border-t border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row justify-center gap-3"
       >
         <UButton
           size="xl"
-          icon="i-heroicons-play"
-          class="min-w-[200px] justify-center text-lg"
+          color="primary"
+          icon="i-heroicons-academic-cap"
+          class="min-w-[220px] justify-center text-lg"
+          :loading="startingSimulation"
+          @click="startSimulation"
+        >
+          محاكاة الاختبار (مؤقّت)
+        </UButton>
+        <UButton
+          size="xl"
+          color="neutral"
+          variant="soft"
+          icon="i-heroicons-eye"
+          class="min-w-[180px] justify-center text-lg"
           @click="startExam"
         >
-          ابدأ الاختبار الآن
+          تصفّح بدون توقيت
         </UButton>
       </div>
+      <p class="px-8 pb-6 -mt-2 text-center text-xs text-gray-400">
+        المحاكاة تُسجَّل في سجلّ اختباراتك مع مؤقّت ونتيجة ومراجعة. التصفّح للاطلاع فقط دون حفظ.
+      </p>
     </div>
 
     <!-- Active Exam State -->
@@ -168,12 +183,12 @@
           </div>
 
           <UButton
-            color="red"
+            color="neutral"
             variant="soft"
             class="shrink-0"
             @click="finishExam"
           >
-            إنهاء الاختبار
+            إنهاء التصفّح
           </UButton>
         </div>
       </div>
@@ -187,34 +202,33 @@
           <!-- Subject/Category Badge -->
           <div class="mb-4 flex gap-2">
             <UBadge
-              v-if="currentQuestion.subject"
+              v-if="currentQuestion.breadcrumb?.category"
               color="neutral"
               variant="subtle"
             >
-              {{
-                currentQuestion.subject.name_ar || currentQuestion.subject.name
-              }}
+              {{ currentQuestion.breadcrumb.category.name }}
             </UBadge>
             <UBadge
               v-if="currentQuestion.difficulty"
               :color="getDifficultyColor(currentQuestion.difficulty)"
               variant="soft"
             >
-              {{ currentQuestion.difficulty }}
+              {{ difficultyLabel(currentQuestion.difficulty) }}
             </UBadge>
           </div>
 
           <div
-            class="prose dark:prose-invert max-w-none text-xl leading-relaxed text-gray-900 dark:text-gray-100 font-medium"
-            v-html="currentQuestion.question_text || currentQuestion.content"
+            class="prose dark:prose-invert max-w-none text-xl leading-relaxed text-gray-900 dark:text-gray-100 font-medium [&_img]:inline-block [&_img]:align-middle [&_img]:max-h-32 [&_img]:mx-1"
+            dir="rtl"
+            v-html="renderMarkdown(currentQuestion.text)"
           />
 
           <div
-            v-if="currentQuestion.media_url || currentQuestion.image"
+            v-if="currentQuestion.image_path"
             class="mt-6 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 p-2 bg-gray-50 dark:bg-gray-900/50"
           >
             <img
-              :src="currentQuestion.media_url || currentQuestion.image"
+              :src="currentQuestion.image_path"
               class="max-w-full h-auto mx-auto rounded-lg"
             >
           </div>
@@ -225,41 +239,43 @@
             v-if="currentQuestion.answers"
             class="space-y-3"
           >
-            <label
+            <button
               v-for="answer in currentQuestion.answers"
               :key="answer.id"
-              class="flex items-start gap-4 p-4 rounded-xl border-2 transition-all cursor-pointer hover:bg-white dark:hover:bg-gray-800 group"
-              :class="
-                answersMap[currentQuestion.id] === answer.id
-                  ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-900/20 shadow-sm'
-                  : 'border-transparent bg-white dark:bg-gray-800 hover:border-gray-200 dark:hover:border-gray-700'
-              "
+              type="button"
+              :disabled="isRevealed(currentQuestion.id)"
+              class="w-full flex items-start gap-4 p-4 rounded-xl border-2 transition-all text-right"
+              :class="answerClass(currentQuestion.id, answer.id)"
+              @click="selectAnswer(currentQuestion.id, answer.id)"
             >
-              <div class="flex items-center h-6">
-                <input
-                  v-model="answersMap[currentQuestion.id]"
-                  type="radio"
-                  :name="'q_' + currentQuestion.id"
-                  :value="answer.id"
-                  class="w-5 h-5 text-primary-600 bg-gray-100 border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                >
+              <div
+                class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border-2 text-xs font-black"
+                :class="indicatorClass(currentQuestion.id, answer.id)"
+              >
+                <UIcon
+                  v-if="isRevealed(currentQuestion.id) && answer.id === correctAnswers[currentQuestion.id]"
+                  name="i-heroicons-check"
+                  class="w-4 h-4"
+                />
+                <UIcon
+                  v-else-if="isRevealed(currentQuestion.id) && answersMap[currentQuestion.id] === answer.id"
+                  name="i-heroicons-x-mark"
+                  class="w-4 h-4"
+                />
               </div>
               <div class="flex-1">
                 <div
-                  class="text-gray-900 dark:text-white"
-                  :class="{
-                    'font-medium': answersMap[currentQuestion.id] === answer.id
-                  }"
-                >
-                  {{ answer.answer_text || answer.content }}
-                </div>
+                  class="text-gray-900 dark:text-white [&_img]:inline-block [&_img]:align-middle [&_img]:max-h-20 [&_img]:mx-1 [&_p]:my-0"
+                  dir="rtl"
+                  v-html="renderMarkdown(answer.text)"
+                />
                 <img
-                  v-if="answer.media_url || answer.image"
-                  :src="answer.media_url || answer.image"
+                  v-if="answer.image_path"
+                  :src="answer.image_path"
                   class="mt-2 rounded-lg max-h-32 object-contain"
                 >
               </div>
-            </label>
+            </button>
           </div>
           <div v-else>
             <UTextarea
@@ -268,6 +284,36 @@
               :rows="4"
               class="w-full"
             />
+          </div>
+
+          <!-- Explanation (shown after revealing the answer) -->
+          <div
+            v-if="isRevealed(currentQuestion.id) && (currentQuestion.explanation?.text || currentQuestion.explanation?.video_url)"
+            class="mt-5 bg-primary-50/50 dark:bg-primary-900/10 rounded-2xl p-5 border border-primary-100 dark:border-primary-900/40 text-right"
+            dir="rtl"
+          >
+            <div class="flex items-center gap-2 mb-3 text-primary-600 font-black text-sm">
+              <UIcon
+                name="i-heroicons-light-bulb"
+                class="w-5 h-5"
+              />
+              شرح الحل
+            </div>
+            <div
+              v-if="currentQuestion.explanation.text"
+              class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed [&_img]:max-w-full [&_img]:rounded-xl"
+              v-html="renderMarkdown(currentQuestion.explanation.text)"
+            />
+            <div
+              v-if="currentQuestion.explanation.video_url"
+              class="relative aspect-video rounded-2xl overflow-hidden shadow-lg border border-gray-200 mt-4"
+            >
+              <iframe
+                :src="embedUrl(currentQuestion.explanation.video_url)"
+                class="absolute inset-0 w-full h-full"
+                allowfullscreen
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -317,11 +363,11 @@
         </UButton>
         <UButton
           v-else
-          color="emerald"
-          icon="i-heroicons-check-circle"
+          color="success"
+          icon="i-heroicons-check"
           @click="finishExam"
         >
-          اعتماد الدرجة وإنهاء
+          إنهاء التصفّح
         </UButton>
       </div>
     </div>
@@ -396,11 +442,41 @@
 
 <script setup lang="ts">
 import { questionsService } from '@/services/api/questions.service'
+import { quizzesService } from '@/services/api/quizzes.service'
+import { showToast } from '@/utils/helpers/toast.helper'
+import { renderMarkdown } from '@/utils/markdown'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
 
 const route = useRoute()
 const examId = route.params.id as string
+
+// Run this model as a timed, persisted exam through the quiz engine.
+const startingSimulation = ref(false)
+async function startSimulation() {
+  startingSimulation.value = true
+  try {
+    const res = await quizzesService.simulateModel(examId)
+    const body = res.data
+    if (body?.status === 409) {
+      showToast('تنبيه', body?.message || 'لديك اختبار قيد التنفيذ — أنهه أولاً', 'warning')
+      return
+    }
+    if (body?.status === 422) {
+      const firstError = Object.values(body?.errors ?? {})[0]
+      showToast('خطأ', Array.isArray(firstError) ? firstError[0] : (body?.message || 'تعذّر بدء المحاكاة'), 'error')
+      return
+    }
+    const session = body?.data?.session
+    if (session?.id) {
+      navigateTo(`/dashboard/quizzes/${session.id}`)
+    }
+  } catch (err) {
+    console.error('Failed to start model simulation', err)
+  } finally {
+    startingSimulation.value = false
+  }
+}
 
 const loading = ref(true)
 const exam = ref<any>(null)
@@ -415,10 +491,58 @@ const currentQuestionIndex = ref(0)
 const answersMap = ref<Record<string, number>>({})
 const textAnswersMap = ref<Record<string, string>>({})
 
-// Timer implementation
+// Retained for the (timed) results template; browse mode leaves them at 0.
 const timerSeconds = ref(0)
 const spentSeconds = ref(0)
-let timerInterval: any = null
+
+// Browse mode is a no-timer study walk-through: picking an answer reveals the
+// correct one (fetched on demand) + the explanation. Maps qid → correct id.
+const correctAnswers = ref<Record<string, number>>({})
+
+function isRevealed(qid: number | string) {
+  return correctAnswers.value[qid] !== undefined
+}
+
+async function selectAnswer(qid: number | string, answerId: number) {
+  if (isRevealed(qid)) return
+  answersMap.value[qid] = answerId
+  try {
+    const res = await questionsService.getCorrectAnswer(qid)
+    const correctId = res.data?.data?.id ?? res.data?.id
+    if (correctId != null) correctAnswers.value[qid] = correctId
+  } catch (err) {
+    console.error('Failed to fetch correct answer', err)
+  }
+}
+
+function answerClass(qid: number | string, answerId: number) {
+  if (isRevealed(qid)) {
+    if (answerId === correctAnswers.value[qid]) return 'border-success-500 bg-success-50/60 dark:bg-success-900/20'
+    if (answerId === answersMap.value[qid]) return 'border-error-400 bg-error-50/60 dark:bg-error-900/20'
+    return 'border-transparent bg-white dark:bg-gray-800 opacity-60'
+  }
+  return answersMap.value[qid] === answerId
+    ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-900/20 shadow-sm'
+    : 'border-transparent bg-white dark:bg-gray-800 hover:border-gray-200 dark:hover:border-gray-700'
+}
+
+function indicatorClass(qid: number | string, answerId: number) {
+  if (isRevealed(qid)) {
+    if (answerId === correctAnswers.value[qid]) return 'bg-success-500 border-success-500 text-white'
+    if (answerId === answersMap.value[qid]) return 'bg-error-500 border-error-500 text-white'
+    return 'border-gray-200 dark:border-gray-700 text-transparent'
+  }
+  return answersMap.value[qid] === answerId
+    ? 'bg-primary-500 border-primary-500 text-white'
+    : 'border-gray-300 dark:border-gray-600 text-transparent'
+}
+
+function embedUrl(url: string) {
+  if (!url) return ''
+  if (url.includes('youtube.com/watch?v=')) return url.replace('watch?v=', 'embed/')
+  if (url.includes('youtu.be/')) return url.replace('youtu.be/', 'youtube.com/embed/')
+  return url
+}
 
 const currentQuestion = computed(
   () => questions.value[currentQuestionIndex.value] || null
@@ -461,50 +585,33 @@ onMounted(async () => {
   }
 })
 
-onUnmounted(() => {
-  if (timerInterval) clearInterval(timerInterval)
-})
-
+// "تصفّح بدون توقيت" — no timer; just enter the study walk-through.
 function startExam() {
   isStarted.value = true
-  // Initialize duration from API (assumes duration is in minutes)
-  const durationInMinutes = exam.value.duration || 60
-  timerSeconds.value = durationInMinutes * 60
-  spentSeconds.value = 0
-
-  timerInterval = setInterval(() => {
-    spentSeconds.value++
-    if (timerSeconds.value > 0) {
-      timerSeconds.value--
-    } else {
-      // Time is up!
-      finishExam()
-    }
-  }, 1000)
 }
 
-async function finishExam() {
-  if (!confirm('هل أنت متأكد من إنهاء الاختبار وإرسال الإجابات؟')) return
-
-  if (timerInterval) clearInterval(timerInterval)
-  isFinished.value = true
-
-  // Here we would dispatch all answers in `answersMap` & `textAnswersMap` to backend
-  // For example:
-  // Promise.all(Object.entries(answersMap.value).map(([qId, aId]) =>
-  //   questionsService.submitAnswer({ question_id: qId, answer_id: aId })
-  // ))
+// Exit browse back to the model intro. No scoring/submission — browsing is a
+// read-only study mode (use "محاكاة الاختبار" for a graded, timed run).
+function finishExam() {
+  isStarted.value = false
+  currentQuestionIndex.value = 0
+  answersMap.value = {}
+  correctAnswers.value = {}
 }
 
 function getDifficultyColor(difficulty: string) {
   switch (difficulty?.toLowerCase()) {
     case 'easy':
-      return 'emerald'
+      return 'success'
     case 'hard':
-      return 'red'
+      return 'error'
     case 'medium':
     default:
-      return 'orange'
+      return 'warning'
   }
+}
+
+function difficultyLabel(difficulty: string) {
+  return ({ easy: 'سهل', medium: 'متوسط', hard: 'صعب' } as Record<string, string>)[difficulty?.toLowerCase()] || difficulty
 }
 </script>

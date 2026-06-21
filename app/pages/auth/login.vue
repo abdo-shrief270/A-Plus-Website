@@ -99,7 +99,7 @@
           <div class="flex items-center gap-3 mb-6">
             <UButton
               icon="i-heroicons-arrow-right"
-              color="gray"
+              color="neutral"
               variant="ghost"
               @click="step = 1"
             />
@@ -161,7 +161,7 @@
           <div class="flex items-center justify-between mb-6">
             <UButton
               icon="i-heroicons-arrow-right"
-              color="gray"
+              color="neutral"
               variant="ghost"
               @click="authCheckData.has_password ? (step = 2) : (step = 1)"
             />
@@ -221,7 +221,7 @@
           <div class="flex items-center gap-3 mb-6">
             <UButton
               icon="i-heroicons-arrow-right"
-              color="gray"
+              color="neutral"
               variant="ghost"
               @click="step = 3"
             />
@@ -273,12 +273,13 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
+import type { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 import { useAuthService } from '@/composables/useAuth'
 import { useAuthStore } from '@/stores/auth'
 import { useRedirect } from '@/composables/useRedirect'
 import { useDeviceId } from '@/utils/device'
+import { buildUsernameSchema, buildPasswordSchema, otpSchema } from '@/schemas/auth'
 
 definePageMeta({
   layout: 'fullscreen',
@@ -295,31 +296,18 @@ useSeoMeta({
 const { loginCheck, login, sendOtp, verifyOtp, loading } = useAuthService()
 const authStore = useAuthStore()
 const { redirectByRole } = useRedirect()
-const toast = useToast()
 
 const step = ref(1)
 const showPassword = ref(false)
 
 const authCheckData = reactive({
   has_2fa: false,
+  has_password: false,
   exists: false
 })
 
-const usernameSchema = z.object({
-  user_name: z
-    .string()
-    .min(1, t('validation.required', { field: t('login.username') }))
-})
-
-const passwordSchema = z.object({
-  password: z
-    .string()
-    .min(1, t('validation.required', { field: t('login.password') }))
-})
-
-const otpSchema = z.object({
-  otp: z.string().min(6, 'رمز التحقق يجب أن يكون 6 أرقام على الأقل')
-})
+const usernameSchema = buildUsernameSchema(t)
+const passwordSchema = buildPasswordSchema(t)
 
 const state = reactive({
   user_name: '',
@@ -376,7 +364,7 @@ async function onPasswordSubmit(
 
     // Otherwise, we got the token and user!
     await authStore.storeUser(authData)
-    redirectByRole(authData.user)
+    if (authData.user) redirectByRole(authData.user)
   } catch (error) {
     console.error('Login password error:', error)
   }
@@ -408,7 +396,7 @@ async function onVerifyOtpSubmit(
 
     const authData = response?.data || response
     await authStore.storeUser(authData)
-    redirectByRole(authData.user)
+    if (authData.user) redirectByRole(authData.user)
   } catch (error) {
     console.error('Verify OTP error:', error)
   }

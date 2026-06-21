@@ -33,6 +33,12 @@ export const studentsService = {
     return axios.get(`/${VERSION}/students/${studentId}`)
   },
 
+  /** POST /v2/students - Create Single Student (إضافة حساب طالب) */
+  createStudent: (payload: Record<string, any>) => {
+    const axios = createAxiosInstance()
+    return axios.post(`/${VERSION}/students`, payload)
+  },
+
   /** PUT /v2/students/{student} - Update Student Profile (تعديل بيانات الطالب) */
   updateStudentProfile: (studentId: number | string, payload: any) => {
     const axios = createAxiosInstance()

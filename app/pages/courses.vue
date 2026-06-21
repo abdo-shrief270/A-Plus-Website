@@ -12,8 +12,15 @@
     <!-- Main Content -->
     <UContainer class="py-12">
       <!-- Loading State -->
-      <div v-if="status === 'pending'" class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        <div v-for="i in 8" :key="i" class="flex flex-col gap-4 rounded-2xl bg-white p-4 dark:bg-gray-900">
+      <div
+        v-if="status === 'pending'"
+        class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        <div
+          v-for="i in 8"
+          :key="i"
+          class="flex flex-col gap-4 rounded-2xl bg-white p-4 dark:bg-gray-900"
+        >
           <USkeleton class="aspect-[16/9] w-full rounded-xl" />
           <USkeleton class="h-6 w-3/4" />
           <USkeleton class="h-4 w-1/2" />
@@ -25,22 +32,51 @@
       </div>
 
       <!-- Error State -->
-      <div v-else-if="error" class="flex flex-col items-center justify-center py-20 text-center">
-        <UIcon name="i-heroicons-exclamation-triangle" class="mb-4 h-16 w-16 text-error-500" />
-        <h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">حدث خطأ أثناء تحميل الدورات</h2>
-        <p class="mb-6 text-gray-600 dark:text-gray-400">يرجى المحاولة مرة أخرى لاحقاً</p>
-        <UButton color="primary" @click="refresh">إعادة المحاولة</UButton>
+      <div
+        v-else-if="error"
+        class="flex flex-col items-center justify-center py-20 text-center"
+      >
+        <UIcon
+          name="i-heroicons-exclamation-triangle"
+          class="mb-4 h-16 w-16 text-error-500"
+        />
+        <h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+          حدث خطأ أثناء تحميل الدورات
+        </h2>
+        <p class="mb-6 text-gray-600 dark:text-gray-400">
+          يرجى المحاولة مرة أخرى لاحقاً
+        </p>
+        <UButton
+          color="primary"
+          @click="() => refresh()"
+        >
+          إعادة المحاولة
+        </UButton>
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="filteredCourses.length === 0" class="flex flex-col items-center justify-center py-20 text-center">
-        <img src="/logo.svg" alt="No results" class="mb-6 h-32 opacity-20 grayscale">
-        <h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">لا توجد نتائج تطابق بحثك</h2>
-        <p class="text-gray-600 dark:text-gray-400">جرب البحث بكلمات مختلفة أو تغيير الفلاتر</p>
+      <div
+        v-else-if="filteredCourses.length === 0"
+        class="flex flex-col items-center justify-center py-20 text-center"
+      >
+        <img
+          src="/logo.svg"
+          alt="No results"
+          class="mb-6 h-32 opacity-20 grayscale"
+        >
+        <h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+          لا توجد نتائج تطابق بحثك
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400">
+          جرب البحث بكلمات مختلفة أو تغيير الفلاتر
+        </p>
       </div>
 
       <!-- Courses Grid -->
-      <div v-else class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <div
+        v-else
+        class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
+      >
         <CourseCard
           v-for="course in filteredCourses"
           :key="course.id"
@@ -95,9 +131,9 @@ const filteredCourses = computed(() => {
   // Filter by Search Query
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
-    result = result.filter(c => 
-      c.title.toLowerCase().includes(query) || 
-      c.description.toLowerCase().includes(query)
+    result = result.filter(c =>
+      c.title.toLowerCase().includes(query)
+      || c.description.toLowerCase().includes(query)
     )
   }
 

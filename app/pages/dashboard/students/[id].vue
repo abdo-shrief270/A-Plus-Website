@@ -1,417 +1,474 @@
 <template>
-  <div class="max-w-4xl mx-auto">
-    <!-- Header -->
-    <div class="flex items-center gap-4 mb-8">
-      <UButton
-        icon="i-heroicons-arrow-right"
-        color="neutral"
-        variant="ghost"
-        class="rtl:-scale-x-100"
-        @click="$router.back()"
-      />
-      <div>
-        <h1
-          class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3"
+  <div>
+    <!-- Top bar with back + title + actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div class="flex items-center gap-3">
+        <UButton
+          to="/dashboard/students"
+          color="neutral"
+          variant="soft"
+          icon="i-heroicons-arrow-right"
+          class="rtl:[&>span:first-child]:rotate-180"
+          square
+        />
+        <div>
+          <p class="text-xs text-gray-500">
+            <NuxtLink
+              to="/dashboard/students"
+              class="hover:text-primary-600"
+            >
+              طلابي
+            </NuxtLink>
+            <span class="mx-1">›</span>
+            <span>الملف الشخصي</span>
+          </p>
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mt-0.5">
+            {{ kid?.name ?? '...' }}
+          </h1>
+        </div>
+      </div>
+
+      <div
+        v-if="kid"
+        class="flex items-center gap-2"
+      >
+        <UButton
+          color="primary"
+          icon="i-heroicons-pencil-square"
+          @click="editOpen = true"
         >
-          الملف الشخصي للطالب
-          <UBadge
-            v-if="student?.status"
-            :color="student.status === 'suspended' ? 'error' : 'success'"
-            variant="subtle"
-          >
-            {{ student.status === "suspended" ? "معلق" : "نشط" }}
-          </UBadge>
-        </h1>
-        <p class="text-sm text-gray-500 mt-1">
-          عرض وتعديل تفاصيل حساب الطالب وحالته الأكاديمية
-        </p>
+          تعديل
+        </UButton>
+        <UDropdownMenu
+          :items="moreItems"
+          :content="{ align: 'end' }"
+        >
+          <UButton
+            color="neutral"
+            variant="soft"
+            icon="i-heroicons-ellipsis-vertical"
+            square
+          />
+        </UDropdownMenu>
       </div>
     </div>
 
-    <!-- loading state -->
+    <!-- Loading -->
     <div
       v-if="loading"
-      class="flex justify-center py-20"
+      class="flex items-center justify-center py-24"
     >
       <UIcon
         name="i-heroicons-arrow-path"
-        class="w-10 h-10 text-primary-500 animate-spin"
+        class="w-8 h-8 text-primary-500 animate-spin"
       />
     </div>
 
+    <!-- Not found -->
     <div
-      v-else-if="!student"
-      class="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700"
+      v-else-if="!kid"
+      class="bg-white border border-gray-100 rounded-3xl p-12 text-center shadow-sm"
     >
-      <UIcon
-        name="i-heroicons-user-minus"
-        class="w-16 h-16 mx-auto text-gray-400 mb-4"
-      />
-      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">
-        الطالب غير موجود
-      </h3>
-      <p class="text-gray-500">
-        لا يمكن العثور على بيانات هذا الطالب في النظام.
+      <div class="w-20 h-20 mx-auto rounded-2xl bg-error-50 flex items-center justify-center mb-4">
+        <UIcon
+          name="i-heroicons-user-minus"
+          class="w-10 h-10 text-error-500"
+        />
+      </div>
+      <h2 class="text-lg font-bold text-gray-900 mb-2">
+        لم نعثر على هذا الحساب
+      </h2>
+      <p class="text-sm text-gray-500 mb-5">
+        قد يكون الحساب محذوفاً أو لا تملك صلاحية الوصول إليه.
       </p>
+      <UButton
+        to="/dashboard/students"
+        color="primary"
+      >
+        العودة لقائمة الطلاب
+      </UButton>
     </div>
 
+    <!-- Profile content -->
     <div
       v-else
-      class="space-y-6"
+      class="space-y-5"
     >
-      <!-- Profile Header Summary -->
-      <div
-        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 flex flex-col md:flex-row items-center md:items-start gap-6 shadow-sm"
-      >
-        <UAvatar
-          :src="student.avatar || student.profile_image"
-          :alt="student.name_ar || student.name"
-          size="3xl"
-          :ui="{ rounded: 'rounded-2xl' }"
-          class="bg-primary-50 dark:bg-primary-900/20 text-primary-600 font-bold"
-        >
-          {{ (student.name_ar || student.name || "ط").charAt(0).toUpperCase() }}
-        </UAvatar>
+      <!-- Profile hero -->
+      <div class="relative bg-gradient-to-l from-primary-600 to-primary-800 rounded-3xl p-6 sm:p-8 overflow-hidden shadow-md">
+        <div class="absolute top-0 left-0 w-48 h-48 bg-white/10 rounded-full -translate-y-1/2 -translate-x-1/4 blur-2xl" />
+        <div class="absolute bottom-0 right-1/3 w-40 h-40 bg-secondary-400/30 rounded-full translate-y-1/2 blur-2xl" />
 
-        <div class="flex-1 text-center md:text-start">
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-            {{ student.name_ar || student.name || student.username }}
-          </h2>
-          <p class="text-gray-500 mb-4">
-            {{ student.email || "البريد الإلكتروني غير متوفر" }}
-          </p>
-
+        <div class="relative flex flex-col md:flex-row md:items-center gap-6">
           <div
-            class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm font-medium"
+            class="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center text-3xl sm:text-4xl font-bold text-white shadow-lg ring-4 ring-white/20 shrink-0"
+            :class="kid.gender === 'female'
+              ? 'bg-gradient-to-br from-pink-400 to-pink-600'
+              : 'bg-gradient-to-br from-secondary-400 to-secondary-600'"
+          >
+            {{ initial(kid.name) }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <h2 class="text-2xl sm:text-3xl font-bold text-white mb-1 truncate drop-shadow-sm">
+              {{ kid.name }}
+            </h2>
+            <p class="text-sm text-white/90 flex items-center gap-1.5 mb-3 font-medium">
+              <UIcon
+                name="i-heroicons-at-symbol"
+                class="w-4 h-4 text-white/80"
+              />
+              {{ kid.user_name }}
+            </p>
+            <div class="flex flex-wrap items-center gap-2">
+              <span
+                v-if="kid.exam_name"
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 ring-1 ring-white/30 backdrop-blur text-xs font-semibold text-white"
+              >
+                <UIcon
+                  name="i-heroicons-academic-cap"
+                  class="w-3.5 h-3.5 text-white"
+                />
+                {{ kid.exam_name }}
+              </span>
+              <span
+                v-if="kid.league?.name"
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-500 ring-1 ring-white/40 text-xs font-semibold text-white shadow-sm"
+              >
+                <UIcon
+                  name="i-heroicons-trophy"
+                  class="w-3.5 h-3.5 text-white"
+                />
+                {{ kid.league.name }}
+              </span>
+              <span
+                v-if="kid.gender"
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 ring-1 ring-white/30 backdrop-blur text-xs font-semibold text-white"
+              >
+                <UIcon
+                  name="i-heroicons-user"
+                  class="w-3.5 h-3.5 text-white"
+                />
+                {{ kid.gender === 'female' ? 'أنثى' : 'ذكر' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center mb-3">
+            <UIcon
+              name="i-heroicons-star"
+              class="w-5 h-5 text-primary-600"
+            />
+          </div>
+          <p class="text-xs text-gray-500">
+            النقاط
+          </p>
+          <p
+            class="text-xl font-bold mt-0.5"
+            :class="kid.has_unlimited_points ? 'text-success-600' : 'text-gray-900'"
           >
             <span
-              class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-800"
-            >
+              v-if="kid.has_unlimited_points"
+              class="text-2xl"
+              title="غير محدود — اشتراك نشط"
+            >∞</span>
+            <span v-else>{{ formatNumber(kid.total_points ?? 0) }}</span>
+          </p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-success-50 flex items-center justify-center mb-3">
+            <UIcon
+              name="i-heroicons-chart-bar"
+              class="w-5 h-5 text-success-600"
+            />
+          </div>
+          <p class="text-xs text-gray-500">
+            الدرجة الكلية
+          </p>
+          <p class="text-xl font-bold text-gray-900 mt-0.5">
+            {{ formatNumber(kid.total_score ?? 0) }}
+          </p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-secondary-50 flex items-center justify-center mb-3">
+            <UIcon
+              name="i-heroicons-trophy"
+              class="w-5 h-5 text-secondary-600"
+            />
+          </div>
+          <p class="text-xs text-gray-500">
+            الدوري الحالي
+          </p>
+          <p class="text-base font-bold text-gray-900 mt-0.5 truncate">
+            {{ kid.league?.name || '—' }}
+          </p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-info-50 flex items-center justify-center mb-3">
+            <UIcon
+              name="i-heroicons-calendar"
+              class="w-5 h-5 text-info-600"
+            />
+          </div>
+          <p class="text-xs text-gray-500">
+            تاريخ الانضمام
+          </p>
+          <p class="text-base font-bold text-gray-900 mt-0.5">
+            {{ kid.joined_at || '—' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Info cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="font-bold text-gray-900 flex items-center gap-2">
               <UIcon
-                name="i-heroicons-phone"
-                class="w-4 h-4 text-gray-400"
+                name="i-heroicons-identification"
+                class="w-5 h-5 text-primary-600"
               />
-              {{ student.phone || "غير مدرج" }}
-            </span>
-            <span
-              v-if="student.parent_phone"
-              class="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-800"
-            >
-              <UIcon
-                name="i-heroicons-users"
-                class="w-4 h-4 text-gray-400"
-              />
-              ولي الأمر: {{ student.parent_phone }}
-            </span>
-            <span
-              v-if="student.grade || student.exam?.name_ar"
-              class="flex items-center gap-1.5 text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/20 px-3 py-1.5 rounded-lg border border-primary-100 dark:border-primary-800/30"
-            >
+              البيانات الشخصية
+            </h3>
+            <UButton
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              icon="i-heroicons-pencil"
+              @click="editOpen = true"
+            />
+          </div>
+          <dl class="divide-y divide-gray-100">
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                الاسم
+              </dt>
+              <dd class="text-sm font-semibold text-gray-900 text-left truncate">
+                {{ kid.name || '—' }}
+              </dd>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                اسم المستخدم
+              </dt>
+              <dd class="text-sm font-mono text-gray-900 text-left truncate">
+                {{ kid.user_name || '—' }}
+              </dd>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                النوع
+              </dt>
+              <dd class="text-sm font-semibold text-gray-900 text-left">
+                {{ kid.gender === 'female' ? 'أنثى' : 'ذكر' }}
+              </dd>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                البريد الإلكتروني
+              </dt>
+              <dd class="text-sm text-gray-900 text-left truncate">
+                {{ kid.email || '—' }}
+              </dd>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                الهاتف
+              </dt>
+              <dd
+                class="text-sm text-gray-900 text-left truncate"
+                dir="ltr"
+              >
+                {{ kid.phone || '—' }}
+              </dd>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                رقم الهوية
+              </dt>
+              <dd
+                class="text-sm font-mono text-gray-900 text-left"
+                dir="ltr"
+              >
+                {{ kid.id_number || '—' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="font-bold text-gray-900 flex items-center gap-2">
               <UIcon
                 name="i-heroicons-academic-cap"
-                class="w-4 h-4 text-primary-500"
+                class="w-5 h-5 text-primary-600"
               />
-              {{ student.grade || student.exam?.name_ar }}
-            </span>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-2 min-w-[140px]">
-          <UButton
-            v-if="student.status === 'active'"
-            color="red"
-            variant="soft"
-            icon="i-heroicons-no-symbol"
-            class="justify-center w-full"
-            :loading="isStatusUpdating"
-            @click="suspendStudent"
-          >
-            تعليق الحساب
-          </UButton>
-          <UButton
-            v-if="student.status === 'suspended'"
-            color="emerald"
-            variant="soft"
-            icon="i-heroicons-check-circle"
-            class="justify-center w-full"
-            :loading="isStatusUpdating"
-            @click="activateStudent"
-          >
-            تفعيل الحساب
-          </UButton>
-          <UButton
-            color="primary"
-            variant="ghost"
-            icon="i-heroicons-chart-bar"
-            class="justify-center w-full"
-            :to="`/dashboard/student-stats?student=${student.id}`"
-          >
-            عرض درجات الطالب
-          </UButton>
-        </div>
-      </div>
-
-      <!-- Edit Student Form -->
-      <div
-        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 p-8 shadow-sm"
-      >
-        <h3
-          class="text-lg font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-4"
-        >
-          تعديل تفاصيل الطالب
-        </h3>
-
-        <UForm
-          :state="editState"
-          :schema="updateSchema"
-          class="space-y-6"
-          @submit="onUpdateStudent"
-        >
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <UFormField
-              label="الاسم الكامل"
-              name="name"
-              required
-            >
-              <UInput
-                v-model="editState.name"
-                icon="i-heroicons-user"
-                placeholder="الاسم الكامل للطالب"
-              />
-            </UFormField>
-
-            <UFormField
-              label="البريد الإلكتروني"
-              name="email"
-            >
-              <UInput
-                v-model="editState.email"
-                type="email"
-                icon="i-heroicons-envelope"
-                placeholder="example@domain.com"
-              />
-            </UFormField>
-
-            <UFormField
-              label="رقم الجوال الخاص بالطالب"
-              name="phone"
-            >
-              <UInput
-                v-model="editState.phone"
-                type="tel"
-                icon="i-heroicons-phone"
-                placeholder="05XXXXXXXX"
-                dir="ltr"
-              />
-            </UFormField>
-
-            <UFormField
-              label="رقم هاتف ولي الأمر"
-              name="parent_phone"
-              required
-            >
-              <UInput
-                v-model="editState.parent_phone"
-                type="tel"
-                icon="i-heroicons-users"
-                placeholder="05XXXXXXXX"
-                dir="ltr"
-              />
-            </UFormField>
-          </div>
-
-          <!-- Academic selection -->
-          <UFormField
-            label="المرحلة الدراسية"
-            name="exam_id"
-            required
-          >
-            <USelectMenu
-              v-model="editState.exam_id"
-              :options="academicStore.exams"
-              value-attribute="id"
-              option-attribute="name_ar"
-              placeholder="اختر المرحلة الدراسية"
-              icon="i-heroicons-academic-cap"
-            />
-          </UFormField>
-
-          <UFormField
-            label="ملاحظات إضافية (خاصة بالإدارة)"
-            name="admin_notes"
-          >
-            <UTextarea
-              v-model="editState.admin_notes"
-              :rows="3"
-              placeholder="أضف أي ملاحظات لمتابعة هذا الطالب..."
-            />
-          </UFormField>
-
-          <div
-            class="flex justify-end pt-4 border-t border-gray-100 dark:border-gray-700 gap-3"
-          >
+              البيانات الدراسية
+            </h3>
             <UButton
-              color="error"
-              variant="soft"
-              icon="i-heroicons-trash"
-              @click="requestDeletion"
-            >
-              طلب الحذف
-            </UButton>
-
-            <div class="flex-1" />
-
-            <UButton
-              type="submit"
-              color="primary"
-              variant="solid"
-              icon="i-heroicons-check"
-              :loading="isSaving"
-              class="px-8"
-            >
-              حفظ التعديلات
-            </UButton>
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              icon="i-heroicons-pencil"
+              @click="editOpen = true"
+            />
           </div>
-        </UForm>
+          <dl class="divide-y divide-gray-100">
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                الاختبار
+              </dt>
+              <dd class="text-sm font-semibold text-gray-900 text-left truncate">
+                {{ kid.exam_name || '—' }}
+              </dd>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                تاريخ الاختبار
+              </dt>
+              <dd class="text-sm text-gray-900 text-left">
+                {{ kid.exam_date || '—' }}
+              </dd>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                الدوري الحالي
+              </dt>
+              <dd class="text-sm font-semibold text-gray-900 text-left flex items-center gap-2 justify-end">
+                <img
+                  v-if="kid.league?.icon"
+                  :src="kid.league.icon"
+                  :alt="kid.league.name"
+                  class="w-5 h-5"
+                >
+                {{ kid.league?.name || '—' }}
+              </dd>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                إجمالي النقاط
+              </dt>
+              <dd class="text-sm font-bold text-left">
+                <span
+                  v-if="kid.has_unlimited_points"
+                  class="text-success-600 text-base"
+                  title="غير محدود — اشتراك نشط"
+                >∞ غير محدود</span>
+                <span
+                  v-else
+                  class="text-primary-700"
+                >
+                  {{ formatNumber(kid.total_points ?? 0) }}
+                </span>
+              </dd>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                إجمالي الدرجة
+              </dt>
+              <dd class="text-sm font-bold text-success-700 text-left">
+                {{ formatNumber(kid.total_score ?? 0) }}
+              </dd>
+            </div>
+            <div class="px-5 py-3 flex items-center justify-between gap-4">
+              <dt class="text-sm text-gray-500">
+                تاريخ الانضمام
+              </dt>
+              <dd class="text-sm text-gray-900 text-left">
+                {{ kid.joined_at || '—' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
       </div>
     </div>
+
+    <!-- Edit modal -->
+    <DashboardKidsEditKidModal
+      v-model:open="editOpen"
+      :kid="kid"
+      @updated="onUpdated"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
 import { studentsService } from '@/services/api/students.service'
-import { useAcademicStore } from '@/stores/academic'
-import { showToast } from '@/utils/helpers/toast.helper'
-import type { FormSubmitEvent } from '@nuxt/ui'
 
-definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
+definePageMeta({
+  layout: 'dashboard',
+  middleware: ['auth'],
+  title: 'ملف الطالب'
+})
 
 const route = useRoute()
-const studentId = route.params.id as string
+const router = useRouter()
+const id = computed(() => route.params.id as string)
 
+const kid = ref<any | null>(null)
 const loading = ref(true)
-const isSaving = ref(false)
-const isStatusUpdating = ref(false)
+const editOpen = ref(false)
 
-const student = ref<any>(null)
-const academicStore = useAcademicStore()
-
-const updateSchema = z.object({
-  name: z.string().min(2, 'الاسم يجب أن يكون حرفين على الأقل'),
-  email: z
-    .string()
-    .email('البريد الإلكتروني غير صالح')
-    .optional()
-    .or(z.literal('')),
-  phone: z.string().optional().or(z.literal('')),
-  parent_phone: z.string().min(8, 'رقم ولي الأمر متطلب ضروري'),
-  exam_id: z.number().nullable(),
-  admin_notes: z.string().optional()
-})
-type UpdateSchema = z.output<typeof updateSchema>
-
-const editState = reactive({
-  name: '',
-  email: '',
-  phone: '',
-  parent_phone: '',
-  exam_id: null as number | null,
-  admin_notes: ''
+useSeoMeta({
+  title: () => `${kid.value?.name ? kid.value.name + ' | ' : ''}ملف الطالب | A Plus`
 })
 
-onMounted(async () => {
-  await Promise.all([fetchStudent(), academicStore.fetchExams()])
-})
+onMounted(() => fetchKid())
+watch(id, () => fetchKid())
 
-async function fetchStudent() {
+async function fetchKid() {
   loading.value = true
   try {
-    const res = await studentsService.getStudentProfile(studentId)
-    const data = res.data?.data || res.data
-    student.value = data?.student || data
-
-    useSeoMeta({
-      title: `${student.value?.name_ar || student.value?.name || 'تفاصيل الطالب'} | A Plus`
-    })
-
-    // Populate form
-    editState.name = student.value.name_ar || student.value.name || ''
-    editState.email = student.value.email || ''
-    editState.phone = student.value.phone || ''
-    editState.parent_phone = student.value.parent_phone || ''
-    editState.exam_id = student.value.exam_id || student.value.exam?.id || null
-    editState.admin_notes = student.value.admin_notes || ''
-  } catch (error) {
-    console.error('Failed to load student details', error)
+    const res = await studentsService.getStudentProfile(id.value)
+    kid.value = res.data?.data ?? res.data
+  } catch (err) {
+    console.error('Failed to load kid', err)
+    kid.value = null
   } finally {
     loading.value = false
   }
 }
 
-async function onUpdateStudent(event: FormSubmitEvent<UpdateSchema>) {
-  isSaving.value = true
-  try {
-    // Delete empty optional strings so validation doesn't fail on backend
-    const payload = { ...event.data }
-    if (!payload.email) delete payload.email
-    if (!payload.phone) delete payload.phone
-
-    await studentsService.updateStudentProfile(studentId, payload)
-
-    showToast('نجاح', 'تم تحديث بيانات الطالب بنجاح', 'success')
-    await fetchStudent() // Refresh data
-  } catch (error: any) {
-    const msg
-      = error.response?.data?.message || 'حدث خطأ أثناء تعديل بيانات الطالب'
-    showToast('خطأ', msg, 'error')
-  } finally {
-    isSaving.value = false
+function onUpdated(updated: any) {
+  if (updated && typeof updated === 'object') {
+    kid.value = { ...kid.value, ...updated }
+  } else {
+    fetchKid()
   }
 }
 
-async function suspendStudent() {
-  isStatusUpdating.value = true
-  try {
-    // A minimal payload to toggle status if the API supports it,
-    // otherwise we fallback to update properties.
-    // Depending on Swagger mapping for PUT /v2/students/{id}, status updates might be via PUT.
-    await studentsService.updateStudentProfile(studentId, {
-      status: 'suspended'
-    })
-    student.value.status = 'suspended'
-    showToast('تنبيه', 'تم تعليق حساب الطالب', 'warning')
-  } catch {
-    showToast('خطأ', 'لم يتم تعليق الحساب', 'error')
-  } finally {
-    isStatusUpdating.value = false
-  }
-}
-
-async function activateStudent() {
-  isStatusUpdating.value = true
-  try {
-    await studentsService.updateStudentProfile(studentId, { status: 'active' })
-    student.value.status = 'active'
-    showToast('نجاح', 'تم تنشيط حساب الطالب', 'success')
-  } catch {
-    showToast('خطأ', 'فشل تنشيط الحساب', 'error')
-  } finally {
-    isStatusUpdating.value = false
-  }
-}
+const moreItems = computed(() => [
+  [
+    {
+      label: 'طلب حذف الحساب',
+      icon: 'i-heroicons-trash',
+      color: 'error' as const,
+      onSelect: () => requestDeletion()
+    }
+  ]
+])
 
 async function requestDeletion() {
-  if (confirm('هل أنت متأكد من تقديم طلب لحذف حساب هذا الطالب؟')) {
-    try {
-      await studentsService.requestStudentDeletion(
-        studentId,
-        'حذف يدوي من الملف الشخصي'
-      )
-      showToast('تم', 'تم إرسال طلب الحذف بنجاح إلى الإدارة.', 'success')
-    } catch (e) {
-      showToast('خطأ', 'حدث خطأ أثناء إرسال طلب الحذف.', 'error')
-    }
+  if (!kid.value) return
+  const ok = confirm(`هل تريد طلب حذف حساب ${kid.value.name}؟\nسيتم تعليق الحساب بانتظار مراجعة الإدارة.`)
+  if (!ok) return
+  try {
+    await studentsService.requestStudentDeletion(kid.value.id, 'طلب من المدرسة')
+    router.push('/dashboard/students')
+  } catch (err) {
+    console.error('Failed to request deletion', err)
   }
+}
+
+function initial(name?: string) {
+  return (name?.trim()?.charAt(0) ?? 'ط').toUpperCase()
+}
+
+function formatNumber(n: number) {
+  return new Intl.NumberFormat('ar-EG').format(n)
 }
 </script>

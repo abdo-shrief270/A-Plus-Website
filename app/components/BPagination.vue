@@ -14,11 +14,7 @@
       :next-button="{ icon: 'i-heroicons-chevron-left', color: 'gray', variant: 'ghost', class: 'rtl:rotate-180' }"
       :ui="{
         list: 'flex items-center gap-1',
-        item: {
-          base: 'min-w-[32px] h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors',
-          active: 'bg-primary-500 text-white shadow-md shadow-primary-500/20',
-          inactive: 'text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800'
-        }
+        item: 'min-w-[32px] h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors'
       }"
     />
   </div>

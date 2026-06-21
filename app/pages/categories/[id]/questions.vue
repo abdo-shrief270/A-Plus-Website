@@ -177,8 +177,8 @@ watch(() => questionsStore.categoryPagination.current_page, (newPage) => {
 })
 
 useSeoMeta({
-  title: computed(() => `${questionsStore.currentCategory?.name || 'أسئلة القسم'} | A Plus`),
-  description: computed(() => questionsStore.currentCategory?.description || 'تصفح الأسئلة المتاحة في هذا القسم')
+  title: computed(() => `${(questionsStore.currentCategory?.name as string) || 'أسئلة القسم'} | A Plus`),
+  description: computed(() => (questionsStore.currentCategory?.description as string) || 'تصفح الأسئلة المتاحة في هذا القسم')
 })
 
 onMounted(() => {

@@ -22,7 +22,7 @@
           <div class="flex items-center gap-3">
             <NuxtLink to="/auth/register">
               <UButton
-                color="gray"
+                color="neutral"
                 variant="ghost"
                 icon="i-heroicons-arrow-right"
                 class="hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -214,7 +214,7 @@
                   </UButton>
 
                   <template #content>
-                    <UCalendar v-model="state.exam_date" />
+                    <UCalendar v-model="examDateValue" />
                   </template>
                 </UPopover>
               </UFormField>
@@ -227,7 +227,7 @@
                 size="xl"
                 :loading="loading"
                 class="w-full font-bold text-lg shadow-xl shadow-primary-500/20 hover:shadow-primary-500/40 hover:-translate-y-0.5 transition-all duration-300 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400"
-                :ui="{ rounded: 'rounded-xl' }"
+                :ui="{ base: 'rounded-xl' }"
               >
                 إنشاء الحساب
               </UButton>
@@ -240,17 +240,17 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
 import type { FormSubmitEvent } from '#ui/types'
 import { authService } from '@/services/api/auth.service'
 import { examService } from '@/services/api/exam.service'
 import { useAuthStore } from '@/stores/auth'
 import { useRedirect } from '@/composables/useRedirect'
 import { useUsernameCheck } from '@/composables/useUsernameCheck'
+import { studentRegisterSchema, type StudentRegisterInput } from '@/schemas/auth'
 import {
   getLocalTimeZone,
   DateFormatter,
-  type CalendarDate
+  type DateValue
 } from '@internationalized/date'
 
 definePageMeta({ layout: 'fullscreen', middleware: 'guest' })
@@ -271,29 +271,8 @@ const genderOptions = [
 
 const examOptions = ref<{ label: string, value: number }[]>([])
 
-const schema = z
-  .object({
-    name: z.string().min(2, 'الاسم مطلوب (٢ أحرف على الأقل)'),
-    user_name: z.string().min(3, 'اسم المستخدم مطلوب'),
-    country_code: z.string().min(1, 'كود الدولة مطلوب'),
-    phone: z.string().min(7, 'رقم الهاتف مطلوب'),
-    email: z
-      .string()
-      .email('بريد إلكتروني غير صالح')
-      .optional()
-      .or(z.literal('')),
-    password: z.string().min(8, 'كلمة المرور ٨ أحرف على الأقل'),
-    password_confirmation: z.string().min(8, 'تأكيد كلمة المرور مطلوب'),
-    gender: z.enum(['male', 'female'], { message: 'الجنس مطلوب' }),
-    exam_id: z.number({ required_error: 'الاختبار مطلوب' }),
-    exam_date: z.any().refine(val => !!val, 'تاريخ الاختبار مطلوب')
-  })
-  .refine(data => data.password === data.password_confirmation, {
-    message: 'كلمات المرور غير متطابقة',
-    path: ['password_confirmation']
-  })
-
-type Schema = z.output<typeof schema>
+const schema = studentRegisterSchema
+type Schema = StudentRegisterInput
 
 const state = reactive({
   name: '',
@@ -305,7 +284,18 @@ const state = reactive({
   password_confirmation: '',
   gender: undefined as 'male' | 'female' | undefined,
   exam_id: undefined as number | undefined,
-  exam_date: undefined as CalendarDate | undefined
+  exam_date: undefined as DateValue | undefined
+})
+
+// Writable bridge for UCalendar so the union cast stays out of the template
+// (a bare `|` there is misparsed as a deprecated Vue filter).
+const examDateValue = computed({
+  // Reactive unwrapping widens the branded DateValue union; cast it back here
+  // (contained in script, never in the template).
+  get: () => state.exam_date as DateValue | undefined,
+  set: (v: DateValue | undefined) => {
+    state.exam_date = v
+  }
 })
 
 const formatter = new DateFormatter('ar-EG', { dateStyle: 'long' })

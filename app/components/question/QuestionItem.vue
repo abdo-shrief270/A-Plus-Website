@@ -197,6 +197,39 @@
             />
           </div>
         </div>
+
+        <!-- AI explanation -->
+        <div
+          v-if="flags.ai_explanations_enabled"
+          class="text-right dir-rtl"
+        >
+          <UButton
+            v-if="!aiExplanation"
+            color="secondary"
+            variant="soft"
+            icon="i-heroicons-sparkles"
+            :loading="aiLoading"
+            @click="fetchAiExplanation"
+          >
+            اشرح أكثر بالذكاء الاصطناعي
+          </UButton>
+
+          <div
+            v-else
+            class="bg-secondary-50/60 dark:bg-secondary-500/10 rounded-3xl p-8 border border-secondary-100 dark:border-secondary-800 text-right dir-rtl"
+          >
+            <div class="flex items-center gap-3 mb-4 text-secondary-600 font-black">
+              <UIcon
+                name="i-heroicons-sparkles"
+                class="w-6 h-6"
+              />
+              شرح بالذكاء الاصطناعي
+            </div>
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed font-medium whitespace-pre-wrap">
+              {{ aiExplanation }}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -211,6 +244,32 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['answered'])
+
+// Captured in setup so the live-points update doesn't call useState() after an
+// await (which loses Nuxt context and would target a detached, non-shared state).
+const wallet = useStudentWallet()
+
+// Platform flags (e.g. AI explanations enabled) — loaded once, shared.
+const { flags, ensureLoaded: ensureFlags } = usePlatformFlags()
+ensureFlags()
+
+const aiExplanation = ref('')
+const aiLoading = ref(false)
+async function fetchAiExplanation() {
+  if (aiLoading.value) return
+  aiLoading.value = true
+  try {
+    const { aiService } = await import('@/services/api/ai.service')
+    const res = await aiService.explain(props.question.id)
+    aiExplanation.value = res.data?.data?.explanation ?? ''
+    const balance = res.data?.data?.balance
+    if (typeof balance === 'number') wallet.setPoints(balance)
+  } catch (err) {
+    console.error('AI explanation failed', err)
+  } finally {
+    aiLoading.value = false
+  }
+}
 
 const isLoading = ref(false)
 const isSubmitted = ref(false)
@@ -292,6 +351,9 @@ const submit = async () => {
     isCorrect.value = result.is_correct
     scoreEarned.value = result.score_earned
     correctAnswerId.value = result.correct_answer || (result.is_correct ? selectedAnswerId.value : null)
+
+    // Keep both navbar counters live: wallet balance (spent) + league score (earned).
+    wallet.applyTotals(result)
 
     isSubmitted.value = true
     emit('answered', result)

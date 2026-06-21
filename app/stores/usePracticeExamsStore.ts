@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useApi } from '../composables/useApi'
-import type { PracticeExam, Pagination, Question } from '../types/question-bank'
+import type { PracticeExam, Pagination } from '../types/question-bank'
 
 /**
  * Practice Exams Store
@@ -22,7 +22,7 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
   const userAnswers = ref<Record<number, number | string>>({}) // question_id -> answer_id or text
   const timeRemaining = ref(0) // in seconds
   const isSessionActive = ref(false)
-  const results = ref<Record<number, { is_correct: boolean; score_earned: number; correct_answer?: number }>>({})
+  const results = ref<Record<number, { is_correct: boolean, score_earned: number, correct_answer?: number }>>({})
 
   const currentQuestion = computed(() => {
     return currentPracticeExam.value?.questions?.[currentQuestionIndex.value] || null
@@ -32,10 +32,10 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
    * GET /practice-exams
    */
   const fetchPracticeExams = async (params: {
-    search?: string;
-    paginate?: boolean;
-    per_page?: number;
-    page?: number;
+    search?: string
+    paginate?: boolean
+    per_page?: number
+    page?: number
   } = {}) => {
     isLoading.value = true
     error.value = null
@@ -68,14 +68,14 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
       const result = await api.show(id) as Record<string, unknown>
       const data = (result?.practice_exam || result?.data || result) as PracticeExam
       currentPracticeExam.value = data
-      
+
       // Initialize session
       currentQuestionIndex.value = 0
       userAnswers.value = {}
       results.value = {}
       timeRemaining.value = (data.duration_minutes || 0) * 60
       isSessionActive.value = true
-      
+
       return data
     } catch (err: unknown) {
       error.value = (err as any).response?.data?.message || 'Failed to start practice session'
@@ -89,7 +89,7 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
     userAnswers.value[questionId] = answer
   }
 
-  const setResult = (questionId: number, result: { is_correct: boolean; score_earned: number; correct_answer?: number }) => {
+  const setResult = (questionId: number, result: { is_correct: boolean, score_earned: number, correct_answer?: number }) => {
     results.value[questionId] = result
   }
 

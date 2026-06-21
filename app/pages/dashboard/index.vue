@@ -1,236 +1,352 @@
 <template>
-  <div>
-    <!-- Welcome -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">
-        مرحباً، {{ authStore.getUser?.name }} 👋
-      </h1>
-      <p class="text-gray-500 mt-1">
-        {{ isSchool ? 'لوحة تحكم المدرسة' : 'لوحة متابعة ولي الأمر' }}
-      </p>
+  <!-- Students get a dedicated home; school/parent keep the admin dashboard. -->
+  <DashboardStudentHome v-if="authStore.isStudent" />
+
+  <div v-else>
+    <!-- Welcome hero -->
+    <div class="relative bg-gradient-to-l from-primary-600 to-primary-800 rounded-3xl p-6 sm:p-8 overflow-hidden shadow-md mb-6">
+      <div class="absolute top-0 left-0 w-56 h-56 bg-white/10 rounded-full -translate-y-1/2 -translate-x-1/4 blur-2xl" />
+      <div class="absolute bottom-0 right-1/4 w-48 h-48 bg-secondary-400/30 rounded-full translate-y-1/2 blur-2xl" />
+
+      <div class="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div class="flex items-center gap-4 min-w-0">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary-400 to-secondary-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg ring-4 ring-white/20 shrink-0">
+            {{ initial(user?.name) }}
+          </div>
+          <div class="min-w-0">
+            <p class="text-xs font-medium text-white/80 mb-1">
+              {{ greeting }}
+            </p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white truncate drop-shadow-sm">
+              {{ user?.name || '—' }}
+            </h1>
+            <p class="text-sm text-white/90 mt-1">
+              {{ roleSubtitle }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <UButton
+            :to="labels.detailRoot"
+            color="secondary"
+            size="lg"
+            icon="i-heroicons-user-plus"
+          >
+            {{ labels.addAction }}
+          </UButton>
+          <UButton
+            to="/dashboard/courses"
+            color="neutral"
+            variant="solid"
+            size="lg"
+            icon="i-heroicons-academic-cap"
+            class="bg-white/15 hover:bg-white/25 backdrop-blur ring-1 ring-white/30 text-white"
+          >
+            تصفح الكورسات
+          </UButton>
+        </div>
+      </div>
     </div>
 
-    <!-- Stat Cards -->
-    <div
-      v-if="statsLoading"
-      class="flex justify-center py-10"
-    >
-      <UIcon
-        name="i-heroicons-arrow-path"
-        class="w-8 h-8 text-primary-500 animate-spin"
-      />
-    </div>
-    <div
-      v-else
-      class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8"
-    >
+    <!-- Stat cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div
         v-for="card in statCards"
         :key="card.label"
-        class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700"
+        class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow"
       >
-        <div :class="`w-10 h-10 rounded-lg ${card.iconBg} flex items-center justify-center mb-3`">
-          <UIcon
-            :name="card.icon"
-            :class="`w-5 h-5 ${card.iconColor}`"
-          />
+        <div class="flex items-start justify-between mb-3">
+          <div :class="['w-11 h-11 rounded-xl flex items-center justify-center', card.iconBg]">
+            <UIcon
+              :name="card.icon"
+              :class="['w-5 h-5', card.iconColor]"
+            />
+          </div>
+          <span
+            v-if="card.delta"
+            class="text-[11px] font-bold flex items-center gap-0.5"
+            :class="card.deltaPositive ? 'text-success-600' : 'text-error-600'"
+          >
+            <UIcon
+              :name="card.deltaPositive ? 'i-heroicons-arrow-trending-up' : 'i-heroicons-arrow-trending-down'"
+              class="w-3.5 h-3.5"
+            />
+            {{ card.delta }}
+          </span>
         </div>
-        <p class="text-2xl font-bold text-gray-900 dark:text-white">
-          {{ card.value }}
+        <p class="text-2xl font-bold text-gray-900">
+          {{ statsLoading ? '...' : (card.value ?? '–') }}
         </p>
-        <p class="text-sm text-gray-500 mt-1">
+        <p class="text-xs text-gray-500 mt-1">
           {{ card.label }}
         </p>
       </div>
     </div>
 
-    <!-- Quick Links (school) -->
-    <div
-      v-if="isSchool"
-      class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
-    >
-      <NuxtLink to="/dashboard/students">
-        <div class="bg-primary-50 dark:bg-primary-900/20 rounded-xl p-5 text-center cursor-pointer hover:bg-primary-100 transition-colors">
-          <UIcon
-            name="i-heroicons-user-group"
-            class="w-8 h-8 text-primary-600 mx-auto mb-2"
-          />
-          <p class="font-semibold text-primary-700 dark:text-primary-300 text-sm">
-            إدارة الطلاب
-          </p>
-        </div>
-      </NuxtLink>
-      <NuxtLink to="/dashboard/students/create">
-        <div class="bg-success-50 dark:bg-success-900/20 rounded-xl p-5 text-center cursor-pointer hover:bg-success-100 transition-colors">
-          <UIcon
-            name="i-heroicons-user-plus"
-            class="w-8 h-8 text-success-600 mx-auto mb-2"
-          />
-          <p class="font-semibold text-success-700 dark:text-success-300 text-sm">
-            إضافة طالب
-          </p>
-        </div>
-      </NuxtLink>
-      <NuxtLink to="/dashboard/students/import">
-        <div class="bg-warning-50 dark:bg-warning-900/20 rounded-xl p-5 text-center cursor-pointer hover:bg-warning-100 transition-colors">
-          <UIcon
-            name="i-heroicons-arrow-up-tray"
-            class="w-8 h-8 text-warning-600 mx-auto mb-2"
-          />
-          <p class="font-semibold text-warning-700 dark:text-warning-300 text-sm">
-            استيراد طلاب
-          </p>
-        </div>
-      </NuxtLink>
-      <NuxtLink to="/dashboard/settings">
-        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-5 text-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-          <UIcon
-            name="i-heroicons-cog-6-tooth"
-            class="w-8 h-8 text-gray-600 dark:text-gray-300 mx-auto mb-2"
-          />
-          <p class="font-semibold text-gray-700 dark:text-gray-300 text-sm">
-            الإعدادات
-          </p>
-        </div>
-      </NuxtLink>
-    </div>
+    <!-- Quick actions -->
+    <section class="mb-6">
+      <h2 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1">
+        إجراءات سريعة
+      </h2>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <NuxtLink
+          v-for="action in quickActions"
+          :key="action.to"
+          :to="action.to"
+          class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-primary-200 transition-all p-4 flex items-center gap-3 group"
+        >
+          <div :class="['w-11 h-11 rounded-xl flex items-center justify-center shrink-0', action.iconBg]">
+            <UIcon
+              :name="action.icon"
+              :class="['w-5 h-5', action.iconColor]"
+            />
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm font-bold text-gray-900 group-hover:text-primary-700 transition-colors truncate">
+              {{ action.label }}
+            </p>
+            <p class="text-[11px] text-gray-500 truncate">
+              {{ action.description }}
+            </p>
+          </div>
+        </NuxtLink>
+      </div>
+    </section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Left Column: Tables -->
-      <div class="lg:col-span-2 space-y-6">
-        <!-- Related Students Table -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-          <div class="p-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-            <h2 class="text-lg font-bold text-gray-900 dark:text-white">
-              الطلاب المرتبطين
+    <!-- Two column layout: recent + trending -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <!-- Left: recent students + enrollments -->
+      <div class="lg:col-span-2 space-y-5">
+        <!-- Recent students -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 class="font-bold text-gray-900 flex items-center gap-2">
+              <UIcon
+                name="i-heroicons-user-group"
+                class="w-5 h-5 text-primary-600"
+              />
+              {{ labels.plural }} المضافون مؤخراً
             </h2>
             <NuxtLink
-              v-if="isSchool"
-              to="/dashboard/students"
-              class="text-sm text-primary-600 hover:text-primary-700"
-            >عرض الكل</NuxtLink>
-          </div>
-          <div class="p-0">
-            <UTable
-              :loading="tablesLoading"
-              :columns="studentColumns"
-              :rows="students"
-              :empty-state="{ icon: 'i-heroicons-users', label: 'لا يوجد طلاب مرتبطين' }"
+              :to="labels.detailRoot"
+              class="text-xs font-semibold text-primary-600 hover:text-primary-700"
             >
-              <template #name-data="{ row }">
-                <div class="flex items-center gap-3">
-                  <UAvatar
-                    :alt="row.user?.name"
-                    size="sm"
-                    class="bg-primary-100 text-primary-600"
-                  />
-                  <span class="font-medium text-gray-900 dark:text-white">{{ row.user?.name }}</span>
-                </div>
-              </template>
-              <template #contact-data="{ row }">
-                <div class="text-sm text-gray-500">
-                  <div>{{ row.user?.email }}</div>
-                  <div class="text-xs">
-                    {{ row.user?.phone }}
-                  </div>
-                </div>
-              </template>
-              <template #exam-data="{ row }">
-                <UBadge
-                  color="gray"
-                  variant="soft"
-                >
-                  {{ row.exam?.name || 'غير محدد' }}
-                </UBadge>
-              </template>
-            </UTable>
+              عرض الكل
+            </NuxtLink>
           </div>
+          <div
+            v-if="tablesLoading"
+            class="py-10 text-center"
+          >
+            <UIcon
+              name="i-heroicons-arrow-path"
+              class="w-6 h-6 text-primary-500 animate-spin"
+            />
+          </div>
+          <div
+            v-else-if="!students.length"
+            class="py-10 text-center text-sm text-gray-500"
+          >
+            لا يوجد {{ labels.plural }} مضافين بعد.
+          </div>
+          <ul
+            v-else
+            class="divide-y divide-gray-100"
+          >
+            <li
+              v-for="student in students"
+              :key="student.id"
+              class="flex items-center gap-3 px-5 py-3 hover:bg-gray-50/60 transition-colors"
+            >
+              <NuxtLink
+                :to="`${labels.detailRoot}/${student.id}`"
+                class="flex items-center gap-3 flex-1 min-w-0 group"
+              >
+                <div
+                  class="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0"
+                  :class="student.gender === 'female'
+                    ? 'bg-gradient-to-br from-pink-400 to-pink-600'
+                    : 'bg-gradient-to-br from-primary-500 to-primary-700'"
+                >
+                  {{ initial(student.name) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-bold text-gray-900 truncate group-hover:text-primary-700">
+                    {{ student.name || '—' }}
+                  </p>
+                  <p class="text-xs text-gray-500 truncate">
+                    @{{ student.user_name }}
+                    <span
+                      v-if="student.exam_name"
+                      class="mx-1"
+                    >·</span>
+                    <span v-if="student.exam_name">{{ student.exam_name }}</span>
+                  </p>
+                </div>
+              </NuxtLink>
+              <span class="text-xs text-gray-400 shrink-0">
+                {{ formatDate(student.joined_at || student.created_at) }}
+              </span>
+            </li>
+          </ul>
         </div>
 
-        <!-- Recent Enrollments Table -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-          <div class="p-5 border-b border-gray-100 dark:border-gray-700">
-            <h2 class="text-lg font-bold text-gray-900 dark:text-white">
-              أحدث الاشتراكات
+        <!-- Recent enrollments -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 class="font-bold text-gray-900 flex items-center gap-2">
+              <UIcon
+                name="i-heroicons-clipboard-document-check"
+                class="w-5 h-5 text-primary-600"
+              />
+              أحدث التسجيلات
             </h2>
-          </div>
-          <div class="p-0">
-            <UTable
-              :loading="tablesLoading"
-              :columns="enrollmentColumns"
-              :rows="enrollments"
-              :empty-state="{ icon: 'i-heroicons-rectangle-stack', label: 'لا توجد اشتراكات حديثة' }"
+            <NuxtLink
+              to="/dashboard/enrollments"
+              class="text-xs font-semibold text-primary-600 hover:text-primary-700"
             >
-              <template #student-data="{ row }">
-                <span class="font-medium text-gray-900 dark:text-white">{{ row.user?.name }}</span>
-              </template>
-              <template #course-data="{ row }">
-                <span class="text-gray-600 dark:text-gray-300">{{ row.course?.title || 'دورة محذوفة' }}</span>
-              </template>
-              <template #status-data="{ row }">
-                <UBadge
-                  :color="row.status === 'active' ? 'success' : 'warning'"
-                  variant="soft"
-                >
-                  {{ row.status === 'active' ? 'نشط' : (row.status === 'pending' ? 'قيد الانتظار' : 'ملغى') }}
-                </UBadge>
-              </template>
-              <template #date-data="{ row }">
-                <span class="text-sm text-gray-500">{{ new Date(row.enrolled_at).toLocaleDateString('ar-SA') }}</span>
-              </template>
-            </UTable>
+              عرض الكل
+            </NuxtLink>
           </div>
+          <div
+            v-if="tablesLoading"
+            class="py-10 text-center"
+          >
+            <UIcon
+              name="i-heroicons-arrow-path"
+              class="w-6 h-6 text-primary-500 animate-spin"
+            />
+          </div>
+          <div
+            v-else-if="!enrollments.length"
+            class="py-10 text-center text-sm text-gray-500"
+          >
+            لا توجد تسجيلات بعد.
+          </div>
+          <ul
+            v-else
+            class="divide-y divide-gray-100"
+          >
+            <li
+              v-for="row in enrollments"
+              :key="row.id"
+              class="flex items-center gap-3 px-5 py-3 hover:bg-gray-50/60 transition-colors"
+            >
+              <div class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0 overflow-hidden">
+                <img
+                  v-if="row.course?.image_path"
+                  :src="row.course.image_path"
+                  :alt="row.course.title"
+                  class="w-full h-full object-cover"
+                >
+                <UIcon
+                  v-else
+                  name="i-heroicons-academic-cap"
+                  class="w-5 h-5 text-primary-600"
+                />
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-gray-900 truncate">
+                  {{ row.course?.title || '—' }}
+                </p>
+                <p class="text-xs text-gray-500 truncate">
+                  {{ row.user?.name || '—' }}
+                </p>
+              </div>
+              <UBadge
+                :color="row.status === 'active' ? 'success' : (row.status === 'pending' ? 'warning' : 'error')"
+                variant="soft"
+                size="sm"
+                class="shrink-0"
+              >
+                {{ statusLabel(row.status) }}
+              </UBadge>
+            </li>
+          </ul>
         </div>
       </div>
 
-      <!-- Right Column: Trending Courses -->
-      <div class="space-y-6">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 h-full">
-          <div class="p-5 border-b border-gray-100 dark:border-gray-700">
-            <h2 class="text-lg font-bold text-gray-900 dark:text-white">
-              الدورات الأكثر طلباً
+      <!-- Right: Trending courses -->
+      <aside class="space-y-5">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+            <UIcon
+              name="i-heroicons-fire"
+              class="w-5 h-5 text-secondary-600"
+            />
+            <h2 class="font-bold text-gray-900">
+              الأكثر رواجاً
             </h2>
           </div>
-          <div class="p-5 flex flex-col gap-4">
-            <div
+          <div
+            v-if="statsLoading"
+            class="py-10 text-center"
+          >
+            <UIcon
+              name="i-heroicons-arrow-path"
+              class="w-6 h-6 text-primary-500 animate-spin"
+            />
+          </div>
+          <div
+            v-else-if="!courses.length"
+            class="py-10 text-center text-sm text-gray-500"
+          >
+            لا توجد كورسات حالياً
+          </div>
+          <ul
+            v-else
+            class="divide-y divide-gray-100"
+          >
+            <li
               v-for="course in courses"
               :key="course.id"
-              class="border border-gray-200 dark:border-gray-600 rounded-xl p-4 hover:border-primary-300 transition-colors"
+              class="px-5 py-3 hover:bg-gray-50/60 transition-colors"
             >
-              <h3 class="font-semibold text-gray-900 dark:text-white mb-2 leading-tight">
-                {{ course.name || course.title }}
-              </h3>
-              <div class="flex items-center justify-between mt-auto">
-                <p class="text-xs text-gray-500 flex items-center gap-1">
-                  <UIcon
-                    name="i-heroicons-users"
-                    class="w-4 h-4"
-                  />
-                  {{ course.enrollments_count }} تسجيل
+              <NuxtLink
+                :to="`/dashboard/courses/${course.id}`"
+                class="block group"
+              >
+                <p class="text-sm font-bold text-gray-900 line-clamp-2 group-hover:text-primary-700 transition-colors mb-1.5">
+                  {{ course.title || course.name }}
                 </p>
-                <div class="text-primary-600 font-bold text-sm">
-                  {{ course.price > 0 ? `${course.price} ريال` : 'مجاني' }}
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-gray-500 flex items-center gap-1">
+                    <UIcon
+                      name="i-heroicons-users"
+                      class="w-3.5 h-3.5"
+                    />
+                    {{ course.enrollments_count || 0 }} مشترك
+                  </span>
+                  <span class="text-sm font-bold text-primary-700">
+                    {{ course.price > 0 ? `${course.price} ر.س` : 'مجاني' }}
+                  </span>
                 </div>
-              </div>
-            </div>
-
-            <div
-              v-if="!courses.length && !statsLoading"
-              class="text-center py-8 text-gray-500"
+              </NuxtLink>
+            </li>
+          </ul>
+          <div class="px-5 py-3 border-t border-gray-100 bg-gray-50/40">
+            <UButton
+              to="/dashboard/courses"
+              variant="ghost"
+              color="primary"
+              size="sm"
+              block
+              icon="i-heroicons-arrow-left"
+              class="rtl:[&>span:first-child]:rotate-180"
             >
-              لا توجد دورات حالياً
-            </div>
+              تصفح كل الكورسات
+            </UButton>
           </div>
         </div>
-      </div>
+      </aside>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth'
-import { statsService } from '@/services/api/stats.service'
-import { studentService } from '@/services/api/student.service'
+import { dashboardService } from '@/services/api/dashboard.service'
 
 definePageMeta({
   layout: 'dashboard',
@@ -240,7 +356,8 @@ definePageMeta({
 useSeoMeta({ title: 'لوحة التحكم | A Plus' })
 
 const authStore = useAuthStore()
-const isSchool = computed(() => authStore.isSchool)
+const labels = useEntityLabels()
+const user = computed(() => authStore.getUser)
 
 const statsData = ref<any>(null)
 const courses = ref<any[]>([])
@@ -250,89 +367,138 @@ const enrollments = ref<any[]>([])
 const statsLoading = ref(true)
 const tablesLoading = ref(true)
 
+const greeting = computed(() => {
+  const hour = new Date().getHours()
+  if (hour < 5) return 'مساء الخير'
+  if (hour < 12) return 'صباح الخير'
+  if (hour < 18) return 'مساء النور'
+  return 'مساء الخير'
+})
+
+const roleSubtitle = computed(() => {
+  if (authStore.isSchool) return 'لوحة تحكم المدرسة — متابعة الطلاب والتسجيلات'
+  if (authStore.isParent) return 'لوحة متابعة ولي الأمر — متابعة أبنائك ودوراتهم'
+  return 'لوحة التحكم'
+})
+
 const statCards = computed(() => [
   {
-    label: 'إجمالي الطلاب',
-    value: statsData.value?.total_students ?? '–',
+    label: `إجمالي ${labels.value.plural}`,
+    value: statsData.value?.total_students,
     icon: 'i-heroicons-user-group',
-    iconBg: 'bg-primary-100',
-    iconColor: 'text-primary-600'
+    iconBg: 'bg-primary-50',
+    iconColor: 'text-primary-600',
+    delta: statsData.value?.new_students_last_month
+      ? `+${statsData.value.new_students_last_month} هذا الشهر`
+      : null,
+    deltaPositive: true
   },
   {
-    label: 'الدورات النشطة',
-    value: statsData.value?.total_courses ?? '–',
-    icon: 'i-heroicons-book-open',
-    iconBg: 'bg-success-100',
+    label: 'الكورسات النشطة',
+    value: statsData.value?.total_courses,
+    icon: 'i-heroicons-academic-cap',
+    iconBg: 'bg-success-50',
     iconColor: 'text-success-600'
   },
   {
-    label: 'متوسط التقدم',
-    value: statsData.value?.average_progress ? `${statsData.value.average_progress}%` : '–',
-    icon: 'i-heroicons-chart-bar',
-    iconBg: 'bg-warning-100',
-    iconColor: 'text-warning-600'
+    label: 'تسجيلات نشطة',
+    value: statsData.value?.active_enrollments,
+    icon: 'i-heroicons-clipboard-document-check',
+    iconBg: 'bg-secondary-50',
+    iconColor: 'text-secondary-600',
+    delta: statsData.value?.new_enrollments_this_week
+      ? `+${statsData.value.new_enrollments_this_week} هذا الأسبوع`
+      : null,
+    deltaPositive: true
   },
   {
     label: 'اشتراكات نشطة',
-    value: statsData.value?.active_enrollments ?? '–',
-    icon: 'i-heroicons-check-circle',
-    iconBg: 'bg-info-100',
+    value: statsData.value?.active_subscriptions,
+    icon: 'i-heroicons-credit-card',
+    iconBg: 'bg-info-50',
     iconColor: 'text-info-600'
   }
 ])
 
-const studentColumns = [
-  { key: 'name', id: 'name', label: 'الطالب' },
-  { key: 'contact', id: 'contact', label: 'معلومات التواصل' },
-  { key: 'exam', id: 'exam', label: 'نوع الاختبار' }
-]
+const quickActions = computed(() => [
+  {
+    label: `إدارة ${labels.value.plural}`,
+    description: `قائمة ${labels.value.plural} وملفاتهم`,
+    to: labels.value.detailRoot,
+    icon: 'i-heroicons-users',
+    iconBg: 'bg-primary-50',
+    iconColor: 'text-primary-600'
+  },
+  {
+    label: 'الكورسات',
+    description: 'تصفح وأشرك في كورسات',
+    to: '/dashboard/courses',
+    icon: 'i-heroicons-academic-cap',
+    iconBg: 'bg-success-50',
+    iconColor: 'text-success-600'
+  },
+  {
+    label: 'التسجيلات',
+    description: 'حالة جميع التسجيلات',
+    to: '/dashboard/enrollments',
+    icon: 'i-heroicons-clipboard-document-check',
+    iconBg: 'bg-secondary-50',
+    iconColor: 'text-secondary-600'
+  },
+  {
+    label: 'الاشتراكات',
+    description: 'باقات النقاط والاشتراكات',
+    to: '/dashboard/subscriptions',
+    icon: 'i-heroicons-credit-card',
+    iconBg: 'bg-warning-50',
+    iconColor: 'text-warning-600'
+  }
+])
 
-const enrollmentColumns = [
-  { key: 'student', id: 'student', label: 'الطالب' },
-  { key: 'course', id: 'course', label: 'الدورة' },
-  { key: 'status', id: 'status', label: 'الحالة' },
-  { key: 'date', id: 'date', label: 'تاريخ الاشتراك' }
-]
+// Students render <DashboardStudentHome>; only school/parent need this bundle.
+onMounted(() => {
+  if (!authStore.isStudent) loadDashboard()
+})
 
-onMounted(async () => {
+async function loadDashboard() {
+  statsLoading.value = true
+  tablesLoading.value = true
   try {
-    // 1. Fetch top level stats and courses
-    const [statsRes, coursesRes] = await Promise.all([
-      statsService.platformStats(),
-      statsService.trendingCourses(5) // Get for both parent & school
-    ])
-    statsData.value = statsRes.data?.data
-    courses.value = coursesRes?.data?.data || []
+    const res = await dashboardService.bundle()
+    const data = res.data?.data ?? res.data ?? {}
+
+    statsData.value = data.stats ?? null
+    courses.value = data.trending_courses ?? []
+    students.value = data.recent_students ?? []
+    enrollments.value = data.recent_enrollments ?? []
   } catch (err) {
-    console.error('Stats Error', err)
+    console.error('Dashboard load error', err)
   } finally {
     statsLoading.value = false
-  }
-
-  try {
-    // 2. Fetch tabular data
-    const [studentsRes, enrollmentsRes] = await Promise.all([
-      studentService.list({ per_page: 5 }), // Show recent 5 students max
-      statsService.enrollments(1) // Show page 1 explicitly
-    ])
-
-    console.log('--- Raw Students Response ---', studentsRes.data)
-    console.log('--- Raw Enrollments Response ---', enrollmentsRes.data)
-
-    // studentsRes.data.data is the payload from successResponse.
-    // Inside it, Resource::collection()->response()->getData(true) creates another 'data' array.
-    students.value = studentsRes.data?.data?.data || []
-
-    // enrollmentsRes.data.data is the payload from successResponse.
-    // Inside it, paginate()->toArray() creates another 'data' array.
-    enrollments.value = enrollmentsRes.data?.data?.data || []
-
-    console.log('=> Parsed Students Array:', students.value)
-    console.log('=> Parsed Enrollments Array:', enrollments.value)
-  } catch (err) {
-    console.error('Tables Error', err)
-  } finally {
     tablesLoading.value = false
   }
-})
+}
+
+function statusLabel(status?: string) {
+  if (status === 'active') return 'نشط'
+  if (status === 'pending') return 'معلّق'
+  if (status === 'expired') return 'منتهي'
+  if (status === 'cancelled') return 'ملغي'
+  return status || '—'
+}
+
+function initial(name?: string) {
+  return (name?.trim()?.charAt(0) ?? 'A').toUpperCase()
+}
+
+function formatDate(iso?: string) {
+  if (!iso) return ''
+  try {
+    return new Date(iso).toLocaleDateString('ar-EG', {
+      month: 'short', day: 'numeric'
+    })
+  } catch {
+    return ''
+  }
+}
 </script>

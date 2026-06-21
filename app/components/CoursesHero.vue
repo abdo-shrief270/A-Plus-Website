@@ -34,8 +34,7 @@
             placeholder="ابحث عن دورة تدريبية..."
             class="w-full shadow-2xl"
             :ui="{
-              base: 'pl-16 pr-6 py-4 rounded-2xl bg-white dark:bg-gray-800 border-none ring-0 focus:ring-2 focus:ring-[#009688] transition-all',
-              placeholder: 'text-gray-400'
+              base: 'pl-16 pr-6 py-4 rounded-2xl bg-white dark:bg-gray-800 border-none ring-0 focus:ring-2 focus:ring-[#009688] transition-all'
             }"
             @update:model-value="onSearch"
           >

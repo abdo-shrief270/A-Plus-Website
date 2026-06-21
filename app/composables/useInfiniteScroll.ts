@@ -15,10 +15,10 @@ export function useInfiniteScroll<T>(fetchFn: (page: number) => Promise<any>) {
     try {
       const nextPage = currentPage.value + 1
       const result = await fetchFn(nextPage)
-      
+
       const newItems = result?.questions || result?.data || []
       items.value = [...items.value, ...newItems]
-      
+
       const pagination = result?.pagination || result?.meta
       if (pagination) {
         currentPage.value = pagination.current_page

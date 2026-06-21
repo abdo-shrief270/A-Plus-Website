@@ -29,7 +29,10 @@
       class="text-center py-12 border-t border-gray-50 dark:border-gray-800 mt-6"
     >
       <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-50 dark:bg-gray-800 text-gray-400 text-xs font-semibold">
-        <UIcon name="i-heroicons-check-circle" class="w-4 h-4 text-green-500" />
+        <UIcon
+          name="i-heroicons-check-circle"
+          class="w-4 h-4 text-green-500"
+        />
         تم الوصول إلى نهاية القائمة
       </div>
     </div>

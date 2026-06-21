@@ -212,12 +212,12 @@ async function fetchQuestions() {
 function getDifficultyColor(difficulty: string) {
   switch (difficulty?.toLowerCase()) {
     case 'easy':
-      return 'emerald'
+      return 'success'
     case 'hard':
-      return 'red'
+      return 'error'
     case 'medium':
     default:
-      return 'orange'
+      return 'warning'
   }
 }
 </script>

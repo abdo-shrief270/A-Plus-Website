@@ -44,7 +44,7 @@
                 {{ device.device_name || device.name || "جهاز غير معروف" }}
                 <UBadge
                   v-if="device.is_current"
-                  color="emerald"
+                  color="success"
                   variant="subtle"
                   size="xs"
                 >
@@ -52,12 +52,10 @@
                 </UBadge>
               </p>
               <p class="text-xs text-gray-500 mt-1">
-                {{ device.platform || "منصة غير معروفة" }} ·
-                {{ device.browser || "متصفح غير معروف" }}
+                {{ device.platform || "منصة غير معروفة" }}
               </p>
               <p class="text-xs text-gray-400 mt-0.5">
-                آخر نشاط:
-                {{ device.last_active_at || device.updated_at || "غير محدد" }}
+                آخر نشاط: {{ formatLastActive(device.last_login_at || device.updated_at) }}
               </p>
             </div>
           </div>
@@ -65,7 +63,7 @@
           <UButton
             v-if="!device.is_current"
             size="sm"
-            color="red"
+            color="error"
             variant="ghost"
             icon="i-heroicons-x-mark"
             :loading="revokingId === device.id"
@@ -100,6 +98,13 @@ useSeoMeta({ title: 'الأجهزة | A Plus' })
 const loading = ref(true)
 const revokingId = ref<number | null>(null)
 const devices = ref<any[]>([])
+
+function formatLastActive(value?: string | null) {
+  if (!value) return 'غير محدد'
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return 'غير محدد'
+  return d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
 
 onMounted(async () => {
   try {

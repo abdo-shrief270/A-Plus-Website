@@ -27,9 +27,9 @@
               @update:model-value="updateFilter('sortBy', $event)"
             />
           </div>
-          
+
           <div class="hidden h-6 w-[1px] bg-gray-200 sm:block dark:bg-gray-800" />
-          
+
           <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
             {{ totalResults }} دورة تدريبية
           </div>

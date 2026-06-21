@@ -21,10 +21,14 @@ export type PaginatedApiResponse<T> = ApiResponse<PaginatedData<T>>
 export interface Exam {
   id: number
   name: string
+  name_ar?: string
   slug: string
   description?: string
   image?: string
   is_active?: boolean
+  type?: string
+  subjects_count?: number
+  sections_count?: number
   sections?: Section[]
 }
 
@@ -32,6 +36,12 @@ export interface Section {
   id: number
   name: string
   categories?: Category[]
+}
+
+export interface Subject {
+  id: number
+  name: string
+  questions_count?: number
 }
 
 export interface Category {
@@ -55,8 +65,8 @@ export interface Question {
   difficulty: 'easy' | 'medium' | 'hard'
   is_new: boolean
   comparison?: {
-    value_1: { text: string; image_path: string | null }
-    value_2: { text: string; image_path: string | null }
+    value_1: { text: string, image_path: string | null }
+    value_2: { text: string, image_path: string | null }
   } | null
   explanation: {
     text: string
@@ -65,10 +75,16 @@ export interface Question {
   }
   answers: Answer[]
   belongs_to?: {
-    exam?: { id: number; name: string }
-    section?: { id: number; name: string }
-    category?: { id: number; name: string }
-    article?: { id: number; title: string } | null
+    exam?: { id: number, name: string }
+    section?: { id: number, name: string }
+    category?: { id: number, name: string }
+    article?: { id: number, title: string } | null
+  } | null
+  // Current API field (QuestionDetailResource) — supersedes belongs_to.
+  breadcrumb?: {
+    section?: { id: number, name: string } | null
+    category?: { id: number, name: string } | null
+    article?: { id: number, title: string } | null
   } | null
   type: {
     id: number
@@ -80,6 +96,8 @@ export interface QuestionSubmissionResult {
   is_correct: boolean
   score_earned: number
   correct_answer?: number // ID of the correct answer
+  balance?: number | null // wallet points balance after the (idempotent) charge
+  total_score?: number | null // league score after any award
 }
 
 export interface Article {
@@ -95,7 +113,7 @@ export interface Article {
     section: {
       id: number
       name: string
-      exam: { id: number; name: string }
+      exam: { id: number, name: string }
     }
   }
 }
@@ -106,7 +124,7 @@ export interface PracticeExam {
   description?: string
   duration_minutes: number
   total_questions: number
-  exam: { id: number; name: string }
+  exam: { id: number, name: string }
   questions?: Question[]
 }
 

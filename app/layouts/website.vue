@@ -97,12 +97,6 @@ const menuItems = [
     icon: 'i-heroicons-trophy'
   },
   {
-    id: 'review',
-    route: '/review',
-    label: 'مراجعة',
-    icon: 'i-heroicons-book-open'
-  },
-  {
     id: 'courses',
     route: '/courses',
     label: 'الدورات',

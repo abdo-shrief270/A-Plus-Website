@@ -15,6 +15,7 @@ export const useQuestionsStore = defineStore('questions', () => {
   const recentQuestions = ref<Question[]>([])
   const searchResults = ref<Question[]>([])
   const categoryQuestions = ref<Question[]>([])
+  const subjectQuestions = ref<Question[]>([])
   const currentQuestion = ref<Question | null>(null)
 
   // Articles State
@@ -27,12 +28,14 @@ export const useQuestionsStore = defineStore('questions', () => {
 
   // Category State
   const currentCategory = ref<Record<string, unknown> | null>(null)
+  const currentSubject = ref<Record<string, unknown> | null>(null)
 
   // Pagination State
   const trendingPagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
   const recentPagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
   const searchPagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
   const categoryPagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
+  const subjectPagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
   const articlePagination = ref<Pagination>({ current_page: 1, per_page: 15, total: 0, last_page: 1 })
 
   const isLoading = ref(false)
@@ -147,6 +150,42 @@ export const useQuestionsStore = defineStore('questions', () => {
   /**
    * GET /categories/{id}/questions
    */
+  const fetchSubjectQuestions = async (subjectId: number | string, params: { paginate?: boolean, per_page?: number, page?: number } = {}, append = false) => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const queryParams = { ...params }
+      if (typeof queryParams.paginate === 'boolean') {
+        queryParams.paginate = queryParams.paginate ? (1 as any) : (0 as any)
+      }
+
+      const subjectApi = new useApi(`subjects/${subjectId}/questions`, 'v2')
+      const result = await subjectApi.get(queryParams) as Record<string, unknown>
+
+      const questions = (result?.questions as Question[]) || []
+      const paginationData = result?.pagination as Pagination
+      const subjectData = result?.subject as Record<string, unknown>
+
+      if (append) {
+        subjectQuestions.value = [...subjectQuestions.value, ...questions]
+      } else {
+        subjectQuestions.value = questions
+      }
+
+      if (subjectData) currentSubject.value = subjectData
+
+      if (paginationData) {
+        subjectPagination.value = paginationData
+      }
+      return result
+    } catch (err: unknown) {
+      error.value = (err as any).response?.data?.message || 'Failed to fetch subject questions'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const fetchCategoryQuestions = async (categoryId: number | string, params: { paginate?: boolean, per_page?: number, page?: number } = {}, append = false) => {
     isLoading.value = true
     error.value = null
@@ -295,16 +334,19 @@ export const useQuestionsStore = defineStore('questions', () => {
     recentQuestions,
     searchResults,
     categoryQuestions,
+    subjectQuestions,
     currentQuestion,
     categoryArticles,
     currentArticle,
     articleQuestions,
     trendingCourses,
     currentCategory,
+    currentSubject,
     trendingPagination,
     recentPagination,
     searchPagination,
     categoryPagination,
+    subjectPagination,
     articlePagination,
     isLoading,
     error,
@@ -315,6 +357,7 @@ export const useQuestionsStore = defineStore('questions', () => {
     searchQuestions,
     fetchQuestionById,
     fetchCategoryQuestions,
+    fetchSubjectQuestions,
     fetchCategoryArticles,
     fetchArticleById,
     fetchArticleQuestions,

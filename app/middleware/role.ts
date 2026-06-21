@@ -1,4 +1,8 @@
-// Role middleware: ensures only school and parent can access /dashboard routes
+/**
+ * Role middleware: lets every authenticated role (student, parent, school)
+ * into the dashboard. Per-page nav and content are gated by role inside the
+ * dashboard itself, not by routing.
+ */
 export default defineNuxtRouteMiddleware(() => {
   const token = useCookie('APlus-token')
   const userType = useCookie('APlus-type')
@@ -8,17 +12,11 @@ export default defineNuxtRouteMiddleware(() => {
   }
 
   const type = userType.value?.toLowerCase()
+  const allowed = ['student', 'parent', 'school']
 
-  // Students are redirected to their home page
-  if (type === 'student') {
-    return navigateTo('/')
-  }
-
-  // school and parent are allowed onto the dashboard
-  if (type === 'school' || type === 'parent') {
+  if (type && allowed.includes(type)) {
     return
   }
 
-  // Unknown role — back to login
   return navigateTo('/auth/login')
 })

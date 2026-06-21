@@ -174,8 +174,12 @@ html.lenis body {
   pointer-events: none;
 }
 
-/* Force white text on primary buttons */
-button[class*="bg-primary"],
-a[class*="bg-primary"] {
+/* Force white text on SOLID primary buttons only — not soft (bg-primary-50/100) */
+button.bg-primary, a.bg-primary,
+button[class*="bg-primary-500"], a[class*="bg-primary-500"],
+button[class*="bg-primary-600"], a[class*="bg-primary-600"],
+button[class*="bg-primary-700"], a[class*="bg-primary-700"],
+button[class*="bg-primary-800"], a[class*="bg-primary-800"],
+button[class*="bg-primary-900"], a[class*="bg-primary-900"] {
   color: white !important;
 }

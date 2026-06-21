@@ -1,11 +1,26 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { Pagination } from '~/types/question-bank'
 
-export function usePagination(defaultPerPage = 15) {
+interface PaginationOptions {
+  perPage?: number
+  /** Called whenever the current page changes (e.g. to refetch). */
+  onPageChange?: (page: number) => void
+}
+
+/**
+ * Accepts either a perPage number (legacy) or an options object with an
+ * `onPageChange` callback that fires whenever the page changes.
+ */
+export function usePagination(arg: number | PaginationOptions = 15) {
+  const options: PaginationOptions = typeof arg === 'number' ? { perPage: arg } : arg
   const currentPage = ref(1)
-  const perPage = ref(defaultPerPage)
+  const perPage = ref(options.perPage ?? 15)
   const total = ref(0)
   const lastPage = ref(1)
+
+  if (options.onPageChange) {
+    watch(currentPage, page => options.onPageChange!(page))
+  }
 
   const setPagination = (meta: Pagination) => {
     currentPage.value = meta.current_page

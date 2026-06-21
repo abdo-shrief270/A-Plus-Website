@@ -10,6 +10,6 @@ export const showToast = (
     title: summary,
     description: detail,
     color: severity,
-    timeout: duration
+    duration
   })
 }

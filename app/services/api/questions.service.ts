@@ -27,6 +27,30 @@ export const questionsService = {
     return axios.get(`/${VERSION}/questions/${questionId}`)
   },
 
+  /** GET /v2/questions/{question}/correct-answer - Lightweight correct-answer fetch */
+  getCorrectAnswer: (questionId: number | string) => {
+    const axios = createAxiosInstance()
+    return axios.get(`/${VERSION}/questions/${questionId}/correct-answer`)
+  },
+
+  /** POST /v2/questions/{question}/bookmark - Toggle bookmark on a question */
+  toggleBookmark: (questionId: number | string) => {
+    const axios = createAxiosInstance()
+    return axios.post(`/${VERSION}/questions/${questionId}/bookmark`)
+  },
+
+  /** GET /v2/bookmarks - List the student's bookmarked questions */
+  listBookmarks: (params?: Record<string, any>) => {
+    const axios = createAxiosInstance()
+    return axios.get(`/${VERSION}/bookmarks`, { params })
+  },
+
+  /** GET /v2/revision/metrics - Big metrics + per-category progress for the revision page */
+  getRevisionMetrics: () => {
+    const axios = createAxiosInstance()
+    return axios.get(`/${VERSION}/revision/metrics`)
+  },
+
   /** GET /v2/subjects/{subject}/questions - Get Questions by Subject (أسئلة مادة معينة) */
   getSubjectQuestions: (subjectId: number | string, params?: Record<string, any>) => {
     const axios = createAxiosInstance()

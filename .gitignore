@@ -4,6 +4,10 @@
 .nitro
 .cache
 dist
+.output
+
+# Stray build dir from a misdirected port-named run
+/3001/
 
 
 # Node dependencies

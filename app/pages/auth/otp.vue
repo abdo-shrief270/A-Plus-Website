@@ -106,7 +106,9 @@ function onBackspace(index: number) {
 function onPaste(e: ClipboardEvent) {
   const text = e.clipboardData?.getData('text') ?? ''
   const digits = text.replace(/\D/g, '').slice(0, 6).split('')
-  digits.forEach((d, i) => { otpDigits[i] = d })
+  digits.forEach((d, i) => {
+    otpDigits[i] = d
+  })
   otpRefs[Math.min(digits.length, 5)]?.focus()
 }
 

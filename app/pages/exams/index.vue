@@ -24,8 +24,7 @@
             placeholder="ابحث عن اختبار (مثلاً: الصف الأول الثانوي)"
             icon="i-heroicons-magnifying-glass"
             :ui="{
-              base: 'rounded-2xl border-none ring-1 ring-white/10 bg-white/10 backdrop-blur-md text-white placeholder-gray-400 focus:ring-primary-500 text-lg py-4',
-              icon: { trailing: { pointer: '' } }
+              base: 'rounded-2xl border-none ring-1 ring-white/10 bg-white/10 backdrop-blur-md text-white placeholder-gray-400 focus:ring-primary-500 text-lg py-4'
             }"
           />
         </div>
@@ -35,7 +34,7 @@
     <!-- Content -->
     <div class="container mx-auto px-4 py-12 -mt-8 relative z-10">
       <div
-        v-if="examsStore.isLoading && examsStore.exams.length === 0"
+        v-if="examsStore.loadingExams && examsStore.exams.length === 0"
         class="flex flex-col items-center justify-center py-20"
       >
         <UIcon
@@ -144,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import { useExamsStore } from '@/stores/useExamsStore'
+import { useAcademicStore } from '@/stores/academic'
 
 // Public page, no auth middleware
 definePageMeta({ layout: 'default' })
@@ -153,7 +152,7 @@ useSeoMeta({
   description: 'تصفح قائمة الاختبارات والمراحل الدراسية المتوفرة في بنك الأسئلة A Plus. تدرب على آلاف الأسئلة الموثقة.'
 })
 
-const examsStore = useExamsStore()
+const examsStore = useAcademicStore()
 const search = ref('')
 
 const filteredExams = computed(() =>
@@ -164,9 +163,7 @@ const filteredExams = computed(() =>
   )
 )
 
-onMounted(async () => {
-  if (examsStore.exams.length === 0) {
-    await examsStore.fetchExams()
-  }
+onMounted(() => {
+  examsStore.fetchExams()
 })
 </script>

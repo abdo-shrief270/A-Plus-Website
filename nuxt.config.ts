@@ -23,14 +23,14 @@ export default defineNuxtConfig({
   },
 
   colorMode: {
-    preference: 'dark',
-    fallback: 'dark',
+    preference: 'light',
+    fallback: 'light',
     classSuffix: ''
   },
 
   ui: {
     theme: {
-      colors: ['primary', 'error', 'warning', 'success', 'info'],
+      colors: ['primary', 'secondary', 'error', 'warning', 'success', 'info'],
       transitions: true,
       defaultVariants: {
         color: 'neutral',
@@ -51,6 +51,12 @@ export default defineNuxtConfig({
     compressPublicAssets: true
   },
 
+  vite: {
+    server: {
+      allowedHosts: true
+    }
+  },
+
   eslint: {
     config: {
       stylistic: {
@@ -65,7 +71,6 @@ export default defineNuxtConfig({
       { code: 'ar', name: 'العربية', file: 'ar.ts', dir: 'rtl' }
     ],
     defaultLocale: 'ar',
-    lazy: true,
     langDir: '../locales',
     strategy: 'no_prefix'
   }

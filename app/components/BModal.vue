@@ -5,8 +5,6 @@
   >
     <UCard
       :ui="{
-        ring: '',
-        divide: 'divide-y divide-gray-100 dark:divide-gray-800',
         header: 'px-6 py-4',
         body: 'p-6',
         footer: 'px-6 py-4'

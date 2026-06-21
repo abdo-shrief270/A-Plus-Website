@@ -12,7 +12,7 @@
       >
       <!-- Overlay Gradient -->
       <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      
+
       <!-- Level Badge -->
       <div class="absolute right-3 top-3">
         <UBadge
@@ -37,11 +37,17 @@
       <!-- Category/Top Info -->
       <div class="mb-2 flex items-center justify-between">
         <div class="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-          <UIcon name="i-heroicons-user-group" class="h-4 w-4" />
+          <UIcon
+            name="i-heroicons-user-group"
+            class="h-4 w-4"
+          />
           <span>{{ course.enrollments_count }} طالب</span>
         </div>
         <div class="flex items-center gap-1">
-          <UIcon name="i-heroicons-star-solid" class="h-4 w-4 text-amber-400" />
+          <UIcon
+            name="i-heroicons-star-solid"
+            class="h-4 w-4 text-amber-400"
+          />
           <span class="text-xs font-bold text-gray-700 dark:text-gray-200">{{ course.rating }}</span>
         </div>
       </div>
@@ -55,13 +61,19 @@
       <div class="mt-auto grid grid-cols-2 gap-3 border-t border-gray-50 pt-4 dark:border-gray-800">
         <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800">
-            <UIcon name="i-heroicons-clock" class="h-4 w-4 text-[#009688]" />
+            <UIcon
+              name="i-heroicons-clock"
+              class="h-4 w-4 text-[#009688]"
+            />
           </div>
           <span>{{ course.total_hours }} ساعة</span>
         </div>
         <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800">
-            <UIcon name="i-heroicons-play-circle" class="h-4 w-4 text-[#009688]" />
+            <UIcon
+              name="i-heroicons-play-circle"
+              class="h-4 w-4 text-[#009688]"
+            />
           </div>
           <span>{{ course.lectures_count }} محاضرة</span>
         </div>
@@ -93,9 +105,9 @@ defineEmits(['enroll'])
 
 const levelColor = computed(() => {
   switch (props.course.level) {
-    case 'beginner': return 'emerald'
-    case 'intermediate': return 'amber'
-    case 'advanced': return 'rose'
+    case 'beginner': return 'success'
+    case 'intermediate': return 'warning'
+    case 'advanced': return 'error'
     default: return 'primary'
   }
 })

@@ -6,7 +6,12 @@ export const settingsService = {
   /** GET /v2/settings - Get Platform Configuration Settings (إعدادات المنصة) */
   getSettings: (params?: Record<string, any>) => {
     const axios = createAxiosInstance()
-    // Optional query parameter: ?group=... can be passed
     return axios.get(`/${VERSION}/settings`, { params })
+  },
+
+  /** GET /v2/settings/{key} - Single setting by its key (e.g. page_about) */
+  getByKey: (key: string) => {
+    const axios = createAxiosInstance()
+    return axios.get(`/${VERSION}/settings/${key}`)
   }
 }
