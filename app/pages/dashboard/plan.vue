@@ -203,7 +203,7 @@
 
               <div class="space-y-2">
                 <component
-                  :is="lesson.is_locked ? 'div' : resolveComponent('NuxtLink')"
+                  :is="lesson.is_locked ? 'div' : NuxtLinkComponent"
                   v-for="lesson in day.lessons"
                   :key="lesson.lesson_id"
                   :to="lesson.is_locked ? undefined : `/dashboard/lessons/${lesson.lesson_id}`"
@@ -278,6 +278,11 @@ import type { StudyPlan, StudyPlanDay, StudyPlanWeek, LessonStatus } from '@/typ
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth'], title: 'الخطة الدراسية' })
 useSeoMeta({ title: 'الخطة الدراسية | A Plus' })
+
+// Resolve the real NuxtLink component object here (in setup) — binding the
+// string 'NuxtLink' to <component :is> can fall back to a plain <nuxtlink>
+// element that renders no <a> and never navigates.
+const NuxtLinkComponent = resolveComponent('NuxtLink')
 
 const loading = ref(true)
 const regenerating = ref(false)

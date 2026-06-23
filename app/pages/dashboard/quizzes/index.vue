@@ -673,6 +673,66 @@
         </UButton>
       </div>
     </div>
+
+    <!-- Share challenge code -->
+    <UModal
+      v-model:open="shareOpen"
+      :ui="{ content: 'sm:max-w-md' }"
+    >
+      <template #content>
+        <div
+          dir="rtl"
+          class="p-6 text-center"
+        >
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-secondary-50 flex items-center justify-center mb-4">
+            <UIcon
+              name="i-heroicons-user-plus"
+              class="w-7 h-7 text-secondary-600"
+            />
+          </div>
+          <h3 class="text-lg font-black text-gray-900 mb-1">
+            تم إنشاء التحدّي
+          </h3>
+          <p class="text-sm text-gray-500 mb-5">
+            شارك هذا الرمز مع صديقك لينضمّ إلى نفس التحدّي
+          </p>
+
+          <div class="flex items-center justify-center gap-2 mb-2">
+            <code class="font-mono font-black text-2xl tracking-[0.3em] text-secondary-700 bg-secondary-50 rounded-xl px-5 py-3 select-all">{{ createdCode }}</code>
+            <UButton
+              :icon="codeCopied ? 'i-heroicons-check' : 'i-heroicons-clipboard-document'"
+              :color="codeCopied ? 'success' : 'neutral'"
+              variant="soft"
+              size="lg"
+              square
+              @click="copyCreatedCode"
+            />
+          </div>
+          <p class="h-5 text-xs text-success-600 mb-4">
+            {{ codeCopied ? 'تم نسخ الرمز ✓' : '' }}
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <UButton
+              block
+              color="neutral"
+              variant="ghost"
+              @click="shareOpen = false"
+            >
+              لاحقاً
+            </UButton>
+            <UButton
+              block
+              color="secondary"
+              icon="i-heroicons-play"
+              @click="startCreatedChallenge"
+            >
+              ابدأ التحدّي الآن
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
@@ -913,14 +973,38 @@ async function createChallenge() {
     }
     const session = body?.data?.session
     if (session?.id) {
-      showToast('تم إنشاء التحدّي', `شارك الرمز: ${body.data.invite_code}`, 'success')
-      navigateTo(`/dashboard/quizzes/${session.id}`)
+      // Show the code in a copyable dialog (not just a fleeting toast) so it
+      // can actually be shared; the quiz starts when the creator confirms.
+      createdCode.value = body.data.invite_code
+      createdSessionId.value = session.id
+      codeCopied.value = false
+      shareOpen.value = true
     }
   } catch (err) {
     console.error('Failed to create challenge', err)
   } finally {
     creatingChallenge.value = false
   }
+}
+
+const shareOpen = ref(false)
+const createdCode = ref('')
+const createdSessionId = ref<number | null>(null)
+const codeCopied = ref(false)
+
+async function copyCreatedCode() {
+  try {
+    await navigator.clipboard.writeText(createdCode.value)
+    codeCopied.value = true
+    setTimeout(() => (codeCopied.value = false), 1500)
+  } catch {
+    // clipboard unavailable — the code is still shown for manual copy
+  }
+}
+
+function startCreatedChallenge() {
+  shareOpen.value = false
+  if (createdSessionId.value) navigateTo(`/dashboard/quizzes/${createdSessionId.value}`)
 }
 
 async function joinChallenge() {
