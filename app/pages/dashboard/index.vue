@@ -237,7 +237,7 @@
                 <img
                   v-if="row.course?.image_path"
                   :src="row.course.image_path"
-                  :alt="row.course.title"
+                  :alt="row.course.title ?? ''"
                   class="w-full h-full object-cover"
                 >
                 <UIcon
@@ -319,7 +319,7 @@
                     {{ course.enrollments_count || 0 }} مشترك
                   </span>
                   <span class="text-sm font-bold text-primary-700">
-                    {{ course.price > 0 ? `${course.price} ر.س` : 'مجاني' }}
+                    {{ (course.price ?? 0) > 0 ? `${course.price} ر.س` : 'مجاني' }}
                   </span>
                 </div>
               </NuxtLink>
@@ -348,6 +348,47 @@
 import { useAuthStore } from '@/stores/auth'
 import { dashboardService } from '@/services/api/dashboard.service'
 
+interface DashboardStats {
+  total_students?: number
+  new_students_last_month?: number
+  total_courses?: number
+  active_enrollments?: number
+  new_enrollments_this_week?: number
+  active_subscriptions?: number
+}
+
+interface TrendingCourse {
+  id: number
+  title?: string | null
+  name?: string | null
+  enrollments_count?: number | null
+  price?: number | null
+}
+
+interface RecentStudent {
+  id: number
+  name?: string | null
+  user_name?: string | null
+  gender?: string | null
+  exam_name?: string | null
+  joined_at?: string | null
+  created_at?: string | null
+}
+
+interface RecentEnrollment {
+  id: number
+  status?: string | null
+  user?: { name?: string | null } | null
+  course?: { title?: string | null, image_path?: string | null } | null
+}
+
+interface DashboardBundle {
+  stats?: DashboardStats | null
+  trending_courses?: TrendingCourse[]
+  recent_students?: RecentStudent[]
+  recent_enrollments?: RecentEnrollment[]
+}
+
 definePageMeta({
   layout: 'dashboard',
   middleware: ['auth', 'role']
@@ -359,10 +400,10 @@ const authStore = useAuthStore()
 const labels = useEntityLabels()
 const user = computed(() => authStore.getUser)
 
-const statsData = ref<any>(null)
-const courses = ref<any[]>([])
-const students = ref<any[]>([])
-const enrollments = ref<any[]>([])
+const statsData = ref<DashboardStats | null>(null)
+const courses = ref<TrendingCourse[]>([])
+const students = ref<RecentStudent[]>([])
+const enrollments = ref<RecentEnrollment[]>([])
 
 const statsLoading = ref(true)
 const tablesLoading = ref(true)
@@ -465,7 +506,7 @@ async function loadDashboard() {
   tablesLoading.value = true
   try {
     const res = await dashboardService.bundle()
-    const data = res.data?.data ?? res.data ?? {}
+    const data = (res.data?.data ?? res.data ?? {}) as DashboardBundle
 
     statsData.value = data.stats ?? null
     courses.value = data.trending_courses ?? []
@@ -479,7 +520,7 @@ async function loadDashboard() {
   }
 }
 
-function statusLabel(status?: string) {
+function statusLabel(status?: string | null) {
   if (status === 'active') return 'نشط'
   if (status === 'pending') return 'معلّق'
   if (status === 'expired') return 'منتهي'
@@ -487,11 +528,11 @@ function statusLabel(status?: string) {
   return status || '—'
 }
 
-function initial(name?: string) {
+function initial(name?: string | null) {
   return (name?.trim()?.charAt(0) ?? 'A').toUpperCase()
 }
 
-function formatDate(iso?: string) {
+function formatDate(iso?: string | null) {
   if (!iso) return ''
   try {
     return new Date(iso).toLocaleDateString('ar-EG', {

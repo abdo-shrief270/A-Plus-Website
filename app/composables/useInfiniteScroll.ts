@@ -1,11 +1,24 @@
 import { ref, computed } from 'vue'
+import type { Ref } from 'vue'
 
-export function useInfiniteScroll<T>(fetchFn: (page: number) => Promise<any>) {
-  const items = ref<T[]>([])
+interface PaginationLike {
+  current_page: number
+  last_page: number
+}
+
+interface PaginatedResult<T> {
+  questions?: T[]
+  data?: T[]
+  pagination?: PaginationLike
+  meta?: PaginationLike
+}
+
+export function useInfiniteScroll<T>(fetchFn: (page: number) => Promise<PaginatedResult<T>>) {
+  const items = ref<T[]>([]) as Ref<T[]>
   const currentPage = ref(1)
   const lastPage = ref(1)
   const isLoading = ref(false)
-  const error = ref<any>(null)
+  const error = ref<unknown>(null)
 
   const hasMore = computed(() => currentPage.value < lastPage.value)
 
@@ -31,7 +44,7 @@ export function useInfiniteScroll<T>(fetchFn: (page: number) => Promise<any>) {
     }
   }
 
-  const reset = (initialItems: T[] = [], pagination?: any) => {
+  const reset = (initialItems: T[] = [], pagination?: PaginationLike) => {
     items.value = initialItems
     if (pagination) {
       currentPage.value = pagination.current_page || 1

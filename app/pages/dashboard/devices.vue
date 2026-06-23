@@ -95,9 +95,19 @@ import { showToast } from '@/utils/helpers/toast.helper'
 definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
 useSeoMeta({ title: 'الأجهزة | A Plus' })
 
+interface Device {
+  id: number
+  device_name?: string | null
+  name?: string | null
+  platform?: string | null
+  is_current?: boolean
+  last_login_at?: string | null
+  updated_at?: string | null
+}
+
 const loading = ref(true)
 const revokingId = ref<number | null>(null)
-const devices = ref<any[]>([])
+const devices = ref<Device[]>([])
 
 function formatLastActive(value?: string | null) {
   if (!value) return 'غير محدد'
@@ -112,7 +122,7 @@ onMounted(async () => {
     const payload = res.data?.data || res.data
     // The API might return it wrapped in an array or under a 'devices' key
     devices.value = Array.isArray(payload) ? payload : payload?.devices || []
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to load devices', error)
     showToast('خطأ', 'فشل في تحميل الأجهزة المتصلة', 'error')
   } finally {
@@ -126,9 +136,10 @@ async function onRevoke(id: number) {
     await authService.revokeDevice(id)
     devices.value = devices.value.filter(d => d.id !== id)
     showToast('نجاح', 'تم تسجيل الخروج من الجهاز بنجاح', 'success')
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const e = error as { response?: { data?: { message?: string } } }
     const msg
-      = error.response?.data?.message || 'فشل في تسجيل الخروج من الجهاز'
+      = e.response?.data?.message || 'فشل في تسجيل الخروج من الجهاز'
     showToast('خطأ', msg, 'error')
   } finally {
     revokingId.value = null

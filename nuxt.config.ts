@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'nuxt-og-image',
     '@nuxtjs/robots',
+    '@nuxtjs/sitemap',
     '@nuxtjs/i18n',
     '@pinia/nuxt'
   ],
@@ -17,8 +18,10 @@ export default defineNuxtConfig({
   },
   css: ['~/assets/css/main.css', '~/assets/css/global.css'],
 
+  // Drives canonical URLs, OG images, robots.txt and sitemap.xml.
+  // Set NUXT_PUBLIC_SITE_URL to the production domain at deploy time.
   site: {
-    url: 'https://aplus.test/',
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://aplus.test/',
     name: 'A Plus'
   },
 

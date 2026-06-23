@@ -39,7 +39,7 @@ export interface TicketReply {
 
 export const ticketsService = {
   /** GET /v2/tickets - list current user's tickets */
-  list: (params?: Record<string, any>) => {
+  list: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/tickets`, { params })
   },

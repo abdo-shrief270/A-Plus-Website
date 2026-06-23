@@ -4,19 +4,19 @@ const VERSION = 'v2'
 
 export const questionsService = {
   /** GET /v2/questions/trending - Get Trending Questions (الأسئلة الشائعة والأكثر حلاً) */
-  getTrendingQuestions: (params?: Record<string, any>) => {
+  getTrendingQuestions: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/questions/trending`, { params })
   },
 
   /** GET /v2/questions/recent - Get Recent Questions (أحدث الأسئلة المُضافة) */
-  getRecentQuestions: (params?: Record<string, any>) => {
+  getRecentQuestions: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/questions/recent`, { params })
   },
 
   /** GET /v2/questions/search - Search Questions (البحث في بنك الأسئلة) */
-  searchQuestions: (params?: Record<string, any>) => {
+  searchQuestions: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/questions/search`, { params })
   },
@@ -40,7 +40,7 @@ export const questionsService = {
   },
 
   /** GET /v2/bookmarks - List the student's bookmarked questions */
-  listBookmarks: (params?: Record<string, any>) => {
+  listBookmarks: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/bookmarks`, { params })
   },
@@ -51,14 +51,8 @@ export const questionsService = {
     return axios.get(`/${VERSION}/revision/metrics`)
   },
 
-  /** GET /v2/subjects/{subject}/questions - Get Questions by Subject (أسئلة مادة معينة) */
-  getSubjectQuestions: (subjectId: number | string, params?: Record<string, any>) => {
-    const axios = createAxiosInstance()
-    return axios.get(`/${VERSION}/subjects/${subjectId}/questions`, { params })
-  },
-
   /** GET /v2/categories/{category}/questions - Get Questions by Category (أسئلة تصنيف فرعي) */
-  getCategoryQuestions: (categoryId: number | string, params?: Record<string, any>) => {
+  getCategoryQuestions: (categoryId: number | string, params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/categories/${categoryId}/questions`, { params })
   },
@@ -76,13 +70,13 @@ export const questionsService = {
   },
 
   /** GET /v2/articles/{id}/questions - Get Article Questions (أسئلة المقال) */
-  getArticleQuestions: (articleId: number | string, params?: Record<string, any>) => {
+  getArticleQuestions: (articleId: number | string, params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/articles/${articleId}/questions`, { params })
   },
 
   /** GET /v2/practice-exams - Get Practice Exams (نماذج الامتحانات والاختبارات التجريبية) */
-  getPracticeExams: (params?: Record<string, any>) => {
+  getPracticeExams: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/practice-exams`, { params })
   },

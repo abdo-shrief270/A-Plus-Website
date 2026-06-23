@@ -266,10 +266,21 @@ import { examService } from '@/services/api/exam.service'
 
 const labels = useEntityLabels()
 
+interface ExamSummary {
+  id: number
+  name: string
+}
+
+interface CreatedStudent {
+  id: number
+  name: string
+  [key: string]: unknown
+}
+
 const props = defineProps<{ open: boolean }>()
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'created': [student: any]
+  'created': [student: CreatedStudent]
 }>()
 
 const initialForm = () => ({
@@ -334,8 +345,8 @@ async function loadExams() {
   try {
     const res = await examService.list({ per_page: 100 })
     const payload = res.data?.data ?? res.data
-    const list = Array.isArray(payload) ? payload : (payload?.data ?? payload?.exams ?? [])
-    exams.value = list.map((e: any) => ({ id: e.id, name: e.name }))
+    const list: ExamSummary[] = Array.isArray(payload) ? payload : (payload?.data ?? payload?.exams ?? [])
+    exams.value = list.map(e => ({ id: e.id, name: e.name }))
   } catch (err) {
     console.error('Failed to load exams', err)
   } finally {
@@ -362,9 +373,10 @@ async function onSubmit() {
     const created = res.data?.data ?? res.data
     emit('created', created)
     onOpenChange(false)
-  } catch (err: any) {
-    if (err?.response?.status === 422 && err.response.data?.errors) {
-      errors.value = err.response.data.errors
+  } catch (err) {
+    const e = err as { response?: { status?: number, data?: { errors?: Record<string, string[]> } } }
+    if (e?.response?.status === 422 && e.response.data?.errors) {
+      errors.value = e.response.data.errors
     }
   } finally {
     submitting.value = false

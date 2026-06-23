@@ -41,7 +41,7 @@
               اختر الكورس <span class="text-error-500">*</span>
             </label>
             <USelect
-              v-model="pickedCourseId"
+              v-model="pickedCourseIdModel"
               :items="courseOptions"
               :loading="coursesLoading"
               :disabled="coursesLoading || submitting"
@@ -187,9 +187,34 @@ import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 const sharedEnrollments = useStudentEnrollments()
 
+interface CourseSummary {
+  id: number
+  title: string
+  image?: string | null
+  total_hours?: number | null
+  lectures_count?: number | null
+  price?: string | number | null
+  [key: string]: unknown
+}
+
+interface EnrollmentRecord {
+  course_id: number | string
+  status?: string
+  [key: string]: unknown
+}
+
+interface PendingPayment {
+  id: number
+  amount: number
+  currency?: string
+  description?: string
+  transaction_id?: string
+  kind?: string
+}
+
 const props = defineProps<{
   open: boolean
-  course: any | null
+  course: CourseSummary | null
 }>()
 
 const emit = defineEmits<{
@@ -201,22 +226,27 @@ const submitting = ref(false)
 const result = ref<{ total_created: number, total_skipped: number, skipped?: Array<{ student_id: number, reason: string }> } | null>(null)
 
 const checkoutOpen = ref(false)
-const pendingPayment = ref<any | null>(null)
+const pendingPayment = ref<PendingPayment | null>(null)
 
-const courses = ref<any[]>([])
+const courses = ref<CourseSummary[]>([])
 const coursesLoading = ref(false)
 const pickedCourseId = ref<number | null>(null)
 
-const enrollments = ref<any[]>([])
+const enrollments = ref<EnrollmentRecord[]>([])
 
 const studentId = computed<number | null>(() => {
-  const user: any = authStore.getUser
+  const user = authStore.getUser as { student?: { id?: number } } | null
   return user?.student?.id ?? null
 })
 
 const courseOptions = computed(() =>
   courses.value.map(c => ({ label: c.title, value: c.id }))
 )
+
+const pickedCourseIdModel = computed<number | undefined>({
+  get: () => pickedCourseId.value ?? undefined,
+  set: (val) => { pickedCourseId.value = val ?? null }
+})
 
 const effectiveCourse = computed(() => {
   if (props.course) return props.course

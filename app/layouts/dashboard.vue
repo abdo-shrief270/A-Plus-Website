@@ -112,7 +112,7 @@ function onSubscribed(result: { total_created: number, total_skipped: number }) 
   }
 }
 
-function onTicketCreated(ticket: any) {
+function onTicketCreated(ticket: { id?: number | string } | null) {
   showToast('تم الإرسال', 'تم إرسال رسالتك إلى فريق الدعم', 'success')
   if (ticket?.id) {
     navigateTo(`/dashboard/tickets/${ticket.id}`)

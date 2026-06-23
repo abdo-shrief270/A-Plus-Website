@@ -5,7 +5,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     console.error('Error Info:', info)
 
     // Check for specific SyntaxError: 10 or payload errors
-    if (error instanceof SyntaxError || (error as any)?.message?.includes('10')) {
+    if (error instanceof SyntaxError || (error as { message?: string } | null)?.message?.includes('10')) {
       console.warn('Caught potential payload parsing error:', error)
     }
   }

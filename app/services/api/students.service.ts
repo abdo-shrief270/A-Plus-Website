@@ -4,25 +4,25 @@ const VERSION = 'v2'
 
 export const studentsService = {
   /** GET /v2/enrollments - Get Enrollments List (قائمة الاشتراكات بالدورات) */
-  getEnrollments: (params?: Record<string, any>) => {
+  getEnrollments: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/enrollments`, { params })
   },
 
   /** GET /v2/trending-courses - Get Trending Courses (الدورات الأكثر إقبالاً) */
-  getTrendingCourses: (params?: Record<string, any>) => {
+  getTrendingCourses: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/trending-courses`, { params })
   },
 
   /** GET /v2/student-stats - Get Student Statistics Charts (رسوم بيانية لتقدم الطلاب) */
-  getStudentStats: (params?: Record<string, any>) => {
+  getStudentStats: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/student-stats`, { params })
   },
 
   /** GET /v2/students - List Students (قائمة الطلاب) */
-  getStudents: (params?: Record<string, any>) => {
+  getStudents: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/students`, { params })
   },
@@ -34,13 +34,13 @@ export const studentsService = {
   },
 
   /** POST /v2/students - Create Single Student (إضافة حساب طالب) */
-  createStudent: (payload: Record<string, any>) => {
+  createStudent: (payload: Record<string, unknown>) => {
     const axios = createAxiosInstance()
     return axios.post(`/${VERSION}/students`, payload)
   },
 
   /** PUT /v2/students/{student} - Update Student Profile (تعديل بيانات الطالب) */
-  updateStudentProfile: (studentId: number | string, payload: any) => {
+  updateStudentProfile: (studentId: number | string, payload: Record<string, unknown>) => {
     const axios = createAxiosInstance()
     // Depending on backend support, this could be PUT or PATCH. Swagger says PUT.
     return axios.put(`/${VERSION}/students/${studentId}`, payload)
@@ -63,7 +63,7 @@ export const studentsService = {
   },
 
   /** POST /v2/students/bulk - Bulk Create Students (إضافة مجموعة طلاب كبيانات JSON) */
-  bulkCreateStudents: (payload: { students: any[] }) => {
+  bulkCreateStudents: (payload: { students: Record<string, unknown>[] }) => {
     const axios = createAxiosInstance()
     return axios.post(`/${VERSION}/students/bulk`, payload)
   }

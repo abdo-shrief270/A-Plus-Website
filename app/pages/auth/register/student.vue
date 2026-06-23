@@ -175,7 +175,7 @@
             >
               <UIcon
                 name="i-heroicons-calendar"
-                class="w-5 h-5 text-gray-500 rtl:ml-2 ltr:mr-2"
+                class="w-5 h-5 text-gray-500 ml-2"
               />
               {{
                 state.exam_date
@@ -297,8 +297,8 @@ onMounted(async () => {
   try {
     const res = await examService.list()
     // تأكد من مسار البيانات في الـ Response الخاص بك
-    const exams = res.data?.data?.exams || res.data?.data || []
-    examOptions.value = exams.map((e: any) => ({
+    const exams: { id: number | string, name: string }[] = res.data?.data?.exams || res.data?.data || []
+    examOptions.value = exams.map(e => ({
       label: e.name,
       value: Number(e.id)
     }))

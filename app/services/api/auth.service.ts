@@ -22,19 +22,19 @@ export const authService = {
   },
 
   /** POST /v2/auth/register/student */
-  registerStudent: (payload: Record<string, any>) => {
+  registerStudent: (payload: Record<string, unknown>) => {
     const axios = createAxiosInstance()
     return axios.post(`/${VERSION}/auth/register/student`, payload)
   },
 
   /** POST /v2/auth/register/parent */
-  registerParent: (payload: Record<string, any>) => {
+  registerParent: (payload: Record<string, unknown>) => {
     const axios = createAxiosInstance()
     return axios.post(`/${VERSION}/auth/register/parent`, payload)
   },
 
   /** POST /v2/auth/otp/send */
-  sendOtp: (payload: Record<string, any>) => {
+  sendOtp: (payload: Record<string, unknown>) => {
     const axios = createAxiosInstance()
     return axios.post(`/${VERSION}/auth/otp/send`, payload)
   },
@@ -46,7 +46,7 @@ export const authService = {
   },
 
   /** POST /v2/auth/password/reset - find user, returns masked phone/email */
-  resetPassword: (payload: Record<string, any>) => {
+  resetPassword: (payload: Record<string, unknown>) => {
     const axios = createAxiosInstance()
     return axios.post(`/${VERSION}/auth/password/reset`, payload)
   },
@@ -64,7 +64,7 @@ export const authService = {
   },
 
   /** POST /v2/auth/profile */
-  updateProfile: (payload: Record<string, any>) => {
+  updateProfile: (payload: Record<string, unknown>) => {
     const axios = createAxiosInstance()
     return axios.post(`/${VERSION}/auth/profile`, payload)
   },

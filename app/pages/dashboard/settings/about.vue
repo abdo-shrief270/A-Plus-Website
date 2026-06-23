@@ -65,7 +65,7 @@
             </p>
             <p
               class="text-sm text-gray-900 break-words"
-              :title="setting.value"
+              :title="setting.value ?? ''"
             >
               {{ setting.value || 'غير محدد' }}
             </p>
@@ -184,8 +184,15 @@ import { pagesService, type CmsPage } from '@/services/api/pages.service'
 definePageMeta({ layout: 'dashboard', middleware: ['auth'], title: 'حول المنصة' })
 useSeoMeta({ title: 'حول المنصة | A Plus' })
 
+interface SettingItem {
+  key: string
+  value?: string | null
+  name_ar?: string | null
+  group?: string | null
+}
+
 const loading = ref(true)
-const settings = ref<any[]>([])
+const settings = ref<SettingItem[]>([])
 const cmsPages = ref<CmsPage[]>([])
 
 const generalSettings = computed(() =>
@@ -203,8 +210,8 @@ onMounted(async () => {
       pagesService.list()
     ])
     const settingsData = settingsRes.data?.data || settingsRes.data
-    const list = Array.isArray(settingsData) ? settingsData : (settingsData?.settings || [])
-    settings.value = list.filter((s: any) => !isLegal(s.key))
+    const list: SettingItem[] = Array.isArray(settingsData) ? settingsData : (settingsData?.settings || [])
+    settings.value = list.filter((s: SettingItem) => !isLegal(s.key))
 
     const pagesData = pagesRes.data?.data ?? pagesRes.data ?? []
     cmsPages.value = Array.isArray(pagesData) ? pagesData : (pagesData?.pages || [])
@@ -237,7 +244,7 @@ function getSocialIcon(key: string) {
   return 'i-heroicons-globe-alt'
 }
 
-function resolveLinkHref(link: any): string {
+function resolveLinkHref(link: SettingItem): string {
   const v: string = link.value ?? ''
   if (!v) return '#'
   if (v.startsWith('http')) return v

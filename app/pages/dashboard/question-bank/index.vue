@@ -60,6 +60,14 @@
       </UButton>
     </div>
 
+    <!-- Error -->
+    <ErrorState
+      v-else-if="loadError"
+      title="تعذّر تحميل بنك الأسئلة"
+      :retrying="loading"
+      @retry="loadSections"
+    />
+
     <!-- No sections -->
     <div
       v-else-if="!sections.length"
@@ -199,14 +207,15 @@ const authStore = useAuthStore()
 
 const sections = ref<Section[]>([])
 const loading = ref(false)
+const loadError = ref(false)
 
 const examId = computed<number | null>(() => {
-  const u: any = authStore.getUser
+  const u = authStore.getUser as { student?: { exam_id?: number | null } } | null
   return u?.student?.exam_id ?? null
 })
 
 const examName = computed<string>(() => {
-  const u: any = authStore.getUser
+  const u = authStore.getUser as { student?: { exam_name?: string, exam?: { name?: string } } } | null
   return u?.student?.exam_name ?? u?.student?.exam?.name ?? ''
 })
 
@@ -220,6 +229,7 @@ async function loadSections() {
     return
   }
   loading.value = true
+  loadError.value = false
   try {
     const res = await examsService.getExamSections(examId.value)
     const data = res.data?.data ?? res.data ?? {}
@@ -227,6 +237,7 @@ async function loadSections() {
   } catch (err) {
     console.error('Failed to load sections', err)
     sections.value = []
+    loadError.value = true
   } finally {
     loading.value = false
   }

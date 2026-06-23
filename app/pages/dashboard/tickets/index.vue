@@ -191,12 +191,12 @@
 </template>
 
 <script setup lang="ts">
-import { ticketsService } from '@/services/api/tickets.service'
+import { ticketsService, type Ticket } from '@/services/api/tickets.service'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth'], title: 'رسائل التواصل' })
 useSeoMeta({ title: 'رسائل التواصل | A Plus' })
 
-const tickets = ref<any[]>([])
+const tickets = ref<Ticket[]>([])
 const meta = ref<{ total: number, per_page: number, last_page: number } | null>(null)
 const loading = ref(true)
 const page = ref(1)
@@ -251,7 +251,7 @@ async function fetchTickets() {
   }
 }
 
-function onCreated(ticket: any) {
+function onCreated(ticket: { id?: number } | null) {
   if (ticket?.id) {
     navigateTo(`/dashboard/tickets/${ticket.id}`)
   } else {
@@ -289,14 +289,15 @@ function statusIconColor(s: string) {
   return 'text-gray-500'
 }
 function categoryLabel(c: string) {
-  return ({
+  const labels: Record<string, string> = {
     inquiry: 'استفسار',
     complaint: 'شكوى',
     suggestion: 'اقتراح',
     technical: 'مشكلة تقنية',
     billing: 'الدفع والفواتير',
     other: 'أخرى'
-  } as Record<string, string>)[c] || c
+  }
+  return labels[c] || c
 }
 function categoryColor(c: string) {
   if (c === 'complaint') return 'error' as const

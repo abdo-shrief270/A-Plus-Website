@@ -223,7 +223,7 @@ const otp = ref('')
 const sentChannel = ref<SecurityMethod>('email')
 const sentTo = ref('')
 const resendCooldown = ref(0)
-const otpInputRef = ref<any>(null)
+const otpInputRef = ref<{ $el?: HTMLElement, input?: HTMLInputElement } | null>(null)
 let cooldownInterval: ReturnType<typeof setInterval> | null = null
 
 function onOtpInput(value: string) {
@@ -239,10 +239,12 @@ function onOtpInput(value: string) {
 
 function focusOtp() {
   nextTick(() => {
-    const el = otpInputRef.value?.$el?.querySelector?.('input')
+    const el: unknown = otpInputRef.value?.$el?.querySelector?.('input')
       ?? otpInputRef.value?.input
       ?? otpInputRef.value
-    if (el && typeof el.focus === 'function') el.focus()
+    if (el && typeof (el as { focus?: unknown }).focus === 'function') {
+      (el as { focus: () => void }).focus()
+    }
   })
 }
 
@@ -398,8 +400,9 @@ async function sendOtp(method: SecurityMethod) {
     step.value = 'verify'
     startCooldown(30)
     focusOtp()
-  } catch (err: any) {
-    error.value = err?.response?.data?.message || 'تعذّر إرسال الرمز'
+  } catch (err: unknown) {
+    const e = err as { response?: { data?: { message?: string } } }
+    error.value = e?.response?.data?.message || 'تعذّر إرسال الرمز'
   } finally {
     busy.value = false
   }
@@ -423,8 +426,9 @@ async function confirm() {
     const updated: SecurityStatus = res.data?.data ?? res.data
     emit('done', updated)
     step.value = 'done'
-  } catch (err: any) {
-    error.value = err?.response?.data?.message || 'الرمز غير صحيح'
+  } catch (err: unknown) {
+    const e = err as { response?: { data?: { message?: string } } }
+    error.value = e?.response?.data?.message || 'الرمز غير صحيح'
   } finally {
     busy.value = false
   }

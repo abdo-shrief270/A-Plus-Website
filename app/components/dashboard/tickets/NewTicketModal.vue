@@ -191,7 +191,7 @@
 </template>
 
 <script setup lang="ts">
-import { ticketsService, type TicketCategory } from '@/services/api/tickets.service'
+import { ticketsService, type Ticket, type TicketCategory } from '@/services/api/tickets.service'
 
 interface TicketPrefill {
   subject?: string
@@ -209,7 +209,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'created': [ticket: any]
+  'created': [ticket: Ticket]
 }>()
 
 const initial = () => ({
@@ -291,9 +291,10 @@ async function submit() {
     const ticket = res.data?.data ?? res.data
     emit('created', ticket)
     onOpenChange(false)
-  } catch (err: any) {
-    if (err?.response?.status === 422 && err.response.data?.errors) {
-      errors.value = err.response.data.errors
+  } catch (err: unknown) {
+    const e = err as { response?: { status?: number, data?: { errors?: Record<string, string[]> } } }
+    if (e?.response?.status === 422 && e.response.data?.errors) {
+      errors.value = e.response.data.errors
     }
   } finally {
     submitting.value = false

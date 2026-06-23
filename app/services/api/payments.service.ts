@@ -14,7 +14,7 @@ export interface Payment {
   status: PaymentStatus
   payment_method: string | null
   paid_at: string | null
-  metadata?: Record<string, any> | null
+  metadata?: Record<string, unknown> | null
   enrollment_id: number | null
   subscription_id: number | null
   kind: PaymentKind
@@ -24,7 +24,7 @@ export interface Payment {
 
 export const paymentsService = {
   /** GET /v2/payments */
-  list: (params?: Record<string, any>) => {
+  list: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/payments`, { params })
   },

@@ -364,7 +364,7 @@
 </template>
 
 <script setup lang="ts">
-import { ticketsService } from '@/services/api/tickets.service'
+import { ticketsService, type Ticket, type TicketReply } from '@/services/api/tickets.service'
 import { showToast } from '@/utils/helpers/toast.helper'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth'], title: 'تفاصيل الرسالة' })
@@ -372,7 +372,9 @@ definePageMeta({ layout: 'dashboard', middleware: ['auth'], title: 'تفاصيل
 const route = useRoute()
 const id = computed(() => route.params.id as string)
 
-const ticket = ref<any | null>(null)
+type TicketDetail = Ticket & { name?: string | null }
+
+const ticket = ref<TicketDetail | null>(null)
 const loading = ref(true)
 const sending = ref(false)
 const closing = ref(false)
@@ -424,7 +426,7 @@ async function sendReply() {
   try {
     const files = replyFiles.value.map(f => f.file)
     const res = await ticketsService.reply(id.value, replyBody.value.trim(), files)
-    const reply = res.data?.data ?? res.data
+    const reply = (res.data?.data ?? res.data) as TicketReply
     if (ticket.value) {
       ticket.value.replies = [...(ticket.value.replies || []), reply]
       ticket.value.last_reply_at = reply.created_at
@@ -433,8 +435,9 @@ async function sendReply() {
     replyFiles.value.forEach(f => URL.revokeObjectURL(f.preview))
     replyFiles.value = []
     showToast('تم الإرسال', 'تمت إضافة ردك بنجاح', 'success')
-  } catch (err: any) {
-    const msg = err?.response?.data?.message || 'تعذّر إرسال الرد'
+  } catch (err) {
+    const e = err as { response?: { data?: { message?: string } } }
+    const msg = e?.response?.data?.message || 'تعذّر إرسال الرد'
     showToast('خطأ', msg, 'error')
   } finally {
     sending.value = false
@@ -446,11 +449,12 @@ async function closeTicket() {
   closing.value = true
   try {
     const res = await ticketsService.close(id.value)
-    const updated = res.data?.data ?? res.data
+    const updated = (res.data?.data ?? res.data) as Partial<TicketDetail>
     if (ticket.value && updated) ticket.value = { ...ticket.value, ...updated }
     showToast('تم الإغلاق', 'تم إغلاق الرسالة', 'success')
-  } catch (err: any) {
-    const msg = err?.response?.data?.message || 'تعذّر إغلاق الرسالة'
+  } catch (err) {
+    const e = err as { response?: { data?: { message?: string } } }
+    const msg = e?.response?.data?.message || 'تعذّر إغلاق الرسالة'
     showToast('خطأ', msg, 'error')
   } finally {
     closing.value = false
@@ -467,14 +471,15 @@ function statusColor(s: string) {
   return 'neutral' as const
 }
 function categoryLabel(c: string) {
-  return ({
+  const labels: Record<string, string> = {
     inquiry: 'استفسار',
     complaint: 'شكوى',
     suggestion: 'اقتراح',
     technical: 'مشكلة تقنية',
     billing: 'الدفع والفواتير',
     other: 'أخرى'
-  } as Record<string, string>)[c] || c
+  }
+  return labels[c] || c
 }
 function categoryColor(c: string) {
   if (c === 'complaint') return 'error' as const
@@ -499,7 +504,7 @@ function formatDateTime(iso?: string) {
     })
   } catch { return iso }
 }
-function initial(name?: string) {
+function initial(name?: string | null) {
   return (name?.trim()?.charAt(0) ?? 'A').toUpperCase()
 }
 </script>

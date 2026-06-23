@@ -233,6 +233,7 @@
 
 <script setup lang="ts">
 import { usePracticeExamsStore } from '@/stores/usePracticeExamsStore'
+import type { QuestionSubmissionResult } from '@/types/question-bank'
 
 definePageMeta({ middleware: ['auth'] })
 
@@ -245,7 +246,7 @@ const totalQuestions = computed(() => store.currentPracticeExam?.questions?.leng
 const progress = computed(() => ((store.currentQuestionIndex + 1) / totalQuestions.value) * 100)
 
 const timeRemaining = ref(0)
-let timerInterval: any = null
+let timerInterval: ReturnType<typeof setInterval> | null = null
 
 const formattedTime = computed(() => {
   const m = Math.floor(timeRemaining.value / 60)
@@ -259,7 +260,7 @@ const startTimer = () => {
     if (timeRemaining.value > 0) {
       timeRemaining.value--
     } else {
-      clearInterval(timerInterval)
+      if (timerInterval) clearInterval(timerInterval)
       onTimeUp()
     }
   }, 1000)
@@ -270,7 +271,7 @@ const onTimeUp = () => {
   finishExam()
 }
 
-const onQuestionAnswered = (result: any) => {
+const onQuestionAnswered = (result: QuestionSubmissionResult) => {
   if (store.currentQuestion) {
     store.setResult(store.currentQuestion.id, result)
   }
@@ -293,7 +294,7 @@ const goToQuestion = (idx: number) => {
 }
 
 const finishExam = () => {
-  clearInterval(timerInterval)
+  if (timerInterval) clearInterval(timerInterval)
   showResultsModal.value = true
 }
 
@@ -320,6 +321,6 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  clearInterval(timerInterval)
+  if (timerInterval) clearInterval(timerInterval)
 })
 </script>

@@ -139,6 +139,7 @@
 
 <script setup lang="ts">
 import { questionsService } from '@/services/api/questions.service'
+import type { Article, Question } from '@/types/question-bank'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth'], title: 'قطعة المراجعة' })
 
@@ -146,8 +147,8 @@ const route = useRoute()
 const id = computed(() => Number(route.params.id))
 
 const loading = ref(true)
-const article = ref<any | null>(null)
-const questions = ref<any[]>([])
+const article = ref<Article | null>(null)
+const questions = ref<Question[]>([])
 
 watch(id, () => {
   loadArticle()

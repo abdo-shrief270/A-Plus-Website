@@ -24,7 +24,7 @@
               v-model="sortBy"
               :options="sortOptions"
               class="w-40"
-              @update:model-value="updateFilter('sortBy', $event)"
+              @update:model-value="updateFilter('sortBy', String($event ?? ''))"
             />
           </div>
 
@@ -66,7 +66,7 @@ const sortOptions = [
 
 const sortBy = ref(props.modelValue.sortBy)
 
-const updateFilter = (key: string, value: any) => {
+const updateFilter = (key: string, value: string) => {
   emit('update:modelValue', {
     ...props.modelValue,
     [key]: value

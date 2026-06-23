@@ -41,7 +41,7 @@
               اختر الباقة <span class="text-error-500">*</span>
             </label>
             <USelect
-              v-model="pickedPlanId"
+              v-model="pickedPlanIdModel"
               :items="planOptions"
               :loading="plansLoading"
               :disabled="plansLoading || submitting"
@@ -183,9 +183,34 @@ import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 
+interface PlanSummary {
+  id: number
+  name: string
+  type?: string
+  price?: number
+  points?: number
+  duration_days?: number
+  [key: string]: unknown
+}
+
+interface SubscriptionRecord {
+  status?: string
+  plan?: { type?: string }
+  [key: string]: unknown
+}
+
+interface PendingPayment {
+  id: number
+  amount: number
+  currency?: string
+  description?: string
+  transaction_id?: string
+  kind?: string
+}
+
 const props = defineProps<{
   open: boolean
-  plan: any | null
+  plan: PlanSummary | null
 }>()
 
 const emit = defineEmits<{
@@ -193,19 +218,19 @@ const emit = defineEmits<{
   'subscribed': [result: { total_created: number, total_skipped: number }]
 }>()
 
-const plans = ref<any[]>([])
+const plans = ref<PlanSummary[]>([])
 const plansLoading = ref(false)
 const pickedPlanId = ref<number | null>(null)
 
-const subs = ref<any[]>([])
+const subs = ref<SubscriptionRecord[]>([])
 const submitting = ref(false)
 const result = ref<{ total_created: number, total_skipped: number } | null>(null)
 
 const checkoutOpen = ref(false)
-const pendingPayment = ref<any | null>(null)
+const pendingPayment = ref<PendingPayment | null>(null)
 
 const studentId = computed<number | null>(() => {
-  const user: any = authStore.getUser
+  const user = authStore.getUser as { student?: { id?: number } } | null
   return user?.student?.id ?? null
 })
 
@@ -215,6 +240,11 @@ const planOptions = computed(() =>
     value: p.id
   }))
 )
+
+const pickedPlanIdModel = computed<number | undefined>({
+  get: () => pickedPlanId.value ?? undefined,
+  set: (val) => { pickedPlanId.value = val ?? null }
+})
 
 const effectiveplan = computed(() => {
   if (props.plan) return props.plan

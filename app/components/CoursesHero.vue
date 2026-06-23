@@ -72,7 +72,7 @@ const emit = defineEmits(['search'])
 
 const popularTags = ['قدرات', 'تحصيلي', 'رياضيات', 'لغة_إنجليزية']
 
-let debounceTimeout: any = null
+let debounceTimeout: ReturnType<typeof setTimeout> | null = null
 const onSearch = (val: string) => {
   if (debounceTimeout) clearTimeout(debounceTimeout)
   debounceTimeout = setTimeout(() => {

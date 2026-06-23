@@ -189,17 +189,42 @@ import { examService } from '@/services/api/exam.service'
 
 const labels = useEntityLabels()
 
+interface ExamSummary {
+  id: number
+  name: string
+}
+
+interface Kid {
+  id: number
+  name?: string
+  email?: string
+  phone?: string
+  exam_id?: number
+  exam_date?: string
+  id_number?: string
+  [key: string]: unknown
+}
+
+interface KidForm {
+  name: string
+  email: string
+  phone: string
+  exam_id: number | undefined
+  exam_date: string
+  id_number: string
+}
+
 const props = defineProps<{
   open: boolean
-  kid: any | null
+  kid: Kid | null
 }>()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'updated': [kid: any]
+  'updated': [kid: Kid]
 }>()
 
-const buildFormFromKid = (k: any | null) => ({
+const buildFormFromKid = (k: Kid | null): KidForm => ({
   name: k?.name ?? '',
   email: k?.email ?? '',
   phone: k?.phone ?? '',
@@ -216,7 +241,7 @@ const errors = ref<Record<string, string[]>>({})
 const submitting = ref(false)
 
 const examsLoading = ref(false)
-const exams = ref<Array<{ id: number, name: string }>>([])
+const exams = ref<ExamSummary[]>([])
 const examOptions = computed(() =>
   exams.value.map(e => ({ label: e.name, value: e.id }))
 )
@@ -257,8 +282,8 @@ async function loadExams() {
   try {
     const res = await examService.list({ per_page: 100 })
     const payload = res.data?.data ?? res.data
-    const list = Array.isArray(payload) ? payload : (payload?.data ?? payload?.exams ?? [])
-    exams.value = list.map((e: any) => ({ id: e.id, name: e.name }))
+    const list: ExamSummary[] = Array.isArray(payload) ? payload : (payload?.data ?? payload?.exams ?? [])
+    exams.value = list.map(e => ({ id: e.id, name: e.name }))
   } catch (err) {
     console.error('Failed to load exams', err)
   } finally {
@@ -271,11 +296,11 @@ async function onSubmit() {
   submitting.value = true
   errors.value = {}
 
-  const payload: Record<string, any> = {}
+  const payload: Record<string, string | number> = {}
   const keys = ['name', 'email', 'phone', 'exam_id', 'exam_date', 'id_number'] as const
   for (const k of keys) {
-    const a = (form.value as any)[k]
-    const b = (original.value as any)[k]
+    const a = form.value[k]
+    const b = original.value[k]
     if (a !== b && a !== '' && a !== undefined && a !== null) {
       payload[k] = a
     }
@@ -286,9 +311,10 @@ async function onSubmit() {
     const updated = res.data?.data ?? res.data
     emit('updated', updated)
     onOpenChange(false)
-  } catch (err: any) {
-    if (err?.response?.status === 422 && err.response.data?.errors) {
-      errors.value = err.response.data.errors
+  } catch (err) {
+    const e = err as { response?: { status?: number, data?: { errors?: Record<string, string[]> } } }
+    if (e?.response?.status === 422 && e.response.data?.errors) {
+      errors.value = e.response.data.errors
     }
   } finally {
     submitting.value = false

@@ -15,7 +15,7 @@ export interface Notification {
 
 export const notificationsService = {
   /** GET /v2/notifications - list latest notifications + unread_count */
-  list: (params?: Record<string, any>) => {
+  list: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/notifications`, { params })
   },

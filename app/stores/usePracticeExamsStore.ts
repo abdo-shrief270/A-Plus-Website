@@ -50,7 +50,7 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
         pagination.value = (result.pagination || result) as Pagination
       }
     } catch (err: unknown) {
-      error.value = (err as any).response?.data?.message || 'Failed to fetch practice exams'
+      error.value = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to fetch practice exams'
       throw err
     } finally {
       isLoading.value = false
@@ -78,7 +78,7 @@ export const usePracticeExamsStore = defineStore('practiceExams', () => {
 
       return data
     } catch (err: unknown) {
-      error.value = (err as any).response?.data?.message || 'Failed to start practice session'
+      error.value = (err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to start practice session'
       throw err
     } finally {
       isLoading.value = false

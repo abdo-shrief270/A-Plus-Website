@@ -9,7 +9,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.75",
@@ -18,7 +20,6 @@
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.2.1",
     "@nuxtjs/robots": "^5.6.7",
-    "@nuxtjs/sitemap": "^7.4.11",
     "@pinia/nuxt": "^0.11.3",
     "@standard-schema/spec": "^1.0.0",
     "@types/canvas-confetti": "^1.9.0",
@@ -40,11 +41,16 @@
     "@iconify-json/circle-flags": "^1.2.10",
     "@iconify-json/heroicons": "^1.2.2",
     "@nuxt/eslint": "^1.10.0",
+    "@nuxt/test-utils": "^4.0.3",
     "@nuxtjs/i18n": "^10.2.1",
+    "@nuxtjs/sitemap": "^8.2.1",
     "@types/js-cookie": "^3.0.6",
+    "@vue/test-utils": "^2.4.11",
     "eslint": "^9.39.1",
+    "happy-dom": "^20.10.6",
     "sass-embedded": "^1.97.3",
     "typescript": "^5.9.3",
+    "vitest": "^2.1.9",
     "vue-tsc": "^3.1.5"
   },
   "packageManager": "pnpm@10.23.0"

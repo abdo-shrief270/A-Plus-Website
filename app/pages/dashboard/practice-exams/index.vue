@@ -142,13 +142,26 @@
 
 <script setup lang="ts">
 import { questionsService } from '@/services/api/questions.service'
+import type { PracticeExam } from '@/types/question-bank'
+import type { Meta } from '@/types/api'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
 useSeoMeta({ title: 'الاختبارات التجريبية | A Plus' })
 
+// The list endpoint returns a lighter card shape than the full PracticeExam
+// detail (no questions; may expose name/questions_count/passing_score/duration).
+type PracticeExamCard = Partial<PracticeExam> & {
+  id: number
+  name?: string
+  description?: string
+  duration?: number
+  questions_count?: number
+  passing_score?: number
+}
+
 const loading = ref(true)
-const practiceExams = ref<any[]>([])
-const meta = ref<any>(null)
+const practiceExams = ref<PracticeExamCard[]>([])
+const meta = ref<Meta | null>(null)
 
 const searchQuery = ref('')
 const page = ref(1)
@@ -169,11 +182,13 @@ async function fetchExams() {
       search: searchQuery.value || undefined
     })
 
-    const data = res.data?.data || res.data
+    const data = (res.data?.data || res.data) as
+      | PracticeExamCard[]
+      | { practice_exams?: PracticeExamCard[], exams?: PracticeExamCard[], meta?: Meta }
     practiceExams.value = Array.isArray(data)
       ? data
       : data?.practice_exams || data?.exams || []
-    meta.value = res.data?.meta || data?.meta || null
+    meta.value = res.data?.meta || (Array.isArray(data) ? null : data?.meta) || null
   } catch (error) {
     console.error('Failed to load practice exams', error)
   } finally {

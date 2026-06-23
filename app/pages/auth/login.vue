@@ -293,7 +293,7 @@ async function onUsernameSubmit(
     } else {
       step.value = 2 // Proceed to Password input
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Login Check error:', error)
   }
 }

@@ -4,7 +4,7 @@ const VERSION = 'v2'
 
 export const plansService = {
   /** GET /v2/plans - List active plans (الباقات) */
-  list: (params?: Record<string, any>) => {
+  list: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/plans`, { params })
   },
@@ -18,7 +18,7 @@ export const plansService = {
 
 export const subscriptionsService = {
   /** GET /v2/subscriptions - Auto-scoped by role */
-  list: (params?: Record<string, any>) => {
+  list: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/subscriptions`, { params })
   },

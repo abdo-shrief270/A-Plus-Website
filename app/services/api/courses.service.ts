@@ -4,7 +4,7 @@ const VERSION = 'v2'
 
 export const coursesService = {
   /** GET /v2/courses - List Courses (قائمة الكورسات) */
-  list: (params?: Record<string, any>) => {
+  list: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/courses`, { params })
   },
@@ -18,7 +18,7 @@ export const coursesService = {
 
 export const enrollmentsService = {
   /** GET /v2/enrollments - Get Enrollments List */
-  list: (params?: Record<string, any>) => {
+  list: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/enrollments`, { params })
   },

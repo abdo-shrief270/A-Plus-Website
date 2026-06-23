@@ -421,8 +421,16 @@ function openModal(flag: Ref<boolean>) {
   })
 }
 
+interface FastAction {
+  label: string
+  icon: string
+  iconBg: string
+  iconColor: string
+  run: () => void
+}
+
 const fastActions = computed(() => {
-  const actions: any[] = []
+  const actions: FastAction[] = []
   if (!authStore.isStudent) {
     actions.push({
       label: labels.value.addAction,

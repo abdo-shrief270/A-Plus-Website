@@ -261,18 +261,13 @@
     </template>
 
     <!-- Error -->
-    <div
+    <ErrorState
       v-else
-      class="bg-white rounded-2xl border border-gray-100 p-12 text-center shadow-sm"
-    >
-      <UIcon
-        name="i-heroicons-trophy"
-        class="w-12 h-12 text-gray-300 mx-auto mb-3"
-      />
-      <p class="text-sm text-gray-500">
-        تعذر تحميل لوحة المتصدرين. حاول مرة أخرى.
-      </p>
-    </div>
+      title="تعذّر تحميل لوحة المتصدرين"
+      message="حدث خطأ أثناء جلب الترتيب. حاول مرة أخرى."
+      :retrying="loading"
+      @retry="load"
+    />
   </div>
 </template>
 

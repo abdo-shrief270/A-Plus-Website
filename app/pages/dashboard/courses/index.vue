@@ -256,6 +256,26 @@
 import { coursesService } from '@/services/api/courses.service'
 import { useAuthStore } from '@/stores/auth'
 
+interface CourseExam {
+  id: number
+  name: string
+}
+
+interface CourseCard {
+  id: number
+  title: string
+  image?: string | null
+  description?: string | null
+  level?: string | null
+  rating?: string | number | null
+  total_hours?: number | null
+  lectures_count?: number | null
+  enrollments_count?: number | null
+  price?: string | number | null
+  exams?: CourseExam[]
+  [key: string]: unknown
+}
+
 const { formatPrice } = useCurrency()
 const authStore = useAuthStore()
 const enrollments = useStudentEnrollments()
@@ -267,7 +287,7 @@ definePageMeta({
 })
 useSeoMeta({ title: 'الكورسات | A Plus' })
 
-const courses = ref<any[]>([])
+const courses = ref<CourseCard[]>([])
 const meta = ref<{ total: number, per_page: number, last_page: number } | null>(null)
 const loading = ref(true)
 const searchQuery = ref('')
@@ -275,7 +295,7 @@ const levelFilter = ref<string | null>(null)
 const page = ref(1)
 
 const enrollOpen = ref(false)
-const selectedCourse = ref<any | null>(null)
+const selectedCourse = ref<CourseCard | null>(null)
 
 const levelOptions = [
   { label: 'جميع المستويات', value: null },
@@ -325,7 +345,7 @@ async function fetchCourses() {
     })
     const body = res.data?.data ?? res.data
     courses.value = Array.isArray(body) ? body : (body?.data ?? [])
-    meta.value = res.data?.meta ?? body?.meta ?? null
+    meta.value = res.data?.meta ?? (body as { meta?: typeof meta.value })?.meta ?? null
   } catch (err) {
     console.error('Failed to load courses', err)
     courses.value = []
@@ -334,7 +354,7 @@ async function fetchCourses() {
   }
 }
 
-function openEnroll(course: any) {
+function openEnroll(course: CourseCard) {
   selectedCourse.value = course
   enrollOpen.value = true
 }

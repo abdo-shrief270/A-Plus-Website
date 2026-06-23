@@ -41,7 +41,7 @@
               اختر الباقة <span class="text-error-500">*</span>
             </label>
             <USelect
-              v-model="pickedPlanId"
+              v-model="pickedPlanIdModel"
               :items="planOptions"
               :loading="plansLoading"
               :disabled="plansLoading || submitting"
@@ -275,9 +275,43 @@ import { plansService, subscriptionsService } from '@/services/api/plans.service
 
 const labels = useEntityLabels()
 
+interface PlanSummary {
+  id: number
+  name: string
+  type?: string
+  price?: number
+  points?: number
+  duration_days?: number
+  [key: string]: unknown
+}
+
+interface KidSummary {
+  id: number
+  name: string
+  user_name?: string
+  gender?: 'male' | 'female'
+  [key: string]: unknown
+}
+
+interface SubscriptionRecord {
+  status?: string
+  student_id?: number
+  plan?: { type?: string }
+  [key: string]: unknown
+}
+
+interface PendingPayment {
+  id: number
+  amount: number
+  currency?: string
+  description?: string
+  transaction_id?: string
+  kind?: string
+}
+
 const props = defineProps<{
   open: boolean
-  plan: any | null
+  plan: PlanSummary | null
 }>()
 
 const emit = defineEmits<{
@@ -285,14 +319,14 @@ const emit = defineEmits<{
   'subscribed': [result: { total_created: number, total_skipped: number }]
 }>()
 
-const kids = ref<any[]>([])
+const kids = ref<KidSummary[]>([])
 const kidsLoading = ref(false)
 
-const plans = ref<any[]>([])
+const plans = ref<PlanSummary[]>([])
 const plansLoading = ref(false)
 const pickedPlanId = ref<number | null>(null)
 
-const subs = ref<any[]>([])
+const subs = ref<SubscriptionRecord[]>([])
 const subsLoading = ref(false)
 
 const selectedIds = ref<number[]>([])
@@ -300,7 +334,7 @@ const submitting = ref(false)
 const result = ref<{ total_created: number, total_skipped: number } | null>(null)
 
 const checkoutOpen = ref(false)
-const pendingPayment = ref<any | null>(null)
+const pendingPayment = ref<PendingPayment | null>(null)
 
 const planOptions = computed(() =>
   plans.value.map(p => ({
@@ -308,6 +342,11 @@ const planOptions = computed(() =>
     value: p.id
   }))
 )
+
+const pickedPlanIdModel = computed<number | undefined>({
+  get: () => pickedPlanId.value ?? undefined,
+  set: (val) => { pickedPlanId.value = val ?? null }
+})
 
 const effectiveplan = computed(() => {
   if (props.plan) return props.plan

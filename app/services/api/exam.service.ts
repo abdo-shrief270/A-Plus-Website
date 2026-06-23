@@ -4,7 +4,7 @@ const VERSION = 'v2'
 
 export const examService = {
   /** GET /v2/exams */
-  list: (params?: Record<string, any>) => {
+  list: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/exams`, { params })
   },
@@ -13,12 +13,6 @@ export const examService = {
   detail: (id: number | string) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/exams/${id}`)
-  },
-
-  /** GET /v2/exams/{id}/subjects */
-  subjects: (id: number | string) => {
-    const axios = createAxiosInstance()
-    return axios.get(`/${VERSION}/exams/${id}/subjects`)
   },
 
   /** GET /v2/exams/{id}/sections */

@@ -4,7 +4,7 @@ const VERSION = 'v2'
 
 export const settingsService = {
   /** GET /v2/settings - Get Platform Configuration Settings (إعدادات المنصة) */
-  getSettings: (params?: Record<string, any>) => {
+  getSettings: (params?: Record<string, string | number | boolean | undefined>) => {
     const axios = createAxiosInstance()
     return axios.get(`/${VERSION}/settings`, { params })
   },

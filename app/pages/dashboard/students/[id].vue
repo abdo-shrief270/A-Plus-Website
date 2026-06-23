@@ -405,11 +405,29 @@ definePageMeta({
   title: 'ملف الطالب'
 })
 
+interface StudentProfile {
+  id: number
+  name?: string
+  user_name?: string
+  email?: string
+  phone?: string
+  id_number?: string
+  gender?: 'male' | 'female' | string
+  exam_name?: string
+  exam_date?: string
+  joined_at?: string
+  total_points?: number
+  total_score?: number
+  has_unlimited_points?: boolean
+  league?: { name?: string, icon?: string } | null
+  [key: string]: unknown
+}
+
 const route = useRoute()
 const router = useRouter()
 const id = computed(() => route.params.id as string)
 
-const kid = ref<any | null>(null)
+const kid = ref<StudentProfile | null>(null)
 const loading = ref(true)
 const editOpen = ref(false)
 
@@ -424,7 +442,7 @@ async function fetchKid() {
   loading.value = true
   try {
     const res = await studentsService.getStudentProfile(id.value)
-    kid.value = res.data?.data ?? res.data
+    kid.value = (res.data?.data ?? res.data) as StudentProfile
   } catch (err) {
     console.error('Failed to load kid', err)
     kid.value = null
@@ -433,9 +451,10 @@ async function fetchKid() {
   }
 }
 
-function onUpdated(updated: any) {
+function onUpdated(updated: Partial<StudentProfile> | null) {
   if (updated && typeof updated === 'object') {
-    kid.value = { ...kid.value, ...updated }
+    const merged = { ...kid.value, ...updated }
+    kid.value = { ...merged, id: merged.id ?? kid.value?.id ?? 0 }
   } else {
     fetchKid()
   }

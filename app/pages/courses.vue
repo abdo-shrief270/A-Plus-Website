@@ -127,9 +127,14 @@ const { data: response, status, error, refresh } = await useAsyncData(
 )
 
 const courses = computed<Course[]>(() => {
-  const env = response.value?.data as any
+  const env = response.value?.data as
+    | (Course[] & { data?: Course[] | { data?: Course[] } })
+    | { data?: Course[] | { data?: Course[] } }
+    | undefined
   const inner = env?.data ?? env // unwrap { status, message, data }
-  return Array.isArray(inner) ? inner : (inner?.data ?? []) // unwrap pagination
+  if (Array.isArray(inner)) return inner
+  const innerData = inner?.data // unwrap pagination
+  return Array.isArray(innerData) ? innerData : []
 })
 
 // Computed Filtered Courses

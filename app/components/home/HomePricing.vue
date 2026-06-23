@@ -113,8 +113,8 @@ const { data } = await useAsyncData(
 )
 
 const plans = computed<Plan[]>(() => {
-  const payload = data.value as any
-  const list = Array.isArray(payload) ? payload : (payload?.data ?? [])
+  const payload = data.value as unknown
+  const list = Array.isArray(payload) ? payload : ((payload as { data?: unknown })?.data ?? [])
   // Subscription plans only — trial is shown as its own card, packs are top-ups.
   return (list as Plan[]).filter(p => p.type === 'subscription').slice(0, 3)
 })

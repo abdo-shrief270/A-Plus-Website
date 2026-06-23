@@ -264,8 +264,9 @@ async function confirmPayment() {
     const updated: Payment = res.data?.data ?? res.data
     step.value = 'success'
     emit('paid', updated)
-  } catch (err: any) {
-    error.value = err?.response?.data?.message || 'تعذّر إتمام الدفع'
+  } catch (err: unknown) {
+    const e = err as { response?: { data?: { message?: string } } }
+    error.value = e?.response?.data?.message || 'تعذّر إتمام الدفع'
   } finally {
     busy.value = false
   }
@@ -281,8 +282,9 @@ async function cancelPayment() {
     const updated: Payment = res.data?.data ?? res.data
     step.value = 'cancelled'
     emit('cancelled', updated)
-  } catch (err: any) {
-    error.value = err?.response?.data?.message || 'تعذّر إلغاء العملية'
+  } catch (err: unknown) {
+    const e = err as { response?: { data?: { message?: string } } }
+    error.value = e?.response?.data?.message || 'تعذّر إلغاء العملية'
   } finally {
     busy.value = false
   }

@@ -447,7 +447,27 @@ const daysRemaining = computed<number | null>(() => {
   return Math.max(0, Math.ceil(ms / (24 * 60 * 60 * 1000)))
 })
 
-const rows = ref<any[]>([])
+interface SubscriptionRow {
+  id: number
+  status: string
+  starts_at?: string
+  ends_at?: string | null
+  student?: {
+    id?: number
+    name?: string
+    user_name?: string
+    gender?: 'male' | 'female' | string
+  } | null
+  plan?: {
+    name?: string
+    type?: string
+    price?: number | string
+    points?: number
+  } | null
+  [key: string]: unknown
+}
+
+const rows = ref<SubscriptionRow[]>([])
 const meta = ref<{ total: number, per_page: number, last_page: number } | null>(null)
 const loading = ref(true)
 const page = ref(1)
@@ -511,7 +531,7 @@ async function fetchSubs() {
   try {
     const res = await subscriptionsService.list({ page: page.value, per_page: 20 })
     const body = res.data?.data ?? res.data
-    rows.value = body?.data ?? body ?? []
+    rows.value = (body?.data ?? body ?? []) as SubscriptionRow[]
     meta.value = body?.meta ?? {
       total: body?.total ?? rows.value.length,
       per_page: body?.per_page ?? 20,

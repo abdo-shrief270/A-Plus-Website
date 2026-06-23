@@ -249,7 +249,7 @@
                     <img
                       v-if="row.course?.image_path"
                       :src="row.course.image_path"
-                      :alt="row.course.title"
+                      :alt="row.course.title ?? ''"
                       class="w-full h-full object-cover"
                     >
                     <UIcon
@@ -342,8 +342,28 @@
 </template>
 
 <script setup lang="ts">
+import type { DropdownMenuItem } from '#ui/types'
 import { enrollmentsService } from '@/services/api/courses.service'
 import { useAuthStore } from '@/stores/auth'
+
+interface EnrollmentRow {
+  id: number
+  status?: string
+  enrolled_at?: string | null
+  created_at?: string | null
+  expires_at?: string | null
+  user?: {
+    name?: string | null
+    user_name?: string | null
+    student?: { id?: number | null } | null
+  } | null
+  course?: {
+    id?: number | null
+    title?: string | null
+    image_path?: string | null
+    level?: string | null
+  } | null
+}
 
 definePageMeta({
   layout: 'dashboard',
@@ -355,7 +375,7 @@ useSeoMeta({ title: 'الاشتراكات | A Plus' })
 const authStore = useAuthStore()
 const wallet = useStudentWallet()
 
-const rows = ref<any[]>([])
+const rows = ref<EnrollmentRow[]>([])
 const meta = ref<{ total: number, per_page: number, last_page: number } | null>(null)
 const loading = ref(true)
 const page = ref(1)
@@ -387,7 +407,7 @@ const stats = computed(() => {
     total: meta.value?.total ?? rows.value.length,
     active: rows.value.filter(r => r.status === 'active').length,
     pending: rows.value.filter(r => r.status === 'pending').length,
-    inactive: rows.value.filter(r => ['expired', 'cancelled'].includes(r.status)).length
+    inactive: rows.value.filter(r => ['expired', 'cancelled'].includes(r.status ?? '')).length
   }
 })
 
@@ -410,7 +430,12 @@ async function fetchEnrollments() {
   loading.value = true
   try {
     const res = await enrollmentsService.list({ page: page.value, per_page: 20 })
-    const body = res.data?.data ?? res.data
+    const body = (res.data?.data ?? res.data) as {
+      data?: EnrollmentRow[]
+      total?: number
+      per_page?: number
+      last_page?: number
+    } & EnrollmentRow[]
     rows.value = body?.data ?? body ?? []
     meta.value = {
       total: body?.total ?? rows.value.length,
@@ -433,10 +458,10 @@ function onEnrolled(result: { total_created: number, total_skipped: number }) {
   }
 }
 
-function rowActions(row: any) {
+function rowActions(row: EnrollmentRow) {
   const courseId = row.course?.id
   const studentId = row.user?.student?.id
-  const items: any[] = [
+  const items: DropdownMenuItem[] = [
     {
       label: 'عرض الكورس',
       icon: 'i-heroicons-eye',
@@ -455,14 +480,14 @@ function rowActions(row: any) {
   return [items]
 }
 
-function statusColor(status: string) {
+function statusColor(status?: string) {
   if (status === 'active') return 'success' as const
   if (status === 'pending') return 'warning' as const
   if (status === 'expired' || status === 'cancelled') return 'error' as const
   return 'neutral' as const
 }
 
-function statusLabel(status: string) {
+function statusLabel(status?: string) {
   if (status === 'active') return 'نشط'
   if (status === 'pending') return 'معلّق'
   if (status === 'expired') return 'منتهي'
@@ -470,14 +495,14 @@ function statusLabel(status: string) {
   return status || '—'
 }
 
-function levelLabel(level?: string) {
+function levelLabel(level?: string | null) {
   if (level === 'beginner') return 'مبتدئ'
   if (level === 'intermediate') return 'متوسط'
   if (level === 'advanced') return 'متقدم'
   return level || ''
 }
 
-function formatDate(iso?: string) {
+function formatDate(iso?: string | null) {
   if (!iso) return '—'
   try {
     return new Date(iso).toLocaleDateString('ar-EG', {
@@ -488,7 +513,7 @@ function formatDate(iso?: string) {
   }
 }
 
-function initial(name?: string) {
+function initial(name?: string | null) {
   return (name?.trim()?.charAt(0) ?? 'ط').toUpperCase()
 }
 </script>

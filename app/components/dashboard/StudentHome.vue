@@ -293,6 +293,7 @@ import { leaderboardService } from '@/services/api/leaderboard.service'
 import { formatNumber } from '@/utils/number'
 import { showToast } from '@/utils/helpers/toast.helper'
 import type { StudyPlan } from '@/types/lesson'
+import type { DailyChallengeStatus } from '@/types/quiz'
 
 const authStore = useAuthStore()
 const wallet = useStudentWallet()
@@ -314,7 +315,7 @@ function initial(name?: string | null) {
 
 // ---- Aggregated data ----
 const plan = ref<StudyPlan | null>(null)
-const daily = ref<any>(null)
+const daily = ref<DailyChallengeStatus | null>(null)
 const reviewDue = ref(0)
 const rank = ref<number | null>(null)
 const leagueName = ref('')

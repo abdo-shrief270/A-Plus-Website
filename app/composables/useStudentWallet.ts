@@ -15,6 +15,20 @@ interface ActiveSubscription {
   }
 }
 
+interface SubscriptionRow {
+  id: number
+  status?: string
+  starts_at?: string | null
+  ends_at?: string | null
+  plan: {
+    id: number
+    name: string
+    type: 'subscription' | 'pack' | string
+    points?: number | null
+    duration_days?: number | null
+  }
+}
+
 interface WalletState {
   points: number // wallet balance (رصيد النقاط) — spent when answering
   score: number // league score (نقاطي) — earned on correct answers
@@ -42,7 +56,7 @@ export const useStudentWallet = () => {
   const state = useState<WalletState>('aplus-student-wallet', () => ({ ...initial }))
 
   const studentId = computed<number | null>(() => {
-    const u: any = authStore.getUser
+    const u = authStore.getUser as ({ student?: { id?: number | null } | null } | null)
     return u?.student?.id ?? null
   })
 
@@ -65,7 +79,7 @@ export const useStudentWallet = () => {
       state.value.hasUnlimited = Boolean(student.has_unlimited_points)
 
       const subsBody = subsRes.data?.data ?? subsRes.data ?? {}
-      const subs: any[] = subsBody?.data ?? (Array.isArray(subsBody) ? subsBody : [])
+      const subs: SubscriptionRow[] = subsBody?.data ?? (Array.isArray(subsBody) ? subsBody : [])
 
       state.value.totalSubscriptions = subs.length
       state.value.activePackCount = subs.filter(s => s.status === 'active' && s.plan?.type === 'pack').length

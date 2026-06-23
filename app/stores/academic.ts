@@ -5,7 +5,6 @@ import type { Exam, Section } from '@/types/question-bank'
 interface AcademicState {
   exams: Exam[]
   currentExam: Exam | null
-  subjectsByExam: Record<string, unknown[]>
   sectionsByExam: Record<string, Section[]>
   loadingExams: boolean
   loadingExam: boolean
@@ -14,7 +13,7 @@ interface AcademicState {
 
 /**
  * Single store for the academic hierarchy: exams (study stages) → sections →
- * subjects. Keyed caches are scoped per-exam-id so we don't refetch on
+ * categories. Keyed caches are scoped per-exam-id so we don't refetch on
  * navigation but can still drop a single entry on demand.
  *
  * Was previously split between `academic.ts` and `useExamsStore.ts` — those
@@ -24,7 +23,6 @@ export const useAcademicStore = defineStore('academic', {
   state: (): AcademicState => ({
     exams: [],
     currentExam: null,
-    subjectsByExam: {},
     sectionsByExam: {},
     loadingExams: false,
     loadingExam: false,
@@ -75,22 +73,6 @@ export const useAcademicStore = defineStore('academic', {
         return null
       } finally {
         this.loadingExam = false
-      }
-    },
-
-    async fetchSubjectsForExam(examId: number | string, forceRefresh = false): Promise<unknown[]> {
-      const key = String(examId)
-      if (this.subjectsByExam[key] && !forceRefresh) return this.subjectsByExam[key]
-
-      try {
-        const res = await examsService.getExamSubjects(examId)
-        const payload = res.data?.data || res.data
-        const list = Array.isArray(payload) ? payload : (payload?.subjects || [])
-        this.subjectsByExam[key] = list
-        return list
-      } catch (error) {
-        console.error(`Failed to fetch subjects for exam ${examId}:`, error)
-        return []
       }
     },
 

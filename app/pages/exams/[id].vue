@@ -152,7 +152,7 @@
             <NuxtLink
               v-for="subject in subjects"
               :key="subject.id"
-              :to="`/subjects/${subject.id}/questions`"
+              :to="`/categories/${subject.id}/questions`"
               class="group relative overflow-hidden bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-100 dark:border-gray-800 p-8 flex flex-col gap-6 transition-all duration-500 hover:shadow-2xl hover:shadow-primary-500/10 hover:-translate-y-2"
             >
               <!-- Decorative Circle -->
@@ -236,8 +236,12 @@ const examId = computed(() => route.params.id as string)
 const examsStore = useAcademicStore()
 
 interface SubjectRow { id: number, name: string, questions_count?: number }
-const subjects = computed<SubjectRow[]>(() => (examsStore.subjectsByExam[examId.value] || []) as SubjectRow[])
 const sections = computed(() => examsStore.sectionsByExam[examId.value] || [])
+// "Subjects" are the categories across the exam's sections (the backend models
+// them as section-categories — there is no separate /subjects resource).
+const subjects = computed<SubjectRow[]>(() =>
+  sections.value.flatMap(s => (s.categories || []) as SubjectRow[])
+)
 
 useSeoMeta({
   title: computed(() => `${examsStore.currentExam?.name || 'تفاصيل الاختبار'} | A Plus`),
@@ -247,7 +251,6 @@ useSeoMeta({
 onMounted(async () => {
   await Promise.all([
     examsStore.fetchExamById(examId.value),
-    examsStore.fetchSubjectsForExam(examId.value),
     examsStore.fetchSectionsForExam(examId.value)
   ])
 })

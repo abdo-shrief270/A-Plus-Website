@@ -63,6 +63,14 @@
       />
     </div>
 
+    <!-- Error -->
+    <ErrorState
+      v-else-if="loadError"
+      title="تعذّر تحميل الطلاب"
+      :retrying="loading"
+      @retry="fetchStudents"
+    />
+
     <!-- Empty -->
     <div
       v-else-if="!loading && !students.length && !searchQuery"
@@ -282,15 +290,29 @@ definePageMeta({
 })
 useSeoMeta({ title: 'طلابي | A Plus' })
 
-const students = ref<any[]>([])
+interface StudentListItem {
+  id: number
+  name?: string
+  user_name?: string
+  gender?: 'male' | 'female' | string
+  exam_name?: string
+  total_points?: number
+  total_score?: number
+  has_unlimited_points?: boolean
+  league?: { name?: string, icon?: string } | null
+  [key: string]: unknown
+}
+
+const students = ref<StudentListItem[]>([])
 const meta = ref<{ total: number, per_page: number, last_page: number } | null>(null)
 const loading = ref(true)
+const loadError = ref(false)
 const searchQuery = ref('')
 const page = ref(1)
 const addOpen = ref(false)
 const importOpen = ref(false)
 const editOpen = ref(false)
-const editing = ref<any | null>(null)
+const editing = ref<StudentListItem | null>(null)
 
 const hasAny = computed(() => students.value.length > 0 || (meta.value?.total ?? 0) > 0)
 
@@ -316,6 +338,7 @@ onMounted(() => fetchStudents())
 
 async function fetchStudents() {
   loading.value = true
+  loadError.value = false
   try {
     const res = await studentsService.getStudents({
       page: page.value,
@@ -323,11 +346,12 @@ async function fetchStudents() {
       per_page: 12
     })
     const body = res.data?.data ?? res.data
-    students.value = Array.isArray(body) ? body : (body?.data ?? [])
+    students.value = (Array.isArray(body) ? body : (body?.data ?? [])) as StudentListItem[]
     meta.value = res.data?.meta ?? body?.meta ?? null
   } catch (err) {
     console.error('Failed to load students', err)
     students.value = []
+    loadError.value = true
   } finally {
     loading.value = false
   }
@@ -346,7 +370,7 @@ function onImported({ total_created }: { total_created: number, total_failed: nu
   }
 }
 
-function actionItems(student: any) {
+function actionItems(student: StudentListItem) {
   return [
     [
       {
@@ -371,19 +395,19 @@ function actionItems(student: any) {
   ]
 }
 
-function openEdit(student: any) {
+function openEdit(student: StudentListItem) {
   editing.value = student
   editOpen.value = true
 }
 
-function onUpdated(updated: any) {
+function onUpdated(updated: (Partial<StudentListItem> & { id: number }) | null) {
   if (!updated) return
   const idx = students.value.findIndex(s => s.id === updated.id)
   if (idx !== -1) students.value[idx] = { ...students.value[idx], ...updated }
   else fetchStudents()
 }
 
-async function requestDeletion(student: any) {
+async function requestDeletion(student: StudentListItem) {
   const ok = confirm(`هل تريد طلب حذف حساب ${student.name}؟\nسيتم تعليق الحساب بانتظار مراجعة الإدارة.`)
   if (!ok) return
   try {

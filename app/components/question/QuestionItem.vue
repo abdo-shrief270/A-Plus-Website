@@ -238,6 +238,7 @@
 <script setup lang="ts">
 import type { Question } from '~/types/question-bank'
 import { useQuestionsStore } from '~/stores/useQuestionsStore'
+import { showToast } from '@/utils/helpers/toast.helper'
 
 const props = defineProps<{
   question: Question
@@ -261,11 +262,19 @@ async function fetchAiExplanation() {
   try {
     const { aiService } = await import('@/services/api/ai.service')
     const res = await aiService.explain(props.question.id)
-    aiExplanation.value = res.data?.data?.explanation ?? ''
+    const explanation = res.data?.data?.explanation ?? ''
+    // Server returns 200 with an empty explanation when generation itself
+    // failed (e.g. AI provider hiccup) — surface that instead of a blank box.
+    if (!explanation) {
+      showToast('تعذّر توليد الشرح', 'لم نتمكن من توليد شرح لهذا السؤال حالياً، حاول لاحقاً.', 'warning')
+      return
+    }
+    aiExplanation.value = explanation
     const balance = res.data?.data?.balance
     if (typeof balance === 'number') wallet.setPoints(balance)
   } catch (err) {
-    console.error('AI explanation failed', err)
+    const e = err as { response?: { data?: { message?: string } } }
+    showToast('خطأ', e?.response?.data?.message || 'تعذّر الحصول على الشرح', 'error')
   } finally {
     aiLoading.value = false
   }

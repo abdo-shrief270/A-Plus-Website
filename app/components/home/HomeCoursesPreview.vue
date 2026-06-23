@@ -44,8 +44,8 @@ const { data } = await useAsyncData(
 )
 
 const courses = computed<Course[]>(() => {
-  const payload = data.value as any
-  const list = Array.isArray(payload) ? payload : (payload?.data ?? [])
+  const payload = data.value as unknown
+  const list = Array.isArray(payload) ? payload : ((payload as { data?: unknown })?.data ?? [])
   return (list as Course[]).slice(0, 3)
 })
 </script>

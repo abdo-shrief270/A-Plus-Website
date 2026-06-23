@@ -289,6 +289,11 @@ import { examService } from '@/services/api/exam.service'
 
 const labels = useEntityLabels()
 
+interface ExamSummary {
+  id: number
+  name: string
+}
+
 const props = defineProps<{ open: boolean }>()
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -297,7 +302,7 @@ const emit = defineEmits<{
 
 const examId = ref<number | undefined>(undefined)
 const examsLoading = ref(false)
-const exams = ref<Array<{ id: number, name: string }>>([])
+const exams = ref<ExamSummary[]>([])
 const examOptions = computed(() =>
   exams.value.map(e => ({ label: e.name, value: e.id }))
 )
@@ -468,7 +473,7 @@ async function submit() {
   submitting.value = true
   try {
     const students = parsedRows.value.map((row) => {
-      const payload: Record<string, any> = {
+      const payload: Record<string, string | number | undefined> = {
         name: row.name,
         user_name: row.user_name,
         password: row.password || undefined,
@@ -494,8 +499,9 @@ async function submit() {
       failed: data.failed ?? []
     }
     emit('imported', { total_created: result.value.total_created, total_failed: result.value.total_failed })
-  } catch (err: any) {
-    parseError.value = err?.response?.data?.message || 'حدث خطأ أثناء إرسال البيانات.'
+  } catch (err) {
+    const e = err as { response?: { data?: { message?: string } } }
+    parseError.value = e?.response?.data?.message || 'حدث خطأ أثناء إرسال البيانات.'
     console.error(err)
   } finally {
     submitting.value = false
@@ -508,8 +514,8 @@ async function loadExams() {
   try {
     const res = await examService.list({ per_page: 100 })
     const payload = res.data?.data ?? res.data
-    const list = Array.isArray(payload) ? payload : (payload?.data ?? payload?.exams ?? [])
-    exams.value = list.map((e: any) => ({ id: e.id, name: e.name }))
+    const list: ExamSummary[] = Array.isArray(payload) ? payload : (payload?.data ?? payload?.exams ?? [])
+    exams.value = list.map(e => ({ id: e.id, name: e.name }))
   } catch (err) {
     console.error('Failed to load exams', err)
   } finally {

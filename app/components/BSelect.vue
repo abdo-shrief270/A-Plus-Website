@@ -33,7 +33,7 @@ defineProps<{
   label?: string
   description?: string
   help?: string
-  error?: any
+  error?: string
   required?: boolean
   searchPlaceholder?: string
 }>()

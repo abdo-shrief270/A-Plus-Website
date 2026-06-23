@@ -112,6 +112,14 @@
       />
     </div>
 
+    <!-- Error -->
+    <ErrorState
+      v-else-if="loadError"
+      title="تعذّر تحميل الأبناء"
+      :retrying="loading"
+      @retry="fetchKids"
+    />
+
     <!-- Empty -->
     <div
       v-else-if="!loading && !kids.length && !searchQuery"
@@ -348,6 +356,19 @@ interface WeeklyChild {
 }
 const weeklySummary = ref<WeeklyChild[]>([])
 
+interface StudentListItem {
+  id: number
+  name?: string
+  user_name?: string
+  gender?: 'male' | 'female' | string
+  exam_name?: string
+  total_points?: number
+  total_score?: number
+  has_unlimited_points?: boolean
+  league?: { name?: string, icon?: string } | null
+  [key: string]: unknown
+}
+
 async function loadWeeklySummary() {
   try {
     const res = await parentDigestService.weekly(7)
@@ -357,15 +378,16 @@ async function loadWeeklySummary() {
   }
 }
 
-const kids = ref<any[]>([])
+const kids = ref<StudentListItem[]>([])
 const meta = ref<{ total: number, per_page: number, last_page: number } | null>(null)
 const loading = ref(true)
+const loadError = ref(false)
 const searchQuery = ref('')
 const page = ref(1)
 const addOpen = ref(false)
 const importOpen = ref(false)
 const editOpen = ref(false)
-const editingKid = ref<any | null>(null)
+const editingKid = ref<StudentListItem | null>(null)
 
 const hasAnyKids = computed(() => kids.value.length > 0 || (meta.value?.total ?? 0) > 0)
 
@@ -394,6 +416,7 @@ onMounted(() => {
 
 async function fetchKids() {
   loading.value = true
+  loadError.value = false
   try {
     const res = await studentsService.getStudents({
       page: page.value,
@@ -401,11 +424,12 @@ async function fetchKids() {
       per_page: 12
     })
     const body = res.data?.data ?? res.data
-    kids.value = Array.isArray(body) ? body : (body?.data ?? [])
+    kids.value = (Array.isArray(body) ? body : (body?.data ?? [])) as StudentListItem[]
     meta.value = res.data?.meta ?? body?.meta ?? null
   } catch (err) {
     console.error('Failed to load kids', err)
     kids.value = []
+    loadError.value = true
   } finally {
     loading.value = false
   }
@@ -424,7 +448,7 @@ function onImported({ total_created }: { total_created: number, total_failed: nu
   }
 }
 
-function actionItems(kid: any) {
+function actionItems(kid: StudentListItem) {
   return [
     [
       {
@@ -449,19 +473,19 @@ function actionItems(kid: any) {
   ]
 }
 
-function openEdit(kid: any) {
+function openEdit(kid: StudentListItem) {
   editingKid.value = kid
   editOpen.value = true
 }
 
-function onUpdated(updated: any) {
+function onUpdated(updated: (Partial<StudentListItem> & { id: number }) | null) {
   if (!updated) return
   const idx = kids.value.findIndex(k => k.id === updated.id)
   if (idx !== -1) kids.value[idx] = { ...kids.value[idx], ...updated }
   else fetchKids()
 }
 
-async function requestDeletion(kid: any) {
+async function requestDeletion(kid: StudentListItem) {
   const ok = confirm(`هل تريد طلب حذف حساب ${kid.name}؟\nسيتم تعليق الحساب بانتظار مراجعة الإدارة.`)
   if (!ok) return
   try {

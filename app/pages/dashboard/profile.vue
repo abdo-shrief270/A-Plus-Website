@@ -145,7 +145,7 @@
                     name="user_name"
                   >
                     <UInput
-                      :model-value="user?.user_name"
+                      :model-value="user?.user_name ?? ''"
                       icon="i-heroicons-at-symbol"
                       size="lg"
                       class="w-full"
@@ -242,7 +242,7 @@
                   required
                 >
                   <USelect
-                    v-model="examState.exam_id"
+                    v-model="examIdModel"
                     :items="examOptions"
                     :loading="loadingExams"
                     :disabled="loadingExams || savingExam"
@@ -476,6 +476,7 @@
 
 <script setup lang="ts">
 import type { FormSubmitEvent } from '#ui/types'
+import type { User } from '@/types/auth'
 import { authService } from '@/services/api/auth.service'
 import { examsService } from '@/services/api/exams.service'
 import { useAuthStore } from '@/stores/auth'
@@ -490,16 +491,38 @@ import {
 definePageMeta({ layout: 'dashboard', middleware: ['auth'], title: 'الملف الشخصي' })
 useSeoMeta({ title: 'الملف الشخصي | A Plus' })
 
+interface ProfileStudent {
+  exam_id?: number | null
+  exam_date?: string | null
+  exam_name?: string | null
+}
+
+interface ProfileUser {
+  id?: number
+  name?: string | null
+  user_name?: string | null
+  email?: string | null
+  phone?: string | null
+  gender?: string | null
+  created_at?: string | null
+  student?: ProfileStudent | null
+}
+
+interface ExamOption {
+  id: number
+  name: string
+}
+
 const authStore = useAuthStore()
 const loading = ref(true)
 const savingProfile = ref(false)
 const savingPassword = ref(false)
 const showCurrent = ref(false)
 const showNew = ref(false)
-const user = ref<any>(null)
+const user = ref<ProfileUser | null>(null)
 
 // Student exam settings
-const exams = ref<any[]>([])
+const exams = ref<ExamOption[]>([])
 const loadingExams = ref(false)
 const savingExam = ref(false)
 const examState = reactive<{ exam_id: number | null, exam_date: string }>({
@@ -507,6 +530,11 @@ const examState = reactive<{ exam_id: number | null, exam_date: string }>({
   exam_date: ''
 })
 const originalExam = ref<{ exam_id: number | null, exam_date: string }>({ exam_id: null, exam_date: '' })
+
+const examIdModel = computed<number | undefined>({
+  get: () => examState.exam_id ?? undefined,
+  set: (val) => { examState.exam_id = val ?? null }
+})
 
 const profileState = reactive<ProfileSchema>({
   name: '',
@@ -583,7 +611,7 @@ onMounted(async () => {
     profileState.phone = user.value?.phone || ''
     Object.assign(original.value, { ...profileState })
 
-    if (user.value) authStore.user = user.value
+    if (user.value) authStore.user = user.value as User
 
     if (authStore.isStudent) {
       hydrateExamState()
@@ -633,23 +661,24 @@ async function onUpdateExam() {
   if (!isExamDirty.value || !examState.exam_id || examDateError.value) return
   savingExam.value = true
   try {
-    const payload: Record<string, any> = { exam_id: examState.exam_id }
+    const payload: Record<string, string | number | null> = { exam_id: examState.exam_id }
     if (examState.exam_date) payload.exam_date = examState.exam_date
     else payload.exam_date = null
 
     const res = await authService.updateProfile(payload)
-    const updatedUser = res.data?.data?.user ?? res.data?.user
+    const updatedUser: ProfileUser | undefined = res.data?.data?.user ?? res.data?.user
     if (updatedUser) {
       user.value = updatedUser
-      authStore.user = updatedUser
+      authStore.user = updatedUser as User
       hydrateExamState()
     } else {
       originalExam.value = { exam_id: examState.exam_id, exam_date: examState.exam_date }
     }
 
     showToast('نجاح', 'تم تحديث بيانات الاختبار بنجاح', 'success')
-  } catch (error: any) {
-    const msg = error.response?.data?.message || 'حدث خطأ أثناء التحديث'
+  } catch (error: unknown) {
+    const e = error as { response?: { data?: { message?: string } } }
+    const msg = e.response?.data?.message || 'حدث خطأ أثناء التحديث'
     showToast('خطأ', msg, 'error')
   } finally {
     savingExam.value = false
@@ -665,16 +694,16 @@ function resetProfile() {
 async function onUpdateProfile(event: FormSubmitEvent<ProfileSchema>) {
   savingProfile.value = true
   try {
-    const payload: Record<string, any> = { ...event.data }
+    const payload: Record<string, string | undefined> = { ...event.data }
     if (!payload.email) delete payload.email
     if (!payload.phone) delete payload.phone
 
     const res = await authService.updateProfile(payload)
 
-    const updatedUser = res.data?.data?.user ?? res.data?.user
+    const updatedUser: ProfileUser | undefined = res.data?.data?.user ?? res.data?.user
     if (updatedUser) {
       user.value = updatedUser
-      authStore.user = updatedUser
+      authStore.user = updatedUser as User
       Object.assign(original.value, {
         name: updatedUser.name || '',
         email: updatedUser.email || '',
@@ -685,8 +714,9 @@ async function onUpdateProfile(event: FormSubmitEvent<ProfileSchema>) {
     }
 
     showToast('نجاح', 'تم تحديث بيانات الملف الشخصي بنجاح', 'success')
-  } catch (error: any) {
-    const msg = error.response?.data?.message || 'حدث خطأ أثناء التحديث'
+  } catch (error: unknown) {
+    const e = error as { response?: { data?: { message?: string } } }
+    const msg = e.response?.data?.message || 'حدث خطأ أثناء التحديث'
     showToast('خطأ', msg, 'error')
   } finally {
     savingProfile.value = false
@@ -705,19 +735,20 @@ async function onChangePassword(event: FormSubmitEvent<PasswordSchema>) {
     passwordState.password = ''
     showCurrent.value = false
     showNew.value = false
-  } catch (error: any) {
-    const msg = error.response?.data?.message || 'تأكد من صحة كلمة المرور الحالية'
+  } catch (error: unknown) {
+    const e = error as { response?: { data?: { message?: string } } }
+    const msg = e.response?.data?.message || 'تأكد من صحة كلمة المرور الحالية'
     showToast('خطأ', msg, 'error')
   } finally {
     savingPassword.value = false
   }
 }
 
-function initial(name?: string) {
+function initial(name?: string | null) {
   return (name?.trim()?.charAt(0) ?? 'A').toUpperCase()
 }
 
-function formatDate(iso?: string) {
+function formatDate(iso?: string | null) {
   if (!iso) return '—'
   try {
     return new Date(iso).toLocaleDateString('ar-EG', {

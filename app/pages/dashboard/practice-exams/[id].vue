@@ -445,6 +445,19 @@ import { questionsService } from '@/services/api/questions.service'
 import { quizzesService } from '@/services/api/quizzes.service'
 import { showToast } from '@/utils/helpers/toast.helper'
 import { renderMarkdown } from '@/utils/markdown'
+import type { PracticeExam, Question } from '@/types/question-bank'
+
+// The detail endpoint may also expose card-style metadata not on the strict
+// PracticeExam shape (name/description/duration/questions_count/passing_score).
+type PracticeExamDetail = Partial<PracticeExam> & {
+  id?: number
+  name?: string
+  description?: string
+  duration?: number
+  questions_count?: number
+  passing_score?: number
+  questions?: Question[]
+}
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth'] })
 
@@ -457,7 +470,12 @@ async function startSimulation() {
   startingSimulation.value = true
   try {
     const res = await quizzesService.simulateModel(examId)
-    const body = res.data
+    const body = res.data as {
+      status?: number
+      message?: string
+      errors?: Record<string, string[]>
+      data?: { session?: { id?: number | string } }
+    }
     if (body?.status === 409) {
       showToast('تنبيه', body?.message || 'لديك اختبار قيد التنفيذ — أنهه أولاً', 'warning')
       return
@@ -479,8 +497,8 @@ async function startSimulation() {
 }
 
 const loading = ref(true)
-const exam = ref<any>(null)
-const questions = ref<any[]>([])
+const exam = ref<PracticeExamDetail | null>(null)
+const questions = ref<Question[]>([])
 
 // Test taking states
 const isStarted = ref(false)
@@ -571,8 +589,12 @@ const formattedTimeSpent = computed(() => {
 onMounted(async () => {
   try {
     const res = await questionsService.getPracticeExamDetails(examId)
-    const data = res.data?.data || res.data
-    exam.value = data?.practice_exam || data?.exam || data
+    const data = (res.data?.data || res.data) as
+      | PracticeExamDetail
+      | { practice_exam?: PracticeExamDetail, exam?: PracticeExamDetail }
+    exam.value = ('practice_exam' in data ? data.practice_exam : undefined)
+      || ('exam' in data ? data.exam : undefined)
+      || (data as PracticeExamDetail)
 
     useSeoMeta({ title: `${exam.value?.title || 'نماذج الاختبار'} | A Plus` })
 
@@ -612,6 +634,7 @@ function getDifficultyColor(difficulty: string) {
 }
 
 function difficultyLabel(difficulty: string) {
-  return ({ easy: 'سهل', medium: 'متوسط', hard: 'صعب' } as Record<string, string>)[difficulty?.toLowerCase()] || difficulty
+  const labels: Record<string, string> = { easy: 'سهل', medium: 'متوسط', hard: 'صعب' }
+  return labels[difficulty?.toLowerCase()] || difficulty
 }
 </script>

@@ -1,6 +1,12 @@
 import { enrollmentsService } from '@/services/api/courses.service'
 import { useAuthStore } from '@/stores/auth'
 
+interface EnrollmentRow {
+  status?: string
+  course_id?: number | string | null
+  course?: { id?: number | string | null } | null
+}
+
 interface EnrollmentsState {
   /** Course IDs the student currently has an `active` enrollment in. */
   activeCourseIds: number[]
@@ -27,7 +33,7 @@ export const useStudentEnrollments = () => {
     try {
       const res = await enrollmentsService.list({ per_page: 200 })
       const body = res.data?.data ?? res.data ?? {}
-      const rows: any[] = body?.data ?? (Array.isArray(body) ? body : [])
+      const rows: EnrollmentRow[] = body?.data ?? (Array.isArray(body) ? body : [])
       state.value.activeCourseIds = rows
         .filter(r => r.status === 'active')
         .map(r => Number(r.course_id ?? r.course?.id))

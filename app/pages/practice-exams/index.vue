@@ -46,17 +46,27 @@
 
 <script setup lang="ts">
 import { practiceExamService } from '@/services/api/practiceExam.service'
+import type { PracticeExam } from '@/types/question-bank'
 
 definePageMeta({ middleware: ['auth'] })
 useSeoMeta({ title: 'نماذج اختبارات | A Plus' })
 
+// The list endpoint returns a lighter card shape than the full PracticeExam
+// detail (no questions; may expose name/questions_count instead of title).
+type PracticeExamListItem = Partial<PracticeExam> & {
+  id: number
+  name?: string
+  questions_count?: number
+}
+
 const loading = ref(true)
-const practiceExams = ref<any[]>([])
+const practiceExams = ref<PracticeExamListItem[]>([])
 
 onMounted(async () => {
   try {
     const res = await practiceExamService.list()
-    practiceExams.value = res.data?.data?.practice_exams || []
+    const data = res.data?.data?.practice_exams as PracticeExamListItem[] | undefined
+    practiceExams.value = data || []
   } catch {
     //
   } finally {

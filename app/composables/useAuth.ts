@@ -6,9 +6,9 @@ import type { LoginPayload, LoginCheckResponse, AuthResponse, StudentRegisterPay
 export const useAuthService = () => {
   const api = new useApi('auth', 'v2')
   const loading = ref(false)
-  const error = ref<any>(null)
+  const error = ref<unknown>(null)
 
-  const post = async <T = any>(endpoint: string, payload: any): Promise<T> => {
+  const post = async <T = unknown>(endpoint: string, payload: unknown): Promise<T> => {
     loading.value = true
     error.value = null
     try {
@@ -25,7 +25,7 @@ export const useAuthService = () => {
     }
   }
 
-  const get = async <T = any>(endpoint: string): Promise<T> => {
+  const get = async <T = unknown>(endpoint: string): Promise<T> => {
     loading.value = true
     error.value = null
     try {
@@ -44,17 +44,17 @@ export const useAuthService = () => {
   const registerStudent = (payload: StudentRegisterPayload) => post<AuthResponse>('register/student', payload)
   const registerParent = (payload: ParentRegisterPayload) => post<AuthResponse>('register/parent', payload)
   const checkUsername = (payload: CheckUsernamePayload) => post<{ available: boolean }>('username/check', payload)
-  const verifyAccounts = (payload: any) => post('verify-account', payload)
-  const logout = (payload: any = {}) => post('logout', payload)
+  const verifyAccounts = (payload: Record<string, unknown>) => post('verify-account', payload)
+  const logout = (payload: Record<string, unknown> = {}) => post('logout', payload)
 
   // Custom OTP functions based on API docs V2
   const sendOtp = (payload: SendOtpPayload) => post<{ message: string, status: number }>('otp/send', payload)
   const verifyOtp = (payload: VerifyOtpPayload) => post<AuthResponse>('otp/verify', payload)
 
   const passwordSendOtp = (payload: { email: string }) => post('password/send-otp', payload)
-  const passwordReset = (payload: any) => post('password/reset', payload)
+  const passwordReset = (payload: Record<string, unknown>) => post('password/reset', payload)
   const resendOtp = (payload: { email: string }) => post('resend-otp', payload)
-  const passwordVerifyOtp = (payload: any) => post('password/verify-otp', payload)
+  const passwordVerifyOtp = (payload: Record<string, unknown>) => post('password/verify-otp', payload)
   const refreshToken = () => get('refresh-token')
 
   return {
