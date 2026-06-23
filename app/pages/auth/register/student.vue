@@ -105,12 +105,9 @@
           label="كلمة المرور"
           name="password"
         >
-          <UInput
+          <PasswordField
             v-model="state.password"
-            type="password"
-            placeholder="••••••••"
-            size="lg"
-            class="w-full"
+            @generate="state.password_confirmation = $event"
           />
         </UFormField>
 

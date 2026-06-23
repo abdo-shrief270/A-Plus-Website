@@ -74,7 +74,7 @@
     <!-- Answers Section -->
     <div class="space-y-4 mb-10">
       <div
-        v-for="ans in question.answers"
+        v-for="(ans, idx) in question.answers"
         :key="ans.id"
         class="group relative cursor-pointer"
         @click="selectAnswer(ans.id)"
@@ -101,7 +101,7 @@
               class="w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm transition-colors border-2"
               :class="getIndicatorClasses(ans.id)"
             >
-              {{ String.fromCharCode(65 + (ans.order || 1) - 1) }}
+              {{ String.fromCharCode(65 + idx) }}
             </div>
             <div
               class="flex-grow text-lg font-bold [&_img]:inline-block [&_img]:align-middle [&_img]:max-h-24 [&_img]:mx-1"

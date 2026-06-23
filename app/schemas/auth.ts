@@ -23,6 +23,14 @@ export type UsernameInput = z.output<ReturnType<typeof buildUsernameSchema>>
 export type PasswordInput = z.output<ReturnType<typeof buildPasswordSchema>>
 export type OtpInput = z.output<typeof otpSchema>
 
+/** Strong-password policy — mirrors the backend (App\Support\PasswordRules). */
+export const strongPassword = z.string()
+  .min(8, 'كلمة المرور ٨ أحرف على الأقل')
+  .regex(/[a-z]/, 'يجب أن تحتوي على حرف صغير')
+  .regex(/[A-Z]/, 'يجب أن تحتوي على حرف كبير')
+  .regex(/\d/, 'يجب أن تحتوي على رقم')
+  .regex(/[^A-Za-z0-9]/, 'يجب أن تحتوي على رمز خاص')
+
 /** Shared base for any user that registers — name, contact, password, gender. */
 const baseRegisterShape = {
   name: z.string().min(2, 'الاسم مطلوب'),
@@ -30,7 +38,7 @@ const baseRegisterShape = {
   country_code: z.string().min(1, 'كود الدولة مطلوب'),
   phone: z.string().min(7, 'رقم الهاتف مطلوب'),
   email: z.string().email('بريد إلكتروني غير صالح').optional().or(z.literal('')),
-  password: z.string().min(8, 'كلمة المرور ٨ أحرف على الأقل'),
+  password: strongPassword,
   password_confirmation: z.string().min(8, 'تأكيد كلمة المرور مطلوب'),
   gender: z.enum(['male', 'female'], { message: 'الجنس مطلوب' })
 }

@@ -102,16 +102,16 @@
         <div class="bg-gradient-to-l from-warning-50 to-white rounded-2xl border border-warning-100 p-4 shadow-sm">
           <p class="text-xs text-gray-500 mb-1.5 flex items-center gap-1.5">
             <UIcon
-              name="i-heroicons-bolt"
+              name="i-heroicons-document-check"
               class="w-3.5 h-3.5 text-warning-600"
             />
-            عدد المحاولات
+            الأسئلة المُجابة
           </p>
           <p class="text-2xl font-bold text-warning-700">
             {{ formatNumber(metrics.totals.attempts) }}
           </p>
           <p class="text-[11px] text-gray-500 mt-1.5">
-            تشمل إعادة الحل لنفس السؤال
+            إجمالي الأسئلة التي أجبت عنها
           </p>
         </div>
 
