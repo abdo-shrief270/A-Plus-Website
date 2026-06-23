@@ -14,6 +14,7 @@ import solutions_otp from './ar/solutions_otp.json'
 import solutions_crm from './ar/solutions_crm.json'
 import solutions_live_chat from './ar/solutions_live_chat.json'
 import book_demo from './ar/book_demo.json'
+import errors from './ar/errors.json'
 
 import layout from './ar/layout.json'
 
@@ -35,6 +36,7 @@ export default defineI18nLocale(async () => {
     solutions_crm,
     solutions_live_chat,
     book_demo,
+    errors,
     layout
   }
 })

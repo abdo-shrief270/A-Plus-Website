@@ -60,7 +60,9 @@
 import { ref, computed, watch } from 'vue'
 // Imported locally (not a global plugin) so vue-tel-input + libphonenumber-js
 // ship only in the register-page chunks, not the app-wide bundle.
-import VueTelInput from 'vue-tel-input'
+// Named export is the component; the default export is the (plugin) installer —
+// importing the default rendered nothing, hiding the phone field.
+import { VueTelInput } from 'vue-tel-input'
 import 'vue-tel-input/vue-tel-input.css'
 import PhoneIcon from './icons/PhoneIcon.vue'
 
