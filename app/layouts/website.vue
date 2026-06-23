@@ -122,6 +122,12 @@ const menuItems = [
     route: '/plan',
     label: 'خطتي',
     icon: 'i-heroicons-map'
+  },
+  {
+    id: 'download',
+    route: '/download',
+    label: 'تحميل التطبيق',
+    icon: 'i-heroicons-device-phone-mobile'
   }
 ]
 

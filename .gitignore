@@ -29,3 +29,6 @@ logs
 
 # VSC
 .history
+
+# App APKs served from the download page (kept out of git; replace on each release)
+public/downloads/*.apk
