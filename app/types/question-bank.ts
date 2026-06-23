@@ -61,16 +61,14 @@ export interface Answer {
 export interface Question {
   id: number
   text: string
-  image_path?: string | null
   difficulty: 'easy' | 'medium' | 'hard'
   is_new: boolean
   comparison?: {
-    value_1: { text: string, image_path: string | null }
-    value_2: { text: string, image_path: string | null }
+    value_1: { text: string, image: string | null }
+    value_2: { text: string, image: string | null }
   } | null
   explanation: {
     text: string
-    image_path: string | null
     video_url: string | null
   }
   answers: Answer[]

@@ -8,6 +8,7 @@ export interface User {
   gender?: 'male' | 'female'
   avatar?: string
   lang: 'ar' | 'en'
+  joined_at?: string
   created_at?: string
   updated_at?: string
   [key: string]: string | number | boolean | undefined | null

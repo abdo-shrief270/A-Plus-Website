@@ -477,6 +477,7 @@ function categoryLabel(c: string) {
     suggestion: 'اقتراح',
     technical: 'مشكلة تقنية',
     billing: 'الدفع والفواتير',
+    question_report: 'الإبلاغ عن سؤال',
     other: 'أخرى'
   }
   return labels[c] || c

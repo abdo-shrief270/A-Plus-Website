@@ -479,6 +479,7 @@ const subOpen = ref(false)
 const statusOptions = [
   { label: 'كل الحالات', value: null },
   { label: 'نشط', value: 'active' },
+  { label: 'بانتظار التفعيل', value: 'pending' },
   { label: 'منتهي', value: 'expired' },
   { label: 'ملغي', value: 'cancelled' }
 ]

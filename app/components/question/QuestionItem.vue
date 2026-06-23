@@ -37,24 +37,12 @@
     </div>
 
     <!-- Question Text -->
-    <div class="mb-10 text-xl md:text-2xl font-black text-gray-800 dark:text-white leading-relaxed text-right dir-rtl">
-      {{ question.text }}
-    </div>
-
-    <!-- Question Image -->
+    <!-- eslint-disable vue/no-v-html -- markdown is admin-authored (see renderMarkdown) -->
     <div
-      v-if="question.image_path"
-      class="mb-10 relative group"
-    >
-      <div
-        class="absolute -inset-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-500"
-      />
-      <img
-        :src="question.image_path"
-        class="relative w-full rounded-3xl border border-white/10 shadow-2xl object-cover h-auto max-h-[400px]"
-        alt="Question Image"
-      >
-    </div>
+      class="mb-10 text-xl md:text-2xl font-black text-gray-800 dark:text-white leading-relaxed text-right dir-rtl [&_img]:inline-block [&_img]:align-middle [&_img]:max-h-40 [&_img]:mx-1"
+      v-html="renderMarkdown(question.text)"
+    />
+    <!-- eslint-enable vue/no-v-html -->
 
     <!-- Comparison Section -->
     <div
@@ -71,13 +59,12 @@
         </div>
         <div
           v-if="val.text"
-          class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4"
-        >
-          {{ val.text }}
-        </div>
+          class="text-lg font-bold text-gray-700 dark:text-gray-200 mb-4 [&_img]:inline-block [&_img]:align-middle [&_img]:max-h-32 [&_img]:mx-1"
+          v-html="renderMarkdown(val.text)"
+        />
         <img
-          v-if="val.image_path"
-          :src="val.image_path"
+          v-if="val.image"
+          :src="val.image"
           class="rounded-xl max-h-40 object-contain shadow-sm"
           alt="Comparison value"
         >
@@ -116,9 +103,10 @@
             >
               {{ String.fromCharCode(65 + (ans.order || 1) - 1) }}
             </div>
-            <div class="flex-grow text-lg font-bold">
-              {{ ans.text }}
-            </div>
+            <div
+              class="flex-grow text-lg font-bold [&_img]:inline-block [&_img]:align-middle [&_img]:max-h-24 [&_img]:mx-1"
+              v-html="renderMarkdown(ans.text)"
+            />
             <UIcon
               v-if="isSubmitted && ans.id === correctAnswerId"
               name="i-heroicons-check-badge"
@@ -175,16 +163,10 @@
             />
             شرح الحل
           </div>
-          <p class="text-gray-600 dark:text-gray-300 leading-relaxed font-medium mb-6 whitespace-pre-wrap">
-            {{ question.explanation.text }}
-          </p>
-
-          <img
-            v-if="question.explanation.image_path"
-            :src="question.explanation.image_path"
-            class="rounded-2xl max-h-[300px] object-contain mb-6 shadow-lg border border-white/10 mx-auto"
-            alt="Explanation"
-          >
+          <div
+            class="text-gray-600 dark:text-gray-300 leading-relaxed font-medium mb-6 [&_img]:inline-block [&_img]:align-middle [&_img]:max-h-40 [&_img]:mx-1"
+            v-html="renderMarkdown(question.explanation.text)"
+          />
 
           <div
             v-if="question.explanation.video_url"
@@ -239,6 +221,7 @@
 import type { Question } from '~/types/question-bank'
 import { useQuestionsStore } from '~/stores/useQuestionsStore'
 import { showToast } from '@/utils/helpers/toast.helper'
+import { renderMarkdown } from '@/utils/markdown'
 
 const props = defineProps<{
   question: Question

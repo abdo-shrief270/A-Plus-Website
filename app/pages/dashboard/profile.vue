@@ -340,21 +340,10 @@
               </div>
               <div class="px-5 py-3 flex items-center justify-between">
                 <dt class="text-sm text-gray-500">
-                  معرف الحساب
-                </dt>
-                <dd
-                  class="text-sm font-mono text-gray-900"
-                  dir="ltr"
-                >
-                  #{{ user?.id || '—' }}
-                </dd>
-              </div>
-              <div class="px-5 py-3 flex items-center justify-between">
-                <dt class="text-sm text-gray-500">
                   تاريخ الانضمام
                 </dt>
                 <dd class="text-sm font-semibold text-gray-900">
-                  {{ formatDate(user?.created_at) }}
+                  {{ formatDate(user?.joined_at) }}
                 </dd>
               </div>
               <div class="px-5 py-3 flex items-center justify-between gap-3">
@@ -504,6 +493,7 @@ interface ProfileUser {
   email?: string | null
   phone?: string | null
   gender?: string | null
+  joined_at?: string | null
   created_at?: string | null
   student?: ProfileStudent | null
 }
@@ -592,7 +582,7 @@ const roleIcon = computed(() => {
 })
 
 const memberSince = computed(() => {
-  const iso = user.value?.created_at
+  const iso = user.value?.joined_at
   if (!iso) return null
   try {
     return new Date(iso).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long' })

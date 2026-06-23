@@ -61,7 +61,7 @@
             class="px-5 py-4 bg-white"
           >
             <p class="text-[11px] font-bold text-primary-600 uppercase tracking-wider mb-1">
-              {{ setting.name_ar || prettyKey(setting.key) }}
+              {{ prettyKey(setting.key) }}
             </p>
             <p
               class="text-sm text-gray-900 break-words"
@@ -103,7 +103,7 @@
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-bold text-gray-900 truncate">
-                {{ link.name_ar || prettyKey(link.key) }}
+                {{ prettyKey(link.key) }}
               </p>
               <p
                 class="text-xs text-gray-500 truncate mt-0.5"
@@ -187,7 +187,6 @@ useSeoMeta({ title: 'حول المنصة | A Plus' })
 interface SettingItem {
   key: string
   value?: string | null
-  name_ar?: string | null
   group?: string | null
 }
 

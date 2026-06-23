@@ -122,16 +122,19 @@ function buildInstance(): AxiosInstance {
         }
       }
 
-      // For everything else, surface the backend message and only run the
-      // redirect side-effects when the failing call wasn't itself an auth
-      // endpoint — otherwise we'd kick a user off the login page in response
-      // to a wrong password or a "device pending approval" 401.
-      // Only surface errors / run redirect side-effects for an actual session.
-      // Guests on public pages get a silent reject (the caller already handles
-      // its own empty/fallback state).
-      if (hasSession) {
-        if (backendMessage) showToast('خطأ', backendMessage, 'error')
-        if (!isAuthEndpoint) handleResponseErrors(error)
+      // Surface the backend message when there's an active session OR the
+      // failing call is part of the auth flow (login/register/otp/password/...).
+      // The latter ensures guests on auth pages see why their submit failed
+      // (wrong password, invalid OTP, device under review, etc.). A guest's
+      // stray 401 on a public browse endpoint stays silent (no message, no
+      // redirect) — the page handles its own empty/fallback state.
+      if (backendMessage && (hasSession || isAuthEndpoint)) {
+        showToast('خطأ', backendMessage, 'error')
+      }
+      // Redirect/logout side-effects only for a real session, and never for
+      // auth endpoints (don't bounce a user off the login page on a bad submit).
+      if (hasSession && !isAuthEndpoint) {
+        handleResponseErrors(error)
       }
 
       return Promise.reject(error)

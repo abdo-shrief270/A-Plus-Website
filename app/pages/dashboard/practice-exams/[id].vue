@@ -62,7 +62,7 @@
         </p>
       </div>
 
-      <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="p-8">
         <div
           class="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
         >
@@ -75,34 +75,6 @@
           </h4>
           <p class="text-gray-500 mt-1">
             {{ exam.questions?.length || exam.questions_count || 0 }} سؤال
-          </p>
-        </div>
-        <div
-          class="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
-        >
-          <UIcon
-            name="i-heroicons-clock"
-            class="w-8 h-8 text-gray-400 mb-3 mx-auto"
-          />
-          <h4 class="font-bold text-gray-900 dark:text-white">
-            المدة الزمنية
-          </h4>
-          <p class="text-gray-500 mt-1">
-            {{ exam.duration || "غير محدد" }} دقيقة
-          </p>
-        </div>
-        <div
-          class="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-xl border border-gray-100 dark:border-gray-700 text-center"
-        >
-          <UIcon
-            name="i-heroicons-check-badge"
-            class="w-8 h-8 text-gray-400 mb-3 mx-auto"
-          />
-          <h4 class="font-bold text-gray-900 dark:text-white">
-            درجة النجاح
-          </h4>
-          <p class="text-gray-500 mt-1">
-            {{ exam.passing_score || 50 }}%
           </p>
         </div>
       </div>
@@ -222,16 +194,6 @@
             dir="rtl"
             v-html="renderMarkdown(currentQuestion.text)"
           />
-
-          <div
-            v-if="currentQuestion.image_path"
-            class="mt-6 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 p-2 bg-gray-50 dark:bg-gray-900/50"
-          >
-            <img
-              :src="currentQuestion.image_path"
-              class="max-w-full h-auto mx-auto rounded-lg"
-            >
-          </div>
         </div>
 
         <div class="p-6 md:p-8 bg-gray-50/50 dark:bg-gray-800/50">

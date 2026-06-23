@@ -5,7 +5,6 @@ export interface LessonQuestionAnswer {
   id: number
   text: string
   image_path?: string | null
-  is_correct: boolean
   order: number
 }
 
