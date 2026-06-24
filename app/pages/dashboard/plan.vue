@@ -203,10 +203,12 @@
 
               <div class="space-y-2">
                 <component
-                  :is="lesson.is_locked ? 'div' : NuxtLinkComponent"
+                  :is="(lesson.is_locked && lesson.locked_reason !== 'trial_locked') ? 'div' : NuxtLinkComponent"
                   v-for="lesson in day.lessons"
                   :key="lesson.lesson_id"
-                  :to="lesson.is_locked ? undefined : `/dashboard/lessons/${lesson.lesson_id}`"
+                  :to="lesson.locked_reason === 'trial_locked'
+                    ? '/dashboard/subscriptions'
+                    : (lesson.is_locked ? undefined : `/dashboard/lessons/${lesson.lesson_id}`)"
                   :class="[
                     'flex items-center gap-3 px-3 py-3 rounded-xl border transition-colors group',
                     lesson.is_locked
@@ -232,7 +234,13 @@
                       {{ lesson.title }}
                     </p>
                     <p class="text-[11px] text-gray-400 mt-0.5">
-                      <template v-if="lesson.is_locked">
+                      <template v-if="lesson.locked_reason === 'trial_locked'">
+                        <UIcon
+                          name="i-heroicons-lock-closed"
+                          class="w-3 h-3 inline align-middle"
+                        /> متاح في الخطة المدفوعة
+                      </template>
+                      <template v-else-if="lesson.is_locked">
                         <UIcon
                           name="i-heroicons-lock-closed"
                           class="w-3 h-3 inline align-middle"

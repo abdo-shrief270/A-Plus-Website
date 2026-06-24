@@ -160,11 +160,22 @@
                     />
                     {{ formatNumber(cat.articles_count || 0) }} قطعة
                   </span>
+                  <span
+                    v-if="cat.is_locked"
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold"
+                  >
+                    <UIcon
+                      name="i-heroicons-lock-closed"
+                      class="w-3 h-3"
+                    />
+                    الخطة المدفوعة
+                  </span>
                 </div>
               </div>
               <UIcon
-                name="i-heroicons-arrow-left"
-                class="w-4 h-4 text-gray-300 group-hover:text-primary-600 transition-colors mt-1"
+                :name="cat.is_locked ? 'i-heroicons-lock-closed' : 'i-heroicons-arrow-left'"
+                class="w-4 h-4 transition-colors mt-1"
+                :class="cat.is_locked ? 'text-amber-500' : 'text-gray-300 group-hover:text-primary-600'"
               />
             </div>
           </button>
@@ -195,6 +206,7 @@ interface Category {
   questions_count?: number
   articles_count?: number
   has_articles?: boolean
+  is_locked?: boolean
 }
 
 interface Section {
@@ -252,6 +264,11 @@ function formatNumber(n: number) {
 }
 
 function onCategoryClick(cat: Category, _section: Section) {
+  // Trial users: locked categories route to the subscription page instead.
+  if (cat.is_locked) {
+    navigateTo('/dashboard/subscriptions')
+    return
+  }
   navigateTo(`/dashboard/question-bank/category/${cat.id}`)
 }
 
