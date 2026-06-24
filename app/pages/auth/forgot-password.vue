@@ -116,13 +116,9 @@
         أدخل كلمة مرور قوية لحسابك
       </p>
       <div class="space-y-4">
-        <UInput
+        <PasswordField
           v-model="newPassword"
-          type="password"
-          placeholder="كلمة المرور الجديدة"
-          size="lg"
-          icon="i-heroicons-lock-closed"
-          class="w-full"
+          @generate="confirmPassword = $event"
         />
         <UInput
           v-model="confirmPassword"
@@ -133,6 +129,12 @@
           class="w-full"
         />
         <p
+          v-if="newPassword && !isStrongPassword"
+          class="text-xs text-error-600"
+        >
+          يجب أن تحتوي على حرف كبير وصغير ورقم ورمز (٨ أحرف على الأقل)
+        </p>
+        <p
           v-if="confirmPassword && newPassword !== confirmPassword"
           class="text-xs text-error-600"
         >
@@ -142,7 +144,7 @@
           block
           size="lg"
           :loading="loading"
-          :disabled="!newPassword || newPassword !== confirmPassword"
+          :disabled="!isStrongPassword || newPassword !== confirmPassword"
           @click="onChangePassword"
         >
           تغيير كلمة المرور
@@ -155,6 +157,7 @@
 <script setup lang="ts">
 import { authService } from '@/services/api/auth.service'
 import { showToast } from '@/utils/helpers/toast.helper'
+import { strongPassword } from '@/schemas/auth'
 
 definePageMeta({ layout: 'auth', middleware: 'guest' })
 useSeoMeta({ title: 'استعادة كلمة المرور | A Plus' })
@@ -170,6 +173,7 @@ const maskedEmail = ref('')
 const otpToken = ref((route.query.token as string) || '')
 const newPassword = ref('')
 const confirmPassword = ref('')
+const isStrongPassword = computed(() => strongPassword.safeParse(newPassword.value).success)
 
 // Watch query changes (OTP redirects back here with step=4)
 watch(

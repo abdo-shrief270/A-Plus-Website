@@ -57,6 +57,12 @@ export const questionsService = {
     return axios.get(`/${VERSION}/categories/${categoryId}/questions`, { params })
   },
 
+  /** DELETE /v2/categories/{category}/answers - Reset saved answers for a category */
+  resetCategoryAnswers: (categoryId: number | string) => {
+    const axios = createAxiosInstance()
+    return axios.delete(`/${VERSION}/categories/${categoryId}/answers`)
+  },
+
   /** GET /v2/categories/{id}/articles - Get Articles by Category (المقالات التابعة لتصنيف) */
   getCategoryArticles: (categoryId: number | string) => {
     const axios = createAxiosInstance()

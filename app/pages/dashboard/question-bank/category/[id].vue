@@ -137,6 +137,17 @@
               </p>
             </div>
           </div>
+          <UButton
+            v-if="questions.length"
+            color="error"
+            variant="soft"
+            size="sm"
+            icon="i-heroicons-arrow-path"
+            :loading="resetting"
+            @click="resetOpen = true"
+          >
+            إعادة تعيين الإجابات
+          </UButton>
         </div>
 
         <div
@@ -219,12 +230,43 @@
         </div>
       </section>
     </div>
+
+    <!-- Reset saved answers confirm -->
+    <UModal v-model:open="resetOpen">
+      <template #content>
+        <div class="p-6">
+          <h3 class="text-lg font-bold text-gray-900 mb-2">
+            إعادة تعيين الإجابات
+          </h3>
+          <p class="text-sm text-gray-600 mb-6">
+            سيتم مسح إجاباتك المحفوظة في هذا التصنيف فقط (لن يتم خصم النقاط المكتسبة). هل تريد المتابعة؟
+          </p>
+          <div class="flex justify-end gap-2">
+            <UButton
+              color="neutral"
+              variant="soft"
+              @click="resetOpen = false"
+            >
+              إلغاء
+            </UButton>
+            <UButton
+              color="error"
+              :loading="resetting"
+              @click="confirmReset"
+            >
+              إعادة التعيين
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { questionsService } from '@/services/api/questions.service'
 import { renderMarkdown } from '@/utils/markdown'
+import { showToast } from '@/utils/helpers/toast.helper'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth'], title: 'تصنيف' })
 
@@ -261,10 +303,27 @@ const loadingArticles = ref(false)
 const loadingQuestions = ref(false)
 const currentPage = ref(1)
 
+const resetOpen = ref(false)
+const resetting = ref(false)
+
 watch(id, () => {
   currentPage.value = 1
   load()
 })
+
+async function confirmReset() {
+  resetting.value = true
+  try {
+    await questionsService.resetCategoryAnswers(id.value)
+    resetOpen.value = false
+    showToast('تم إعادة تعيين إجابات هذا التصنيف', undefined, 'success')
+    await loadQuestions(currentPage.value)
+  } catch {
+    showToast('تعذّر إعادة التعيين', undefined, 'error')
+  } finally {
+    resetting.value = false
+  }
+}
 
 async function loadArticles() {
   loadingArticles.value = true

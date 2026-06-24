@@ -521,6 +521,7 @@ interface QuestionDetail {
     article?: { id: number, title: string } | null
   } | null
   is_bookmarked?: boolean
+  student_answer?: { answer_id: number, is_correct: boolean } | null
 }
 
 const loading = ref(true)
@@ -645,6 +646,16 @@ async function loadQuestion() {
     const data = res.data?.data ?? res.data ?? {}
     question.value = data.question ?? null
     bookmarked.value = !!question.value?.is_bookmarked
+
+    // Restore the student's previous answer so reopening shows their result.
+    reset()
+    const sa = question.value?.student_answer
+    if (sa) {
+      selectedAnswerId.value = sa.answer_id
+      isCorrect.value = sa.is_correct
+      submitted.value = true
+      correctAnswerId.value = sa.is_correct ? sa.answer_id : null
+    }
   } catch (err) {
     console.error('Failed to load question', err)
     question.value = null
