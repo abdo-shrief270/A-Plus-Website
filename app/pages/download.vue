@@ -238,7 +238,7 @@ definePageMeta({
 })
 
 // ── Release config ────────────────────────────────────────────────
-const APP_VERSION = '1.0.0'
+const APP_VERSION = '1.1.0'
 // Flip to true and set PLAY_URL once the app is live on Google Play.
 const PLAY_LIVE = false
 const PLAY_URL = 'https://play.google.com/store/apps/details?id=com.aplus.aplus_app_final'
