@@ -21,6 +21,37 @@
       </UButton>
     </div>
 
+    <!-- Cooldown setting (hours/days before a wrong answer is due again) -->
+    <div class="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+      <UIcon
+        name="i-heroicons-clock"
+        class="h-5 w-5 text-primary-600"
+      />
+      <span class="text-sm font-semibold text-gray-700">يُعاد عرض السؤال الخاطئ بعد</span>
+      <UInput
+        v-model.number="cooldownValue"
+        type="number"
+        :min="1"
+        size="sm"
+        class="w-20"
+      />
+      <USelect
+        v-model="cooldownUnit"
+        :items="unitItems"
+        value-key="value"
+        size="sm"
+        class="w-28"
+      />
+      <UButton
+        size="sm"
+        :loading="savingSettings"
+        :disabled="!cooldownValue || cooldownValue < 1"
+        @click="saveSettings"
+      >
+        حفظ
+      </UButton>
+    </div>
+
     <!-- Loading -->
     <div
       v-if="loading && !queue.length"
@@ -154,6 +185,7 @@
 import QuestionItem from '@/components/question/QuestionItem.vue'
 import { reviewService } from '@/services/api/review.service'
 import { formatNumber } from '@/utils/number'
+import { showToast } from '@/utils/helpers/toast.helper'
 import type { Question, QuestionSubmissionResult } from '@/types/question-bank'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth'], title: 'مراجعة الأخطاء' })
@@ -169,6 +201,38 @@ interface ReviewSummary {
 const loading = ref(true)
 const queue = ref<Question[]>([])
 const summary = ref<ReviewSummary | null>(null)
+
+// Wrong-answer cooldown setting (hours/days)
+const cooldownValue = ref(1)
+const cooldownUnit = ref<'hours' | 'days'>('days')
+const savingSettings = ref(false)
+const unitItems = [
+  { label: 'يوم', value: 'days' },
+  { label: 'ساعة', value: 'hours' }
+]
+
+async function loadSettings() {
+  try {
+    const res = await reviewService.getSettings()
+    const d = res.data?.data ?? {}
+    cooldownUnit.value = d.cooldown_unit ?? 'days'
+    cooldownValue.value = d.cooldown_value ?? 1
+  } catch { /* keep defaults */ }
+}
+
+async function saveSettings() {
+  if (!cooldownValue.value || cooldownValue.value < 1) return
+  savingSettings.value = true
+  try {
+    await reviewService.updateSettings({ cooldown_value: cooldownValue.value, cooldown_unit: cooldownUnit.value })
+    showToast('تم حفظ مدة الانتظار', undefined, 'success')
+    await load()
+  } catch {
+    showToast('تعذّر حفظ الإعداد', undefined, 'error')
+  } finally {
+    savingSettings.value = false
+  }
+}
 
 const sessionIndex = ref(0)
 const sessionTotal = ref(0)
@@ -219,5 +283,8 @@ const nextDueLabel = computed(() => {
   return `خلال ${Math.ceil(hours / 24)} يوم`
 })
 
-onMounted(load)
+onMounted(() => {
+  load()
+  loadSettings()
+})
 </script>

@@ -24,6 +24,14 @@ export interface LadderLeague {
   is_current: boolean
 }
 
+export interface LeaderboardWeek {
+  offset: number
+  start: string
+  end: string
+  is_current: boolean
+  label: string
+}
+
 export interface LeaderboardData {
   period: 'week' | 'all'
   league: LeagueInfo
@@ -35,4 +43,6 @@ export interface LeaderboardData {
   }
   top: LeaderboardRow[]
   ladder: LadderLeague[]
+  week?: LeaderboardWeek | null
+  weeks?: LeaderboardWeek[]
 }

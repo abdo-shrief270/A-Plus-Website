@@ -61,7 +61,8 @@ export const useDashboardNav = (): ComputedRef<NavSection[]> => {
           { label: 'اختباراتي الذاتية', icon: 'i-heroicons-puzzle-piece', to: '/dashboard/quizzes' },
           { label: 'مراجعة الأخطاء', icon: 'i-heroicons-arrow-path-rounded-square', to: '/dashboard/review' },
           { label: 'تحليل الأداء', icon: 'i-heroicons-chart-bar', to: '/dashboard/performance' },
-          { label: 'المتصدرين', icon: 'i-heroicons-trophy', to: '/dashboard/leaderboard' }
+          { label: 'المتصدرين', icon: 'i-heroicons-trophy', to: '/dashboard/leaderboard' },
+          { label: 'سجل النقاط', icon: 'i-heroicons-sparkles', to: '/dashboard/points' }
         ]
       })
       sections.push({

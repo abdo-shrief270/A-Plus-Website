@@ -27,6 +27,19 @@
       </div>
     </div>
 
+    <!-- Week selector (history) -->
+    <div
+      v-if="period === 'week' && (data?.weeks?.length ?? 0) > 1"
+      class="mb-4"
+    >
+      <USelect
+        v-model="weekOffset"
+        :items="weekItems"
+        value-key="value"
+        class="w-full sm:w-72"
+      />
+    </div>
+
     <!-- Loading -->
     <div
       v-if="loading && !data"
@@ -288,8 +301,13 @@ const periods = [
 ]
 
 const period = ref<'week' | 'all'>('week')
+const weekOffset = ref(0)
 const loading = ref(true)
 const data = ref<LeaderboardData | null>(null)
+
+const weekItems = computed(() =>
+  (data.value?.weeks ?? []).map(w => ({ label: w.label, value: w.offset }))
+)
 
 const myInitial = computed(() =>
   authStore.getUser?.name?.charAt(0)?.toUpperCase() ?? 'أ'
@@ -304,7 +322,7 @@ const nextLeagueProgress = computed(() => {
 async function load() {
   loading.value = true
   try {
-    const res = await leaderboardService.get(period.value)
+    const res = await leaderboardService.get(period.value, weekOffset.value)
     data.value = res.data?.data ?? null
   } catch (err) {
     console.error('Failed to load leaderboard', err)
@@ -317,8 +335,11 @@ async function load() {
 function setPeriod(p: 'week' | 'all') {
   if (period.value === p) return
   period.value = p
+  weekOffset.value = 0
   load()
 }
+
+watch(weekOffset, load)
 
 onMounted(load)
 </script>
